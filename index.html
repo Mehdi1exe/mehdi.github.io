@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>GAMING | Rennspiel + Klick-Challenge</title>
+    <title> Gamer & Developer</title>
     <style>
         * {
             margin: 0;
@@ -12,199 +12,177 @@
         }
 
         body {
-            background: #0a0014;
-            color: #f0f0f0;
-            font-family: 'Segoe UI', 'Arial', sans-serif;
-            text-align: center;
-            overflow-x: hidden;
+            background: radial-gradient(circle at 10% 20%, #0a0f1e, #03050b);
+            color: #eef;
+            font-family: 'Segoe UI', 'Poppins', 'Arial', sans-serif;
+            line-height: 1.5;
+            scroll-behavior: smooth;
         }
 
+        /* Neon-Glow Effekte */
+        .glow-text {
+            text-shadow: 0 0 8px #00eaff, 0 0 20px #00eaff66;
+        }
+
+        /* Navigationsleiste */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px 10%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
+            background: rgba(5, 10, 20, 0.7);
+            backdrop-filter: blur(12px);
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid rgba(138, 43, 226, 0.5);
-            flex-wrap: wrap;
+            border-bottom: 1px solid #00eaff33;
         }
-
         .logo {
             font-size: 28px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #00eaff, #8a2be2);
+            font-weight: 800;
+            background: linear-gradient(135deg, #00eaff, #aa66ff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            letter-spacing: 2px;
         }
-
         .nav-links a {
             color: #ddd;
             text-decoration: none;
             margin-left: 30px;
-            font-size: 18px;
+            font-size: 1rem;
             transition: 0.3s;
+            font-weight: 500;
         }
-
         .nav-links a:hover {
             color: #00eaff;
             text-shadow: 0 0 6px #00eaff;
         }
 
+        /* Hero Section */
         .hero {
-            padding: 60px 20px 80px;
-            background: radial-gradient(circle at 20% 30%, #120024, #00040a);
-            border-bottom: 2px solid rgba(0, 234, 255, 0.2);
+            text-align: center;
+            padding: 120px 20px 100px;
         }
-
-        h1 {
-            font-size: clamp(2rem, 7vw, 4rem);
+        .hero .badge {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
             color: #00eaff;
-            text-shadow: 0 0 15px #00eaff, 0 0 30px #8a2be2;
+            margin-bottom: 20px;
         }
-
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        .hero h1 span {
+            background: linear-gradient(135deg, #fff, #00eaff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
         .hero p {
             font-size: 1.2rem;
-            margin: 20px 0 30px;
-            color: #ccc;
+            max-width: 600px;
+            margin: 20px auto;
+            color: #bbb;
         }
-
-        .btn-game {
+        .btn-group {
+            margin-top: 30px;
+        }
+        .btn {
+            display: inline-block;
             background: linear-gradient(135deg, #8a2be2, #5a1a9e);
             color: white;
-            padding: 14px 30px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
+            padding: 12px 28px;
+            border-radius: 40px;
+            text-decoration: none;
             font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 18px #8a2be2;
+            margin: 0 8px;
             transition: 0.25s;
-            margin: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
         }
-
-        .btn-game:hover {
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #00eaff;
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            background: #00eaff22;
+            transform: scale(1.05);
+        }
+        .btn:hover {
             transform: scale(1.05);
             background: #00eaff;
-            box-shadow: 0 0 28px #00eaff;
             color: #0a0014;
+            box-shadow: 0 0 15px #00eaff;
         }
 
-        .btn-stop {
-            background: #2c1a3a;
-            box-shadow: 0 0 8px #aa66ff;
+        /* Sektionen allgemein */
+        section {
+            padding: 80px 10%;
+        }
+        .section-title {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(135deg, #fff, #00eaff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        .btn-stop:hover {
-            background: #ff4444;
-            box-shadow: 0 0 20px #ff4444;
-            color: white;
-        }
-
-        /* ----- Rennspiel-Container ----- */
-        #gameContainer {
-            display: none;
-            margin: 40px auto;
-            width: 90%;
-            max-width: 1100px;
-            background: #000000aa;
-            border-radius: 32px;
-            padding: 20px;
-            backdrop-filter: blur(4px);
-            border: 1px solid #8a2be2;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        #canvas3d {
-            width: 100%;
-            height: 550px;
-            border-radius: 24px;
-            display: block;
-            background: #0a1a2a;
-        }
-
-        .game-info {
-            font-size: 1.2rem;
-            color: #00eaff;
-            display: flex;
-            gap: 40px;
-            justify-content: center;
-        }
-
-        .score {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: #000000aa;
-            padding: 5px 15px;
-            border-radius: 30px;
-        }
-
-        .game-over-msg {
-            font-size: 1.5rem;
-            color: #ff6666;
-            text-shadow: 0 0 10px red;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.7; transform: scale(1);}
-            100% { opacity: 1; transform: scale(1.05);}
-        }
-
-        /* ----- Bestenlisten nebeneinander ----- */
-        .leaderboards {
+        /* Über Mich Karten */
+        .about-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 30px;
-            margin: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .leaderboard {
-            background: rgba(0, 0, 0, 0.7);
+        .about-card {
+            background: rgba(20, 25, 45, 0.7);
             backdrop-filter: blur(8px);
             border-radius: 28px;
-            padding: 20px;
-            width: 320px;
-            border: 1px solid #ffaa44;
+            padding: 30px 25px;
+            width: 240px;
+            text-align: center;
+            border: 1px solid #00eaff33;
+            transition: 0.3s;
         }
-        .leaderboard h2 {
-            color: #ffaa44;
+        .about-card:hover {
+            transform: translateY(-8px);
+            border-color: #00eaff;
+            box-shadow: 0 10px 25px #00eaff22;
+        }
+        .about-card .icon {
+            font-size: 2.5rem;
             margin-bottom: 15px;
-            font-size: 1.6rem;
         }
-        .leaderboard ol {
-            padding-left: 25px;
-            text-align: left;
-            color: #ddd;
-        }
-        .leaderboard li {
-            margin: 8px 0;
-            font-size: 1rem;
-        }
-        .leaderboard small {
-            color: #aaa;
+        .about-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #00eaff;
         }
 
-        /* ----- Klick-Challenge Bereich ----- */
-        .click-challenge {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 32px;
-            padding: 25px 20px;
+        /* Klick-Challenge Sektion */
+        .click-section {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 48px;
             margin: 40px auto;
-            max-width: 550px;
+            padding: 40px 20px;
+            max-width: 700px;
+            backdrop-filter: blur(4px);
             border: 1px solid #ffaa44;
-            backdrop-filter: blur(8px);
         }
-        .click-challenge h2 {
-            font-size: 1.8rem;
-            color: #ffaa44;
-            margin-bottom: 15px;
+        .click-challenge {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            border: none;
         }
         .click-area {
             margin: 20px 0;
@@ -214,21 +192,20 @@
             width: 180px;
             height: 180px;
             border-radius: 50%;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: bold;
             color: white;
             border: none;
             cursor: pointer;
             box-shadow: 0 0 30px #ff6600;
             transition: 0.05s linear;
-            touch-action: manipulation;
         }
         .click-btn:active {
             transform: scale(0.95);
             background: #ffaa00;
         }
         .timer {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-family: monospace;
             background: #000000aa;
             display: inline-block;
@@ -246,517 +223,168 @@
             border: none;
             text-align: center;
             font-size: 1rem;
-            width: 200px;
+            width: 220px;
             margin: 10px;
+            background: #111;
+            color: white;
+        }
+        .leaderboard {
+            background: rgba(0,0,0,0.6);
+            border-radius: 24px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .leaderboard h3 {
+            color: #ffaa44;
+            margin-bottom: 10px;
+        }
+        .leaderboard ol {
+            padding-left: 25px;
         }
 
-        .cards-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
+        /* Kontakt / Footer */
+        .contact-area {
+            text-align: center;
         }
-        .card {
-            background: rgba(17, 17, 34, 0.85);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(138, 43, 226, 0.5);
-            border-radius: 32px;
-            padding: 25px 20px;
-            width: 280px;
-        }
-        .card h2 {
+        .social-icons a {
+            color: #ccc;
             font-size: 1.8rem;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #e0e0ff, #aa88ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            margin: 0 15px;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+        .social-icons a:hover {
+            color: #00eaff;
+            text-shadow: 0 0 8px #00eaff;
         }
         footer {
-            margin-top: 60px;
-            padding: 30px 20px;
-            background: #05000c;
-            border-top: 1px solid #2a1a4a;
+            text-align: center;
+            padding: 30px;
             font-size: 0.8rem;
+            border-top: 1px solid #00eaff33;
         }
-        .left-bottom-card {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(12px);
-            border-left: 4px solid #00eaff;
-            border-radius: 16px;
-            padding: 12px 18px;
-            width: 200px;
-            text-align: left;
-            z-index: 999;
-            font-size: 0.8rem;
-        }
+
         @media (max-width: 700px) {
-            .leaderboards { flex-direction: column; align-items: center; }
-            .click-btn { width: 130px; height: 130px; font-size: 1.8rem; }
-            #canvas3d { height: 300px; }
+            .navbar { flex-direction: column; gap: 15px; }
+            .nav-links a { margin: 0 15px; }
+            .hero { padding: 80px 20px; }
+            section { padding: 50px 5%; }
+            .click-btn { width: 130px; height: 130px; font-size: 1.6rem; }
         }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
-    <div class="logo">⚡ GAMING ⚡</div>
+    <div class="logo">⚡ gaming ⚡</div>
     <div class="nav-links">
-        <a href="#">🏠 Home</a>
-        <a href="#">🎮 Rennspiel</a>
-        <a href="#">🖱️ Klick-Challenge</a>
+        <a href="#home">HOME</a>
+        <a href="#about">ABOUT</a>
+        <a href="#skills">SKILLS</a>
+        <a href="#click-game">KLICK-SPIEL</a>
+        <a href="#contact">CONTACT</a>
     </div>
 </nav>
 
-<section class="hero">
-    <h1>RENNSPIEL + KLICK-CHALLENGE</h1>
-    <p>🚗 Rennspiel (nur PC mit Pfeiltasten) & 🖱️ Klick-Challenge (50 Sek.)</p>
-    <button class="btn-game" id="startGameBtn">▶ START RENNSPIEL</button>
-</section>
-
 <main>
-    <div class="cards-container">
-        <div class="card">
-            <h2>🏎️ Rennspiel</h2>
-            <p>Weiche den Bäumen aus. Steuere mit ← → (nur Tastatur). Nach Game Over: Name eintragen für Bestenliste.</p>
+    <!-- Hero Bereich -->
+    <section id="home" class="hero">
+        <div class="badge">GAMER • DEVELOPER • CREATOR</div>
+        <h1>WILLKOMMEN <span>AUF MEINER WEBSITE</span></h1>
+        <p> hier könnt ihr klicken😊<br> und kucken wer der beste ist.</p>
+        <div class="btn-group">
+            <a href="#click-game" class="btn">KLICK-CHALLENGE</a>
+            <a href="#about" class="btn btn-outline">ÜBER MICH</a>
         </div>
-        <div class="card">
-            <h2>🖱️ Klick-Challenge</h2>
-            <p>50 Sekunden – so oft wie möglich klicken! Name eintragen und Bestenliste toppen.</p>
-        </div>
-    </div>
+    </section>
 
-    <!-- RENNSPIEL BEREICH (exakt dein Code, aber mit Bestenliste) -->
-    <div id="gameContainer">
-        <canvas id="canvas3d"></canvas>
-        <div class="game-info">
-            <span>🚗 Steuere mit ← →</span>
-            <span class="score" id="scoreDisplay">Score: 0</span>
-        </div>
-        <div id="gameOverMsg" class="game-over-msg" style="display: none;">💥 GAME OVER! 💥</div>
-        <button class="btn-game" id="restartGameBtn" style="display: none;">🔄 Neustart</button>
-        <button class="btn-game btn-stop" id="stopGameBtn">⏹️ Spiel beenden</button>
-    </div>
-
-    <!-- Zwei Bestenlisten nebeneinander -->
-    <div class="leaderboards">
-        <div class="leaderboard">
-            <h2>🏆 RENNSPIEL - HIGHSCORES</h2>
-            <ol id="racingLeaderboardList">
-                <li>Noch keine Einträge</li>
-            </ol>
-            <small>Deine besten Punktzahlen (lokal gespeichert)</small>
-        </div>
-        <div class="leaderboard">
-            <h2>🏆 KLICK-CHALLENGE - TOP 5</h2>
-            <ol id="clickLeaderboardList">
-                <li>Noch keine Einträge</li>
-            </ol>
-            <small>Meiste Klicks in 50 Sekunden</small>
-        </div>
-    </div>
-
-    <!-- KLICK-CHALLENGE Bereich -->
-    <div class="click-challenge" id="clickChallengeArea">
-        <h2>🖱️ KLICK-CHALLENGE (50 Sek.)</h2>
-        <div>
-            <input type="text" id="playerName" class="name-input" placeholder="Dein Name" maxlength="20">
-            <button id="startClickGameBtn" class="btn-game">▶ START KLICKEN</button>
-        </div>
-        <div id="clickGamePanel" style="display: none;">
-            <div class="timer" id="timerDisplay">50.0 s</div>
-            <div class="score-board" id="clickScore">Klicks: 0</div>
-            <div class="click-area">
-                <button id="clickButton" class="click-btn">👆 KLICK</button>
+    <!-- Über Mich Sektion (4 Karten) -->
+    <section id="about">
+        <h2 class="section-title">ÜBER MICH</h2>
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="icon">🎮</div>
+                <h3>GAMING</h3>
+                <p>Ich mache neue spiele.</p>
             </div>
-            <button id="resetClickBtn" class="btn-game btn-stop">🔄 Zurück</button>
+            <div class="about-card">
+                <div class="icon">💻</div>
+                <h3>PROGRAMMIEREN</h3>
+                <p>Ich entwickle meine Website.</p>
+            </div>
+            <div class="about-card">
+                <div class="icon">✨</div>
+                <h3>KREATIVITÄT</h3>
+                <p> .</p>
+            </div>
+            <div class="about-card">
+                <div class="icon">🎯</div>
+                <h3>ZIELE</h3>
+                <p>Immer besser werden und meine Ziele erreichen.</p>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Skills Bereich (optional) -->
+    <section id="skills">
+        <h2 class="section-title">MEINE SKILLS</h2>
+        <div class="about-grid">
+            <div class="about-card"><h3>HTML/CSS</h3><p>Moderne Layouts, Responsive Design</p></div>
+            <div class="about-card"><h3>JavaScript</h3><p>Interaktive Web-Apps & Games</p></div>
+            <div class="about-card"><h3>Three.js</h3><p>3D-Erfahrungen im Browser</p></div>
+            <div class="about-card"><h3>UI/UX</h3><p>Kreative & benutzerfreundliche Designs</p></div>
+        </div>
+    </section>
+
+    <!-- KLICK-CHALLENGE Bereich (das Spiel bleibt) -->
+    <section id="click-game">
+        <h2 class="section-title">🖱️ KLICK-CHALLENGE</h2>
+        <div class="click-section">
+            <div class="click-challenge">
+                <div>
+                    <input type="text" id="playerName" class="name-input" placeholder="Dein Name" maxlength="20">
+                    <button id="startClickGameBtn" class="btn">▶ START KLICKEN</button>
+                </div>
+                <div id="clickGamePanel" style="display: none;">
+                    <div class="timer" id="timerDisplay">50.0 s</div>
+                    <div class="score-board" id="clickScore">Klicks: 0</div>
+                    <div class="click-area">
+                        <button id="clickButton" class="click-btn">👆 KLICK</button>
+                    </div>
+                    <button id="resetClickBtn" class="btn btn-outline" style="margin-top:15px;">🔄 Zurück</button>
+                </div>
+                <div class="leaderboard" id="leaderboardDiv">
+                    <h3>🏆 BESTENLISTE (Top 5)</h3>
+                    <ol id="leaderboardList">
+                        <li>Noch keine Einträge</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Kontakt Sektion -->
+    <section id="contact">
+        <h2 class="section-title">KONTAKT</h2>
+        <div class="contact-area">
+            <p>Du hast eine Idee oder ein Projekt? Schreib mir gerne!</p>
+            <div class="social-icons" style="margin: 25px 0;">
+                <a href="#">🐦 Twitter</a>
+                <a href="#">📺 Twitch</a>
+                <a href="#">💬 Discord</a>
+                <a href="#">📧 Email</a>
+            </div>
+        </div>
+    </section>
 </main>
 
 <footer>
-    <p>© 2025 GAMING – Rennspiel (PC) + Klick-Challenge (Touch & Maus)</p>
+    <p>© 2025 MEHDI – Level up your life!</p>
 </footer>
 
-<div class="left-bottom-card">
-    <h3>📌 Info</h3>
-    <p>Rennspiel nur mit Tastatur (← →)<br>Klick-Challenge: Klicken oder Tippen</p>
-</div>
-
-<script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
-        }
-    }
-</script>
-
-<script type="module">
-    import * as THREE from 'three';
-
-    // ==================== RENNSPIEL (dein Code, erweitert um Bestenliste) ====================
-    const gameContainer = document.getElementById('gameContainer');
-    const startBtn = document.getElementById('startGameBtn');
-    const stopBtn = document.getElementById('stopGameBtn');
-    const restartGameBtn = document.getElementById('restartGameBtn');
-    const gameOverMsgDiv = document.getElementById('gameOverMsg');
-    const scoreSpan = document.getElementById('scoreDisplay');
-    const canvas = document.getElementById('canvas3d');
-
-    let scene, camera, renderer, car, obstacles = [], roadSegments = [];
-    let isGameRunning = false, gameOverFlag = false, score = 0, currentSpeed = 0.22, baseSpeed = 0.22;
-    let animationId = null;
-    let leftPressed = false, rightPressed = false, carX = 0;
-    const minX = -2.8, maxX = 2.8;
-    const roadLength = 30, obstacleSpawnDistance = 25;
-    let cameraHelper, threeInit = false;
-    let lastScoreUpdate = 0;
-
-    // Bestenliste Rennspiel (lokal)
-    let racingLeaderboard = [];
-    const racingLeaderboardList = document.getElementById('racingLeaderboardList');
-    function loadRacingLeaderboard() {
-        const stored = localStorage.getItem('racingLeaderboard');
-        racingLeaderboard = stored ? JSON.parse(stored) : [];
-        renderRacingLeaderboard();
-    }
-    function saveRacingLeaderboard() { localStorage.setItem('racingLeaderboard', JSON.stringify(racingLeaderboard)); }
-    function addRacingScore(name, scoreVal) {
-        if (!name.trim()) name = "Fahrer";
-        racingLeaderboard.push({ name: name.substring(0,20), score: Math.floor(scoreVal) });
-        racingLeaderboard.sort((a,b) => b.score - a.score);
-        racingLeaderboard = racingLeaderboard.slice(0,5);
-        saveRacingLeaderboard();
-        renderRacingLeaderboard();
-    }
-    function renderRacingLeaderboard() {
-        racingLeaderboardList.innerHTML = '';
-        if (racingLeaderboard.length === 0) {
-            racingLeaderboardList.innerHTML = '<li>Noch keine Einträge</li>';
-            return;
-        }
-        racingLeaderboard.forEach(entry => {
-            const li = document.createElement('li');
-            li.textContent = `${entry.name}: ${entry.score} Punkte`;
-            racingLeaderboardList.appendChild(li);
-        });
-    }
-
-    // --- Deine ursprünglichen Funktionen (unverändert) ---
-    function init3D() {
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a2a2a);
-        scene.fog = new THREE.FogExp2(0x0a2a2a, 0.008);
-        
-        camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 200);
-        camera.position.set(0, 5, 12);
-        camera.lookAt(0, 0, 0);
-        
-        renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-        renderer.shadowMap.enabled = true;
-        
-        const ambient = new THREE.AmbientLight(0x404060);
-        scene.add(ambient);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        dirLight.position.set(5, 12, 8);
-        dirLight.castShadow = true;
-        dirLight.receiveShadow = true;
-        dirLight.shadow.mapSize.width = 1024;
-        dirLight.shadow.mapSize.height = 1024;
-        scene.add(dirLight);
-        const fillLight = new THREE.PointLight(0x4466cc, 0.5);
-        fillLight.position.set(0, 4, -5);
-        scene.add(fillLight);
-        
-        const ground = new THREE.Mesh(
-            new THREE.PlaneGeometry(40, 200),
-            new THREE.MeshStandardMaterial({ color: 0x2a5a2a, roughness: 0.9 })
-        );
-        ground.rotation.x = -Math.PI/2;
-        ground.position.y = -0.2;
-        ground.receiveShadow = true;
-        scene.add(ground);
-        
-        car = new THREE.Group();
-        const bodyGeo = new THREE.BoxGeometry(1.0, 0.4, 2.0);
-        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xe34234, metalness: 0.7, roughness: 0.3 });
-        const body = new THREE.Mesh(bodyGeo, bodyMat);
-        body.castShadow = true;
-        body.receiveShadow = true;
-        body.position.y = 0.2;
-        car.add(body);
-        
-        const roofGeo = new THREE.BoxGeometry(0.8, 0.3, 1.2);
-        const roofMat = new THREE.MeshStandardMaterial({ color: 0xcc5533 });
-        const roof = new THREE.Mesh(roofGeo, roofMat);
-        roof.position.y = 0.55;
-        roof.castShadow = true;
-        car.add(roof);
-        
-        const windowMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, emissive: 0x224466 });
-        const frontWind = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 0.1), windowMat);
-        frontWind.position.set(0, 0.5, 0.85);
-        car.add(frontWind);
-        const rearWind = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 0.1), windowMat);
-        rearWind.position.set(0, 0.5, -0.85);
-        car.add(rearWind);
-        
-        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.3 });
-        const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.3, 16);
-        const wheelPos = [[-0.7, 0.12, 0.85], [0.7, 0.12, 0.85], [-0.7, 0.12, -0.85], [0.7, 0.12, -0.85]];
-        wheelPos.forEach(pos => {
-            const wheel = new THREE.Mesh(wheelGeo, wheelMat);
-            wheel.rotation.z = Math.PI/2;
-            wheel.position.set(pos[0], pos[1], pos[2]);
-            wheel.castShadow = true;
-            car.add(wheel);
-        });
-        car.position.y = 0.1;
-        car.castShadow = true;
-        scene.add(car);
-        
-        function createRoadSegment(zPos) {
-            const group = new THREE.Group();
-            const roadMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.6 });
-            const roadPlane = new THREE.Mesh(new THREE.PlaneGeometry(6, roadLength), roadMat);
-            roadPlane.rotation.x = -Math.PI/2;
-            roadPlane.position.y = -0.05;
-            roadPlane.receiveShadow = true;
-            group.add(roadPlane);
-            
-            const stripeMat = new THREE.MeshStandardMaterial({ color: 0xffcc44 });
-            for (let i = -roadLength/2 + 1; i < roadLength/2; i+= 1.8) {
-                const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.05, 0.6), stripeMat);
-                stripe.position.set(0, 0.02, i);
-                stripe.castShadow = false;
-                group.add(stripe);
-            }
-            const edgeMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
-            const leftEdge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, roadLength), edgeMat);
-            leftEdge.position.set(-2.95, 0.02, 0);
-            group.add(leftEdge);
-            const rightEdge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, roadLength), edgeMat);
-            rightEdge.position.set(2.95, 0.02, 0);
-            group.add(rightEdge);
-            
-            group.position.z = zPos;
-            return group;
-        }
-        
-        for (let i = -2; i <= 2; i++) {
-            const seg = createRoadSegment(i * roadLength);
-            scene.add(seg);
-            roadSegments.push(seg);
-        }
-        
-        function updateCamera() {
-            camera.position.x += (car.position.x - camera.position.x) * 0.1;
-            camera.lookAt(car.position.x, 0.5, 0);
-        }
-        return { updateCamera };
-    }
-    
-    function createTree(x, z) {
-        const group = new THREE.Group();
-        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B5A2B, roughness: 0.8 });
-        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 1.0, 6), trunkMat);
-        trunk.position.y = 0.5;
-        trunk.castShadow = true;
-        group.add(trunk);
-        const leafMat = new THREE.MeshStandardMaterial({ color: 0x3c9e3c });
-        const foliage1 = new THREE.Mesh(new THREE.ConeGeometry(0.6, 0.8, 8), leafMat);
-        foliage1.position.y = 1.0;
-        foliage1.castShadow = true;
-        group.add(foliage1);
-        const foliage2 = new THREE.Mesh(new THREE.ConeGeometry(0.5, 0.7, 8), leafMat);
-        foliage2.position.y = 1.5;
-        foliage2.castShadow = true;
-        group.add(foliage2);
-        group.position.set(x, 0, z);
-        return group;
-    }
-    
-    function spawnObstacle(zPos) {
-        const xPos = (Math.random() - 0.5) * 5.0;
-        const clampedX = Math.min(maxX - 0.5, Math.max(minX + 0.5, xPos));
-        const tree = createTree(clampedX, zPos);
-        scene.add(tree);
-        obstacles.push({ mesh: tree, collisionRadius: 0.7, x: clampedX, z: zPos });
-    }
-    
-    function updateObstacles(speed) {
-        for (let i = 0; i < obstacles.length; i++) {
-            obstacles[i].z -= speed;
-            obstacles[i].mesh.position.z = obstacles[i].z;
-        }
-        obstacles = obstacles.filter(obs => {
-            if (obs.z < -12) {
-                scene.remove(obs.mesh);
-                return false;
-            }
-            return true;
-        });
-    }
-    
-    function manageObstacleSpawning() {
-        if (!isGameRunning) return;
-        let maxZ = -30;
-        for (let obs of obstacles) if (obs.z > maxZ) maxZ = obs.z;
-        while (maxZ < 20) {
-            const newZ = maxZ + obstacleSpawnDistance;
-            spawnObstacle(newZ);
-            maxZ = newZ;
-        }
-    }
-    
-    function updateRoad(speed) {
-        for (let seg of roadSegments) seg.position.z -= speed;
-        for (let i = 0; i < roadSegments.length; i++) {
-            if (roadSegments[i].position.z < -roadLength)
-                roadSegments[i].position.z += roadLength * roadSegments.length;
-        }
-    }
-    
-    function checkCollisions() {
-        const carRadius = 0.6;
-        for (let obs of obstacles) {
-            const dx = car.position.x - obs.x;
-            const dz = 0 - obs.z;
-            if (Math.hypot(dx, dz) < carRadius + obs.collisionRadius) {
-                gameOver();
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    function updateScore(speed) {
-        if (!isGameRunning) return;
-        score += speed * 2;
-        scoreSpan.innerText = `Score: ${Math.floor(score)}`;
-        if (Math.floor(score) > lastScoreUpdate + 200) {
-            lastScoreUpdate = Math.floor(score);
-            currentSpeed = Math.min(0.55, currentSpeed + 0.02);
-        }
-    }
-    
-    function gameOver() {
-        if (!isGameRunning) return;
-        isGameRunning = false;
-        gameOverFlag = true;
-        gameOverMsgDiv.style.display = 'block';
-        restartGameBtn.style.display = 'inline-block';
-        if (animationId) cancelAnimationFrame(animationId);
-        animationId = null;
-        
-        const finalScore = Math.floor(score);
-        const playerName = prompt(`Game Over! Du hast ${finalScore} Punkte erreicht.\nGib deinen Namen für die Bestenliste ein:`, "Fahrer");
-        if (playerName !== null) addRacingScore(playerName, finalScore);
-    }
-    
-    function restartGame() {
-        for (let obs of obstacles) scene.remove(obs.mesh);
-        obstacles = [];
-        score = 0;
-        scoreSpan.innerText = "Score: 0";
-        currentSpeed = baseSpeed;
-        carX = 0;
-        car.position.x = 0;
-        gameOverFlag = false;
-        gameOverMsgDiv.style.display = 'none';
-        restartGameBtn.style.display = 'none';
-        for (let i = 0; i < roadSegments.length; i++) roadSegments[i].position.z = (i - 2) * roadLength;
-        for (let i = 0; i < 4; i++) spawnObstacle(-10 + i * obstacleSpawnDistance);
-        isGameRunning = true;
-        gameLoop();
-    }
-    
-    function handleKeyDown(e) {
-        if (!isGameRunning || gameOverFlag) return;
-        if (e.key === 'ArrowLeft') { leftPressed = true; e.preventDefault(); }
-        else if (e.key === 'ArrowRight') { rightPressed = true; e.preventDefault(); }
-    }
-    function handleKeyUp(e) {
-        if (e.key === 'ArrowLeft') leftPressed = false;
-        else if (e.key === 'ArrowRight') rightPressed = false;
-    }
-    
-    function updateCar() {
-        if (!isGameRunning || gameOverFlag) return;
-        let move = 0;
-        if (leftPressed) move = -0.18;
-        if (rightPressed) move = 0.18;
-        carX += move;
-        carX = Math.min(maxX, Math.max(minX, carX));
-        car.position.x = carX;
-    }
-    
-    function gameLoop() {
-        if (!isGameRunning) return;
-        updateCar();
-        const speed = currentSpeed;
-        updateRoad(speed);
-        updateObstacles(speed);
-        manageObstacleSpawning();
-        updateScore(speed);
-        if (checkCollisions()) return;
-        if (cameraHelper) cameraHelper.updateCamera();
-        renderer.render(scene, camera);
-        animationId = requestAnimationFrame(gameLoop);
-    }
-    
-    function startRennspiel() {
-        if (isGameRunning) return;
-        gameContainer.style.display = "flex";
-        if (!threeInit) {
-            const initRes = init3D();
-            cameraHelper = initRes.updateCamera;
-            threeInit = true;
-            window.addEventListener('keydown', handleKeyDown);
-            window.addEventListener('keyup', handleKeyUp);
-            for (let i = 0; i < 5; i++) spawnObstacle(-10 + i * obstacleSpawnDistance);
-        } else {
-            restartGame();
-            return;
-        }
-        isGameRunning = true;
-        gameOverFlag = false;
-        score = 0;
-        currentSpeed = baseSpeed;
-        scoreSpan.innerText = "Score: 0";
-        gameOverMsgDiv.style.display = 'none';
-        restartGameBtn.style.display = 'none';
-        gameLoop();
-        const handleResize = () => {
-            const w = canvas.clientWidth, h = canvas.clientHeight;
-            renderer.setSize(w, h);
-            camera.aspect = w / h;
-            camera.updateProjectionMatrix();
-        };
-        window.addEventListener('resize', handleResize);
-        handleResize();
-    }
-    
-    function stopRennspiel() {
-        if (animationId) cancelAnimationFrame(animationId);
-        isGameRunning = false;
-        gameContainer.style.display = "none";
-    }
-    
-    startBtn.addEventListener('click', startRennspiel);
-    stopBtn.addEventListener('click', stopRennspiel);
-    restartGameBtn.addEventListener('click', () => restartGame());
-    gameContainer.style.display = "none";
-    loadRacingLeaderboard();
-
-    // ==================== KLICK-CHALLENGE ====================
+<script>
+    // ==================== KLICK-CHALLENGE (unverändert, nur eingebettet) ====================
     const startClickBtn = document.getElementById('startClickGameBtn');
     const clickGamePanel = document.getElementById('clickGamePanel');
     const playerNameInput = document.getElementById('playerName');
@@ -764,57 +392,69 @@
     const clickScoreSpan = document.getElementById('clickScore');
     const clickButton = document.getElementById('clickButton');
     const resetClickBtn = document.getElementById('resetClickBtn');
-    const clickLeaderboardList = document.getElementById('clickLeaderboardList');
+    const leaderboardList = document.getElementById('leaderboardList');
 
-    let clickCount = 0, timeLeft = 50, clickGameActive = false, countdownInterval = null;
-    let clickLeaderboard = [];
+    let clickCount = 0;
+    let timeLeft = 50;
+    let clickGameActive = false;
+    let countdownInterval = null;
+    let leaderboard = [];
 
-    function loadClickLeaderboard() {
+    function loadLeaderboard() {
         const stored = localStorage.getItem('clickLeaderboard');
-        clickLeaderboard = stored ? JSON.parse(stored) : [];
-        renderClickLeaderboard();
+        if(stored) leaderboard = JSON.parse(stored);
+        else leaderboard = [];
+        renderLeaderboard();
     }
-    function saveClickLeaderboard() { localStorage.setItem('clickLeaderboard', JSON.stringify(clickLeaderboard)); }
-    function addClickScore(name, scoreVal) {
-        if (!name.trim()) name = "Klicker";
-        clickLeaderboard.push({ name: name.substring(0,20), score: scoreVal });
-        clickLeaderboard.sort((a,b) => b.score - a.score);
-        clickLeaderboard = clickLeaderboard.slice(0,5);
-        saveClickLeaderboard();
-        renderClickLeaderboard();
+    function saveLeaderboard() { localStorage.setItem('clickLeaderboard', JSON.stringify(leaderboard)); }
+    function addScore(name, scoreVal) {
+        if(!name.trim()) name = "Anonym";
+        leaderboard.push({ name: name.substring(0,20), score: scoreVal });
+        leaderboard.sort((a,b) => b.score - a.score);
+        leaderboard = leaderboard.slice(0,5);
+        saveLeaderboard();
+        renderLeaderboard();
     }
-    function renderClickLeaderboard() {
-        clickLeaderboardList.innerHTML = '';
-        if (clickLeaderboard.length === 0) {
-            clickLeaderboardList.innerHTML = '<li>Noch keine Einträge</li>';
+    function renderLeaderboard() {
+        if(!leaderboardList) return;
+        leaderboardList.innerHTML = '';
+        if(leaderboard.length === 0) {
+            leaderboardList.innerHTML = '<li>Noch keine Einträge</li>';
             return;
         }
-        clickLeaderboard.forEach(entry => {
+        leaderboard.forEach(entry => {
             const li = document.createElement('li');
             li.textContent = `${entry.name}: ${entry.score} Klicks`;
-            clickLeaderboardList.appendChild(li);
+            leaderboardList.appendChild(li);
         });
     }
 
     function startClickChallenge() {
         const name = playerNameInput.value.trim();
-        if (name === "") { alert("Bitte gib deinen Namen für die Bestenliste ein!"); return; }
-        document.querySelector('#clickChallengeArea .name-input').style.display = 'none';
+        if(name === "") {
+            alert("Bitte gib deinen Namen für die Bestenliste ein!");
+            return;
+        }
+        // UI wechseln
+        document.querySelector('#click-game .name-input').style.display = 'none';
         startClickBtn.style.display = 'none';
         clickGamePanel.style.display = 'block';
-        clickCount = 0; timeLeft = 50; clickGameActive = true;
+        // Reset
+        clickCount = 0;
+        timeLeft = 50;
+        clickGameActive = true;
         clickScoreSpan.innerText = `Klicks: 0`;
         timerDisplay.innerText = `50.0 s`;
         clickButton.disabled = false;
-        if (countdownInterval) clearInterval(countdownInterval);
+        if(countdownInterval) clearInterval(countdownInterval);
         const startTime = Date.now();
         countdownInterval = setInterval(() => {
-            if (!clickGameActive) return;
+            if(!clickGameActive) return;
             const elapsed = (Date.now() - startTime) / 1000;
             const remaining = Math.max(0, 50 - elapsed);
             timeLeft = remaining;
             timerDisplay.innerText = `${remaining.toFixed(1)} s`;
-            if (remaining <= 0) {
+            if(remaining <= 0) {
                 clearInterval(countdownInterval);
                 endClickGame();
             }
@@ -822,30 +462,31 @@
     }
 
     function endClickGame() {
-        if (!clickGameActive) return;
+        if(!clickGameActive) return;
         clickGameActive = false;
         clickButton.disabled = true;
         clearInterval(countdownInterval);
         const finalScore = clickCount;
         const playerName = playerNameInput.value.trim();
-        addClickScore(playerName, finalScore);
+        addScore(playerName, finalScore);
         alert(`Zeit vorbei! Du hast ${finalScore} Klicks geschafft. Eintrag in Bestenliste!`);
+        // Zurück zur Eingabe
         clickGamePanel.style.display = 'none';
-        document.querySelector('#clickChallengeArea .name-input').style.display = 'inline-block';
+        document.querySelector('#click-game .name-input').style.display = 'inline-block';
         startClickBtn.style.display = 'inline-block';
         playerNameInput.value = playerName;
     }
 
     function cancelClickGame() {
-        if (countdownInterval) clearInterval(countdownInterval);
+        if(countdownInterval) clearInterval(countdownInterval);
         clickGameActive = false;
         clickGamePanel.style.display = 'none';
-        document.querySelector('#clickChallengeArea .name-input').style.display = 'inline-block';
+        document.querySelector('#click-game .name-input').style.display = 'inline-block';
         startClickBtn.style.display = 'inline-block';
     }
 
     clickButton.addEventListener('click', () => {
-        if (clickGameActive && timeLeft > 0) {
+        if(clickGameActive && timeLeft > 0) {
             clickCount++;
             clickScoreSpan.innerText = `Klicks: ${clickCount}`;
             clickButton.style.transform = 'scale(0.95)';
@@ -854,7 +495,7 @@
     });
     startClickBtn.addEventListener('click', startClickChallenge);
     resetClickBtn.addEventListener('click', cancelClickGame);
-    loadClickLeaderboard();
+    loadLeaderboard();
 </script>
 </body>
 </html>
