@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title> GAMING | Steuerbares Auto-Spiel</title>
+    <title>GAMING | Auto-Spiel</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,6 @@
             scroll-behavior: smooth;
         }
 
-        /* ----- NAVIGATION ----- */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -195,7 +194,7 @@
             color: #00eaff;
         }
 
-        /* Linker Kasten unten (fixed) */
+        /* Linker Kasten unten */
         .left-bottom-card {
             position: fixed;
             bottom: 20px;
@@ -243,7 +242,7 @@
 <body>
 
 <nav class="navbar">
-    <div class="logo">⚡  GAMING ⚡</div>
+    <div class="logo">⚡ GAMING ⚡</div>
     <div class="nav-links">
         <a href="#">🏠 Home</a>
         <a href="#">🎮 Games</a>
@@ -252,8 +251,8 @@
 </nav>
 
 <section class="hero">
-    <h1>GAMING</h1>
-    <p>willkommen auf der gamimg zone 🎧🎮</p>
+    <h1>GAMING ZONE</h1>
+    <p>Willkommen zu meiner Next-Gen Gaming Zone 🎧🎮</p>
     <button class="btn-game" id="startGameBtn">▶ START GAME</button>
 </section>
 
@@ -261,8 +260,8 @@
     <div class="cards-container">
         <div class="card">
             <h2>🎯 Über Mich</h2>
-            <p>ich versuche alles zumachen.<br>
-             🔥</p>
+            <p>Hi! Ich bin ein leidenschaftlicher Gamer.<br>
+            Ich liebe Gaming, Coding und coole Projekte 🔥</p>
         </div>
         <div class="card">
             <h2>📀 Empfohlene Games</h2>
@@ -273,16 +272,16 @@
 
     <!-- SPIEL BEREICH -->
     <div id="gameContainer">
-        <canvas id="gameCanvas" width="800" height="300" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/300"></canvas>
+        <canvas id="gameCanvas" width="800" height="300" style="width:100%; height:auto; aspect-ratio:800/300"></canvas>
         <div class="game-info">🚗 Steuere das Auto mit ← und → Pfeiltasten! Unendliche Straße.</div>
         <button class="btn-game btn-stop" id="stopGameBtn">⏹️ Spiel beenden</button>
     </div>
 </main>
 
 <footer>
-    <p>©  GAMING </p>
+    <p>© 2025 GAMING – Level up your life!</p>
     <div class="social-links">
-        <a href="#">/a>
+        <a href="#">🐦 Twitter</a>
         <a href="#">📺 Twitch</a>
         <a href="#">💬 Discord</a>
         <a href="#">🎬 YouTube</a>
@@ -297,29 +296,24 @@
 
 <script>
     (function() {
-        // DOM-Elemente
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const gameContainer = document.getElementById('gameContainer');
         const startBtn = document.getElementById('startGameBtn');
         const stopBtn = document.getElementById('stopGameBtn');
 
-        // Spielvariablen
         let animationId = null;
         let isGameRunning = false;
 
-        // Straßenparameter
         const ROAD_Y = 210;
         const ROAD_HEIGHT = 70;
         const CAR_WIDTH = 50;
         const CAR_HEIGHT = 30;
-        // Autoposition dynamisch (steuerbar)
-        let carX = 120;       // Startwert, später anpassbar
+        let carX = 120;
         const CAR_Y = ROAD_Y + (ROAD_HEIGHT - CAR_HEIGHT) / 2;
 
-        // Bewegungsgrenzen (abhängig von canvas Breite)
-        let minCarX = 20;
-        let maxCarX = canvas.width - CAR_WIDTH - 20;
+        let minCarX = 15;
+        let maxCarX = canvas.width - CAR_WIDTH - 15;
 
         const MARKER_WIDTH = 30;
         const MARKER_HEIGHT = 12;
@@ -327,12 +321,10 @@
         let scrollSpeed = 4;
         let markers = [];
 
-        // Funktion zur Aktualisierung der Auto-Bewegungsgrenzen
         function updateCarBounds() {
             if (canvas.width > 0) {
                 minCarX = 15;
                 maxCarX = canvas.width - CAR_WIDTH - 15;
-                // Stelle sicher, dass carX innerhalb der neuen Grenzen ist
                 carX = Math.min(maxCarX, Math.max(minCarX, carX));
             }
         }
@@ -353,13 +345,11 @@
             if (!ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Hintergrund
             ctx.fillStyle = "#2a5a2a";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#0b2b3b";
             ctx.fillRect(0, 0, canvas.width, ROAD_Y - 10);
 
-            // Straße
             ctx.fillStyle = "#2c2c2c";
             ctx.fillRect(0, ROAD_Y, canvas.width, ROAD_HEIGHT);
             ctx.strokeStyle = "#f0f0f0";
@@ -373,7 +363,6 @@
             ctx.lineTo(canvas.width, ROAD_Y + ROAD_HEIGHT);
             ctx.stroke();
 
-            // Fahrbahnmarkierungen
             for (let m of markers) {
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(m.x, m.y, m.w, m.h);
@@ -381,7 +370,7 @@
                 ctx.fillRect(m.x+2, m.y+2, m.w-4, m.h-4);
             }
 
-            // Auto zeichnen (mit aktuellem carX)
+            // Auto
             ctx.fillStyle = "#e34234";
             ctx.shadowBlur = 8;
             ctx.shadowColor = "#ff6666";
@@ -435,21 +424,19 @@
             animationId = requestAnimationFrame(gameLoop);
         }
 
-        // Steuerung: Pfeiltasten links/rechts
         function handleKeyDown(e) {
             if (!isGameRunning) return;
-            const key = e.key;
-            if (key === 'ArrowLeft') {
+            if (e.key === 'ArrowLeft') {
                 carX -= 18;
                 if (carX < minCarX) carX = minCarX;
                 e.preventDefault();
-            } else if (key === 'ArrowRight') {
+                drawScene();
+            } else if (e.key === 'ArrowRight') {
                 carX += 18;
                 if (carX > maxCarX) carX = maxCarX;
                 e.preventDefault();
+                drawScene();
             }
-            // Optional: sofort neu zeichnen für flüssigeres Feedback
-            drawScene();
         }
 
         function startGame() {
@@ -459,8 +446,7 @@
                 canvas.width = 800;
                 canvas.height = 300;
             }
-            updateCarBounds();      // setzt min/max basierend auf canvas Breite
-            // Auto in die Mitte setzen
+            updateCarBounds();
             carX = (canvas.width - CAR_WIDTH) / 2;
             carX = Math.min(maxCarX, Math.max(minCarX, carX));
             initMarkers();
@@ -477,25 +463,21 @@
             }
             isGameRunning = false;
             gameContainer.style.display = "none";
-            // Entferne Tastatur-Listener vorübergehend? Wir lassen ihn, aber isGameRunning verhindert Bewegung.
         }
 
-        // Event-Listener
-        if (startBtn) startBtn.addEventListener('click', startGame);
-        if (stopBtn) stopBtn.addEventListener('click', stopGame);
+        startBtn.addEventListener('click', startGame);
+        stopBtn.addEventListener('click', stopGame);
         window.addEventListener('keydown', handleKeyDown);
 
-        // Initialisierung
         gameContainer.style.display = "none";
         isGameRunning = false;
-
         if (ctx) {
             ctx.fillStyle = "#1a2a1f";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             updateCarBounds();
         }
 
-        console.log("✅ Auto-Spiel mit Steuerung (Pfeiltasten links/rechts) geladen!");
+        console.log("✅ Auto-Spiel – nur 'GAMING', Steuerung mit Pfeiltasten funktioniert.");
     })();
 </script>
 </body>
