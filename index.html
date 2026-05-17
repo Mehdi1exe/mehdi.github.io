@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Klick-Challenge | Solo + Lokal + Online + Bot</title>
+    <title>Klick-Challenge | Solo + Lokal + Online + Bot (30 Sek.)</title>
     <style>
         * {
             margin: 0;
@@ -136,7 +136,7 @@
 <body>
 <div class="container">
     <h1>⚡ KLICK-CHALLENGE ⚡</h1>
-    <p class="sub">Wähle deinen Modus</p>
+    <p class="sub">Wähle deinen Modus – 30 Sekunden</p>
 
     <!-- Startseite -->
     <div id="startPage">
@@ -155,9 +155,9 @@
     <!-- Einzelspieler -->
     <div id="soloMode" class="game-card solo-card hidden">
         <h2>👤 Einzelspieler · Globale Bestenliste</h2>
-        <div><input type="text" id="soloName" class="name-input" placeholder="Dein Name"><button id="soloStartBtn" class="btn">START (20 Sek.)</button></div>
+        <div><input type="text" id="soloName" class="name-input" placeholder="Dein Name"><button id="soloStartBtn" class="btn">START (30 Sek.)</button></div>
         <div id="soloGamePanel" style="display:none;">
-            <div class="timer" id="soloTimer">20.0 s</div>
+            <div class="timer" id="soloTimer">30.0 s</div>
             <div class="score-board" id="soloScore">Klicks: 0</div>
             <button id="soloClickBtn" class="click-btn">👆</button>
             <button id="soloBackBtn" class="btn back-btn">Zurück</button>
@@ -170,11 +170,11 @@
     <div id="localMode" class="game-card duel-card hidden">
         <h2>👥 Lokales Duell · Ein Gerät</h2>
         <div class="duel-players">
-            <div class="player-box"><h3>⚡ Spieler 1</h3><div id="p1Score" class="player-score">0</div><button id="p1StartBtn" class="btn">Start (20s)</button>
-                <div id="p1GameArea" style="display:none;"><div class="timer" id="p1Timer">20.0 s</div><button id="p1ClickBtn" class="click-btn" style="width:120px;height:120px;">👆</button><button id="p1CancelBtn" class="btn">Abbrechen</button></div>
+            <div class="player-box"><h3>⚡ Spieler 1</h3><div id="p1Score" class="player-score">0</div><button id="p1StartBtn" class="btn">Start (30s)</button>
+                <div id="p1GameArea" style="display:none;"><div class="timer" id="p1Timer">30.0 s</div><button id="p1ClickBtn" class="click-btn" style="width:120px;height:120px;">👆</button><button id="p1CancelBtn" class="btn">Abbrechen</button></div>
             </div>
-            <div class="player-box"><h3>⚡ Spieler 2</h3><div id="p2Score" class="player-score">0</div><button id="p2StartBtn" class="btn">Start (20s)</button>
-                <div id="p2GameArea" style="display:none;"><div class="timer" id="p2Timer">20.0 s</div><button id="p2ClickBtn" class="click-btn" style="width:120px;height:120px;">👆</button><button id="p2CancelBtn" class="btn">Abbrechen</button></div>
+            <div class="player-box"><h3>⚡ Spieler 2</h3><div id="p2Score" class="player-score">0</div><button id="p2StartBtn" class="btn">Start (30s)</button>
+                <div id="p2GameArea" style="display:none;"><div class="timer" id="p2Timer">30.0 s</div><button id="p2ClickBtn" class="click-btn" style="width:120px;height:120px;">👆</button><button id="p2CancelBtn" class="btn">Abbrechen</button></div>
             </div>
         </div>
         <div id="localResult" class="duel-result">⭐ Wer gewinnt? Starte beide Spieler nacheinander!</div>
@@ -200,7 +200,7 @@
             <div id="onlineStatus" class="duel-result">Kein aktives Duell.</div>
         </div>
         <div id="onlineGameArea" style="display:none;">
-            <div class="timer" id="onlineTimer">20.0 s</div>
+            <div class="timer" id="onlineTimer">30.0 s</div>
             <div class="score-board" id="onlineScore">Klicks: 0</div>
             <button id="onlineClickBtn" class="click-btn">👆</button>
             <button id="onlineCancelBtn" class="btn back-btn">Abbrechen</button>
@@ -211,9 +211,9 @@
     <!-- Bot-Duell (gegen KI) -->
     <div id="botMode" class="game-card bot-card hidden">
         <h2>🤖 Gegen Bot · Wer klickt schneller?</h2>
-        <div><input type="text" id="botName" class="name-input" placeholder="Dein Name"><button id="botStartBtn" class="btn">START (20 Sek.)</button></div>
+        <div><input type="text" id="botName" class="name-input" placeholder="Dein Name"><button id="botStartBtn" class="btn">START (30 Sek.)</button></div>
         <div id="botGamePanel" style="display:none;">
-            <div class="timer" id="botTimer">20.0 s</div>
+            <div class="timer" id="botTimer">30.0 s</div>
             <div class="score-board" id="botScore">Klicks: 0</div>
             <button id="botClickBtn" class="click-btn">👆</button>
             <button id="botGameBackBtn" class="btn back-btn">Abbrechen</button>
@@ -248,7 +248,7 @@
     }
 
     // ========== EINZELSPIELER ==========
-    let soloActive = false, soloCount = 0, soloCountdown = null, soloTimeLeft = 20;
+    let soloActive = false, soloCount = 0, soloCountdown = null, soloTimeLeft = 30;
     const soloNameInput = document.getElementById('soloName');
     const soloStartBtn = document.getElementById('soloStartBtn');
     const soloGamePanel = document.getElementById('soloGamePanel');
@@ -277,16 +277,16 @@
         soloNameInput.disabled = true;
         soloStartBtn.style.display = 'none';
         soloGamePanel.style.display = 'block';
-        soloActive = true; soloCount = 0; soloTimeLeft = 20;
+        soloActive = true; soloCount = 0; soloTimeLeft = 30;
         soloScoreSpan.innerText = `Klicks: 0`;
-        soloTimer.innerText = `20.0 s`;
+        soloTimer.innerText = `30.0 s`;
         soloClickBtn.disabled = false;
         if (soloCountdown) clearInterval(soloCountdown);
         const start = Date.now();
         soloCountdown = setInterval(() => {
             if (!soloActive) return;
             const elapsed = (Date.now() - start) / 1000;
-            const rem = Math.max(0, 20 - elapsed);
+            const rem = Math.max(0, 30 - elapsed);
             soloTimeLeft = rem;
             soloTimer.innerText = `${rem.toFixed(1)} s`;
             if (rem <= 0) { clearInterval(soloCountdown); endSolo(); }
@@ -309,7 +309,7 @@
     soloBackBtn.addEventListener('click', cancelSolo);
 
     // ========== LOKALES DUELL ==========
-    let p1Active = false, p2Active = false, p1Clicks = 0, p2Clicks = 0, p1TimerInt = null, p2TimerInt = null, p1Time = 20, p2Time = 20;
+    let p1Active = false, p2Active = false, p1Clicks = 0, p2Clicks = 0, p1TimerInt = null, p2TimerInt = null, p1Time = 30, p2Time = 30;
     const p1Start = document.getElementById('p1StartBtn'), p1Game = document.getElementById('p1GameArea'), p1Click = document.getElementById('p1ClickBtn'), p1Cancel = document.getElementById('p1CancelBtn'), p1TimerEl = document.getElementById('p1Timer'), p1ScoreEl = document.getElementById('p1Score');
     const p2Start = document.getElementById('p2StartBtn'), p2Game = document.getElementById('p2GameArea'), p2Click = document.getElementById('p2ClickBtn'), p2Cancel = document.getElementById('p2CancelBtn'), p2TimerEl = document.getElementById('p2Timer'), p2ScoreEl = document.getElementById('p2Score');
     const localResultDiv = document.getElementById('localResult'), localResetBtn = document.getElementById('localResetBtn');
@@ -321,13 +321,13 @@
             else localResultDiv.innerHTML = `⭐ Wer gewinnt? Starte beide Spieler nacheinander!`;
         } else if (!p1Active && !p2Active && p1Clicks === 0 && p2Clicks === 0) localResultDiv.innerHTML = `⭐ Wer gewinnt? Starte beide Spieler nacheinander!`;
     }
-    function startPlayer1() { if (p1Active) return; p1Start.style.display='none'; p1Game.style.display='block'; p1Active=true; p1Clicks=0; p1Time=20; p1ScoreEl.innerText="0"; p1TimerEl.innerText="20.0 s"; p1Click.disabled=false; if(p1TimerInt) clearInterval(p1TimerInt); const start=Date.now(); p1TimerInt=setInterval(()=>{ if(!p1Active) return; const elapsed=(Date.now()-start)/1000; const rem=Math.max(0,20-elapsed); p1Time=rem; p1TimerEl.innerText=`${rem.toFixed(1)} s`; if(rem<=0){ clearInterval(p1TimerInt); endPlayer1(); } },100); }
+    function startPlayer1() { if (p1Active) return; p1Start.style.display='none'; p1Game.style.display='block'; p1Active=true; p1Clicks=0; p1Time=30; p1ScoreEl.innerText="0"; p1TimerEl.innerText="30.0 s"; p1Click.disabled=false; if(p1TimerInt) clearInterval(p1TimerInt); const start=Date.now(); p1TimerInt=setInterval(()=>{ if(!p1Active) return; const elapsed=(Date.now()-start)/1000; const rem=Math.max(0,30-elapsed); p1Time=rem; p1TimerEl.innerText=`${rem.toFixed(1)} s`; if(rem<=0){ clearInterval(p1TimerInt); endPlayer1(); } },100); }
     function endPlayer1() { if(!p1Active) return; p1Active=false; p1Click.disabled=true; clearInterval(p1TimerInt); p1ScoreEl.innerText=p1Clicks; p1Game.style.display='none'; p1Start.style.display='inline-block'; updateLocalResult(); }
     function cancelPlayer1() { if(p1TimerInt) clearInterval(p1TimerInt); p1Active=false; p1Game.style.display='none'; p1Start.style.display='inline-block'; p1Clicks=0; p1ScoreEl.innerText="0"; updateLocalResult(); }
     p1Click.addEventListener('click',()=>{ if(p1Active && p1Time>0){ p1Clicks++; p1ScoreEl.innerText=p1Clicks; p1Click.style.transform='scale(0.95)'; setTimeout(()=>p1Click.style.transform='',100); } });
     p1Start.addEventListener('click', startPlayer1);
     p1Cancel.addEventListener('click', cancelPlayer1);
-    function startPlayer2() { if (p2Active) return; p2Start.style.display='none'; p2Game.style.display='block'; p2Active=true; p2Clicks=0; p2Time=20; p2ScoreEl.innerText="0"; p2TimerEl.innerText="20.0 s"; p2Click.disabled=false; if(p2TimerInt) clearInterval(p2TimerInt); const start=Date.now(); p2TimerInt=setInterval(()=>{ if(!p2Active) return; const elapsed=(Date.now()-start)/1000; const rem=Math.max(0,20-elapsed); p2Time=rem; p2TimerEl.innerText=`${rem.toFixed(1)} s`; if(rem<=0){ clearInterval(p2TimerInt); endPlayer2(); } },100); }
+    function startPlayer2() { if (p2Active) return; p2Start.style.display='none'; p2Game.style.display='block'; p2Active=true; p2Clicks=0; p2Time=30; p2ScoreEl.innerText="0"; p2TimerEl.innerText="30.0 s"; p2Click.disabled=false; if(p2TimerInt) clearInterval(p2TimerInt); const start=Date.now(); p2TimerInt=setInterval(()=>{ if(!p2Active) return; const elapsed=(Date.now()-start)/1000; const rem=Math.max(0,30-elapsed); p2Time=rem; p2TimerEl.innerText=`${rem.toFixed(1)} s`; if(rem<=0){ clearInterval(p2TimerInt); endPlayer2(); } },100); }
     function endPlayer2() { if(!p2Active) return; p2Active=false; p2Click.disabled=true; clearInterval(p2TimerInt); p2ScoreEl.innerText=p2Clicks; p2Game.style.display='none'; p2Start.style.display='inline-block'; updateLocalResult(); }
     function cancelPlayer2() { if(p2TimerInt) clearInterval(p2TimerInt); p2Active=false; p2Game.style.display='none'; p2Start.style.display='inline-block'; p2Clicks=0; p2ScoreEl.innerText="0"; updateLocalResult(); }
     p2Click.addEventListener('click',()=>{ if(p2Active && p2Time>0){ p2Clicks++; p2ScoreEl.innerText=p2Clicks; p2Click.style.transform='scale(0.95)'; setTimeout(()=>p2Click.style.transform='',100); } });
@@ -336,8 +336,8 @@
     function resetLocal() { if(p1Active) cancelPlayer1(); else { p1Start.style.display='inline-block'; p1Game.style.display='none'; p1Clicks=0; p1ScoreEl.innerText="0"; } if(p2Active) cancelPlayer2(); else { p2Start.style.display='inline-block'; p2Game.style.display='none'; p2Clicks=0; p2ScoreEl.innerText="0"; } localResultDiv.innerHTML="⭐ Wer gewinnt? Starte beide Spieler nacheinander!"; }
     localResetBtn.addEventListener('click', resetLocal);
 
-    // ========== ONLINE-DUELL (mit Code, unverändert) ==========
-    let onlineRoomId = null, onlinePlayerRole = null, onlineGameActive = false, onlineClickCount = 0, onlineCountdown = null, onlineTimeLeft = 20;
+    // ========== ONLINE-DUELL (mit Code) ==========
+    let onlineRoomId = null, onlinePlayerRole = null, onlineGameActive = false, onlineClickCount = 0, onlineCountdown = null, onlineTimeLeft = 30;
     const createRoomBtn = document.getElementById('createRoomBtn');
     const codeDisplayArea = document.getElementById('codeDisplayArea');
     const roomCodeDisplaySpan = document.getElementById('roomCodeDisplay');
@@ -426,16 +426,16 @@
         onlineGameArea.style.display = 'block';
         onlineGameActive = true;
         onlineClickCount = 0;
-        onlineTimeLeft = 20;
+        onlineTimeLeft = 30;
         onlineScoreSpan.innerText = `Klicks: 0`;
-        onlineTimer.innerText = `20.0 s`;
+        onlineTimer.innerText = `30.0 s`;
         onlineClickBtn.disabled = false;
         if (onlineCountdown) clearInterval(onlineCountdown);
         const start = Date.now();
         onlineCountdown = setInterval(() => {
             if (!onlineGameActive) return;
             const elapsed = (Date.now() - start) / 1000;
-            const rem = Math.max(0, 20 - elapsed);
+            const rem = Math.max(0, 30 - elapsed);
             onlineTimeLeft = rem;
             onlineTimer.innerText = `${rem.toFixed(1)} s`;
             if (rem <= 0) { clearInterval(onlineCountdown); endOnlineGame(); }
@@ -478,14 +478,14 @@
     });
 
     const startOnlineRoundBtn = document.createElement('button');
-    startOnlineRoundBtn.innerText = "🎮 Runde spielen (20s)";
+    startOnlineRoundBtn.innerText = "🎮 Runde spielen (30s)";
     startOnlineRoundBtn.className = "btn";
     startOnlineRoundBtn.style.margin = "10px";
     startOnlineRoundBtn.addEventListener('click', startOnlineGame);
     if (onlineStatusDiv) onlineStatusDiv.parentElement.appendChild(startOnlineRoundBtn);
 
     // ========== BOT-DUELL (gegen KI) ==========
-    let botActive = false, botCount = 0, botCountdown = null, botTimeLeft = 20;
+    let botActive = false, botCount = 0, botCountdown = null, botTimeLeft = 30;
     const botNameInput = document.getElementById('botName');
     const botStartBtn = document.getElementById('botStartBtn');
     const botGamePanel = document.getElementById('botGamePanel');
@@ -503,16 +503,16 @@
         botStartBtn.style.display = 'none';
         botGamePanel.style.display = 'block';
         botResultDiv.innerHTML = "";
-        botActive = true; botCount = 0; botTimeLeft = 20;
+        botActive = true; botCount = 0; botTimeLeft = 30;
         botScoreSpan.innerText = `Klicks: 0`;
-        botTimer.innerText = `20.0 s`;
+        botTimer.innerText = `30.0 s`;
         botClickBtn.disabled = false;
         if (botCountdown) clearInterval(botCountdown);
         const start = Date.now();
         botCountdown = setInterval(() => {
             if (!botActive) return;
             const elapsed = (Date.now() - start) / 1000;
-            const rem = Math.max(0, 20 - elapsed);
+            const rem = Math.max(0, 30 - elapsed);
             botTimeLeft = rem;
             botTimer.innerText = `${rem.toFixed(1)} s`;
             if (rem <= 0) { clearInterval(botCountdown); endBotGame(); }
@@ -526,15 +526,12 @@
         clearInterval(botCountdown);
         const playerScore = botCount;
         const name = botNameInput.value.trim();
-        // Spielerpunktzahl in globale Bestenliste eintragen
         await saveGlobalScore(name, playerScore);
         
-        // Bot-Punktzahl generieren (zufällig zwischen 80% und 120% der Spielerpunktzahl, mindestens 0)
         let min = Math.floor(playerScore * 0.8);
         let max = Math.floor(playerScore * 1.2);
         if (max < min) max = min + 5;
         const botScore = Math.floor(Math.random() * (max - min + 1) + min);
-        // Bot darf nicht negativ sein
         const finalBot = Math.max(0, botScore);
         
         let resultText = "";
@@ -569,7 +566,7 @@
     botStartBtn.addEventListener('click', startBotGame);
     botGameBackBtn.addEventListener('click', cancelBotGame);
 
-    // ========== NAVIGATION ZWISCHEN STARTSEITE UND MODI ==========
+    // ========== NAVIGATION ==========
     const startPage = document.getElementById('startPage');
     const soloDiv = document.getElementById('soloMode');
     const localDiv = document.getElementById('localMode');
