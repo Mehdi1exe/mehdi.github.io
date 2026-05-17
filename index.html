@@ -3,616 +3,692 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Klick-Challenge | Solo + Lokal + Online + Bot (30 Sek.)</title>
+    <title>GAMING | 3D Racing - Vermeide die Bäume!</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
         }
         body {
-            background: radial-gradient(circle at 10% 20%, #0a0f1e, #03050b);
-            color: #eef;
-            font-family: 'Segoe UI', 'Poppins', sans-serif;
-            min-height: 100vh;
-            padding: 20px;
+            background: #0a0014;
+            color: #f0f0f0;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            text-align: center;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(138, 43, 226, 0.5);
         }
-        h1 {
-            font-size: clamp(2rem, 7vw, 3rem);
-            background: linear-gradient(135deg, #fff, #00eaff);
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00eaff, #8a2be2);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-align: center;
         }
-        .sub {
-            text-align: center;
-            margin-bottom: 20px;
+        .nav-links a {
+            color: #ddd;
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+        .nav-links a:hover {
+            color: #00eaff;
+            text-shadow: 0 0 6px #00eaff;
+        }
+        .hero {
+            padding: 100px 20px 120px;
+            background: radial-gradient(circle at 20% 30%, #120024, #00040a);
+            border-bottom: 2px solid rgba(0, 234, 255, 0.2);
+        }
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            color: #00eaff;
+            text-shadow: 0 0 15px #00eaff, 0 0 30px #8a2be2;
+        }
+        .hero p {
+            font-size: 1.4rem;
+            margin: 20px 0 30px;
             color: #ccc;
         }
-        .start-buttons {
+        .btn-game {
+            background: linear-gradient(135deg, #8a2be2, #5a1a9e);
+            color: white;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 18px #8a2be2;
+            transition: 0.25s;
+            margin: 0 10px;
+        }
+        .btn-game:hover {
+            transform: scale(1.05);
+            background: #00eaff;
+            box-shadow: 0 0 28px #00eaff;
+            color: #0a0014;
+        }
+        .btn-stop {
+            background: #2c1a3a;
+            box-shadow: 0 0 8px #aa66ff;
+        }
+        .btn-stop:hover {
+            background: #ff4444;
+            box-shadow: 0 0 20px #ff4444;
+            color: white;
+        }
+        #gameContainer {
+            display: none;
+            margin: 40px auto;
+            width: 90%;
+            max-width: 1100px;
+            background: #000000aa;
+            border-radius: 32px;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            border: 1px solid #8a2be2;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        #canvas3d {
+            width: 100%;
+            height: 550px;
+            border-radius: 24px;
+            display: block;
+            background: #0a1a2a;
+        }
+        .game-info {
+            font-size: 1.2rem;
+            color: #00eaff;
+            text-shadow: 0 0 5px #00eaff;
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+        }
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: #000000aa;
+            padding: 5px 15px;
+            border-radius: 30px;
+        }
+        .game-over-msg {
+            font-size: 1.5rem;
+            color: #ff6666;
+            text-shadow: 0 0 10px red;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; transform: scale(1);}
+            100% { opacity: 1; transform: scale(1.05);}
+        }
+        .cards-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
-            margin: 30px 0;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
         }
-        .mode-btn {
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(12px);
-            border: 2px solid;
-            border-radius: 60px;
-            padding: 20px 30px;
-            width: 200px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
+        .card {
+            background: rgba(17, 17, 34, 0.85);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            border-radius: 32px;
+            padding: 35px 25px;
+            width: 320px;
+            transition: all 0.3s ease;
         }
-        .mode-btn.solo { border-color: #ffaa44; }
-        .mode-btn.local { border-color: #44aaff; }
-        .mode-btn.online { border-color: #ff66cc; }
-        .mode-btn.bot { border-color: #66ff66; }
-        .mode-btn h2 { font-size: 1.5rem; margin-bottom: 8px; }
-        .mode-btn p { font-size: 0.9rem; color: #ccc; }
-        .mode-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.1); }
-        .game-card {
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(12px);
-            border-radius: 48px;
-            padding: 20px;
-            margin-bottom: 30px;
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: #00eaff;
+            box-shadow: 0 20px 35px rgba(0, 234, 255, 0.2);
         }
-        .solo-card { border: 1px solid #ffaa44; }
-        .duel-card { border: 1px solid #44aaff; }
-        .online-card { border: 1px solid #ff66cc; }
-        .bot-card { border: 1px solid #66ff66; }
-        .game-card h2 { text-align: center; margin-bottom: 15px; }
-        .solo-card h2 { color: #ffaa44; }
-        .duel-card h2 { color: #44aaff; }
-        .online-card h2 { color: #ff66cc; }
-        .bot-card h2 { color: #66ff66; }
-        .name-input, .code-input {
-            padding: 12px 20px;
-            border-radius: 40px;
-            border: none;
-            font-size: 1rem;
-            background: #111;
-            color: white;
-            text-align: center;
-            margin: 10px;
-        }
-        .name-input { width: 220px; }
-        .code-input { width: 140px; letter-spacing: 4px; }
-        .btn {
-            background: linear-gradient(135deg, #8a2be2, #5a1a9e);
-            color: white;
-            padding: 12px 28px;
-            border-radius: 40px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            margin: 8px;
-        }
-        .btn:hover { transform: scale(1.05); background: #00eaff; color: black; }
-        .click-btn {
-            background: #ff6600;
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
+        .card h2 {
             font-size: 2rem;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 0 30px #ff6600;
-            transition: 0.05s linear;
-            margin: 10px auto;
-            display: block;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #e0e0ff, #aa88ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        .click-btn:active { transform: scale(0.95); background: #ffaa00; }
-        .timer { font-size: 2rem; font-family: monospace; background: #000000aa; display: inline-block; padding: 8px 25px; border-radius: 40px; margin: 10px; }
-        .score-board { font-size: 1.5rem; margin: 10px; }
-        .leaderboard { background: rgba(0,0,0,0.6); border-radius: 24px; padding: 15px; margin-top: 20px; text-align: left; }
-        .leaderboard h3 { color: #ffaa44; text-align: center; margin-bottom: 10px; }
-        .leaderboard ol { padding-left: 25px; }
-        .duel-players { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-        .player-box { background: rgba(20,30,50,0.7); border-radius: 32px; padding: 15px; flex: 1; min-width: 200px; text-align: center; }
-        .player-score { font-size: 1.8rem; font-weight: bold; margin: 10px 0; }
-        .duel-result { text-align: center; margin-top: 15px; font-size: 1.2rem; background: #000000aa; border-radius: 40px; padding: 10px; word-break: break-all; }
-        .back-btn { background: #2c1a3a; margin-top: 20px; display: inline-block; }
-        .hidden { display: none; }
-        @media (max-width: 550px) {
-            .click-btn { width: 140px; height: 140px; font-size: 1.5rem; }
-            .player-box { min-width: 150px; }
-            .mode-btn { width: 160px; padding: 15px; }
+        .card p {
+            font-size: 1.15rem;
+            line-height: 1.5;
+            color: #cfcfcf;
+        }
+        footer {
+            margin-top: 60px;
+            padding: 30px 20px;
+            background: #05000c;
+            border-top: 1px solid #2a1a4a;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        .social-links a {
+            color: #bb99ff;
+            text-decoration: none;
+            margin: 0 12px;
+            transition: 0.2s;
+        }
+        .social-links a:hover {
+            color: #00eaff;
+        }
+        .left-bottom-card {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+            border-left: 4px solid #00eaff;
+            border-radius: 16px;
+            padding: 15px 20px;
+            width: 220px;
+            text-align: left;
+            z-index: 999;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            transition: 0.2s;
+        }
+        .left-bottom-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #00eaff;
+        }
+        .left-bottom-card p {
+            font-size: 0.85rem;
+            margin: 5px 0;
+            color: #ddd;
+        }
+        .left-bottom-card:hover {
+            transform: translateY(-3px);
+            border-left-width: 6px;
+            background: rgba(10, 0, 20, 0.9);
+        }
+        @media (max-width: 600px) {
+            .left-bottom-card {
+                width: 180px;
+                padding: 10px 15px;
+                bottom: 10px;
+                left: 10px;
+            }
+            #canvas3d { height: 300px; }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>⚡ KLICK-CHALLENGE ⚡</h1>
-    <p class="sub">Wähle deinen Modus – 30 Sekunden</p>
+<nav class="navbar">
+    <div class="logo">⚡ GAMING ⚡</div>
+    <div class="nav-links">
+        <a href="#">🏠 Home</a>
+        <a href="#">🎮 Games</a>
+        <a href="#">📢 News</a>
+        <a href="#" id="autoMenuLink">🚗 Auto</a>   <!-- Neue Menütaste -->
+    </div>
+</nav>
 
-    <!-- Startseite -->
-    <div id="startPage">
-        <div class="leaderboard">
-            <h3>🏆 GLOBALE BESTENLISTE (Top 10)</h3>
-            <ol id="globalLeaderboard"><li>Lade...</li></ol>
+<section class="hero">
+    <h1>3D RACING - VORSICHT BÄUME!</h1>
+    <p>Weiche den Bäumen aus, sonst ist das Spiel vorbei! 🎮🌲</p>
+    <button class="btn-game" id="startGameBtn">▶ START GAME (3D)</button>
+</section>
+
+<main>
+    <div class="cards-container">
+        <div class="card">
+            <h2>🎯 Über Mich</h2>
+            <p>Hi! Ich bin ein leidenschaftlicher Gamer.<br>
+            Ich liebe Gaming, Coding und coole Projekte 🔥</p>
         </div>
-        <div class="start-buttons">
-            <div class="mode-btn solo" data-mode="solo"><h2>👤 Einzelspieler</h2><p>Globaler Highscore</p></div>
-            <div class="mode-btn local" data-mode="local"><h2>👥 Lokales Duell</h2><p>Zwei Spieler, ein Gerät</p></div>
-            <div class="mode-btn online" data-mode="online"><h2>🌐 Online-Duell</h2><p>Per 4‑stelligen Code</p></div>
-            <div class="mode-btn bot" data-mode="bot"><h2>🤖 Gegen Bot</h2><p>Klick gegen die KI</p></div>
+        <div class="card">
+            <h2>📀 Empfohlene Games</h2>
+            <p>⭐ Brawl Stars • Roblox ⭐<br>
+            Mehr Games folgen bald...</p>
         </div>
     </div>
 
-    <!-- Einzelspieler -->
-    <div id="soloMode" class="game-card solo-card hidden">
-        <h2>👤 Einzelspieler · Globale Bestenliste</h2>
-        <div><input type="text" id="soloName" class="name-input" placeholder="Dein Name"><button id="soloStartBtn" class="btn">START (30 Sek.)</button></div>
-        <div id="soloGamePanel" style="display:none;">
-            <div class="timer" id="soloTimer">30.0 s</div>
-            <div class="score-board" id="soloScore">Klicks: 0</div>
-            <button id="soloClickBtn" class="click-btn">👆</button>
-            <button id="soloBackBtn" class="btn back-btn">Zurück</button>
+    <div id="gameContainer">
+        <canvas id="canvas3d"></canvas>
+        <div class="game-info">
+            <span>🚗 Steuere mit ← →</span>
+            <span class="score" id="scoreDisplay">Score: 0</span>
         </div>
-        <div class="leaderboard"><h3>🏆 GLOBALE BESTENLISTE</h3><ol id="soloLeaderboard"></ol></div>
-        <button class="btn back-btn" data-back="solo">⬅ Zurück zur Startseite</button>
+        <div id="gameOverMsg" class="game-over-msg" style="display: none;">💥 GAME OVER! 💥</div>
+        <button class="btn-game" id="restartGameBtn" style="display: none;">🔄 Neustart</button>
+        <button class="btn-game btn-stop" id="stopGameBtn">⏹️ Spiel beenden</button>
     </div>
+</main>
 
-    <!-- Lokales Duell -->
-    <div id="localMode" class="game-card duel-card hidden">
-        <h2>👥 Lokales Duell · Ein Gerät</h2>
-        <div class="duel-players">
-            <div class="player-box"><h3>⚡ Spieler 1</h3><div id="p1Score" class="player-score">0</div><button id="p1StartBtn" class="btn">Start (30s)</button>
-                <div id="p1GameArea" style="display:none;"><div class="timer" id="p1Timer">30.0 s</div><button id="p1ClickBtn" class="click-btn" style="width:120px;height:120px;">👆</button><button id="p1CancelBtn" class="btn">Abbrechen</button></div>
-            </div>
-            <div class="player-box"><h3>⚡ Spieler 2</h3><div id="p2Score" class="player-score">0</div><button id="p2StartBtn" class="btn">Start (30s)</button>
-                <div id="p2GameArea" style="display:none;"><div class="timer" id="p2Timer">30.0 s</div><button id="p2ClickBtn" class="click-btn" style="width:120px;height:120px;">👆</button><button id="p2CancelBtn" class="btn">Abbrechen</button></div>
-            </div>
-        </div>
-        <div id="localResult" class="duel-result">⭐ Wer gewinnt? Starte beide Spieler nacheinander!</div>
-        <button id="localResetBtn" class="btn back-btn">🔄 Zurücksetzen</button>
-        <button class="btn back-btn" data-back="local">⬅ Zurück zur Startseite</button>
+<footer>
+    <p>© 2025 GAMING – Level up your life!</p>
+    <div class="social-links">
+        <a href="#">🐦 Twitter</a>
+        <a href="#">📺 Twitch</a>
+        <a href="#">💬 Discord</a>
+        <a href="#">🎬 YouTube</a>
     </div>
+</footer>
 
-    <!-- Online-Duell mit 4‑stelligem Code -->
-    <div id="onlineMode" class="game-card online-card hidden">
-        <h2>🌐 Online-Duell · 4‑stelliger Code</h2>
-        <div id="onlineMain">
-            <button id="createRoomBtn" class="btn">➕ Raum erstellen</button>
-            <div id="codeDisplayArea" style="margin-top:15px; display:none;">
-                <p>Dein Raum-Code:</p>
-                <div class="link-box" id="roomCodeDisplay"></div>
-                <button id="copyCodeBtn" class="btn">📋 Code kopieren</button>
-            </div>
-            <div style="margin-top:20px;">
-                <p>Raum beitreten</p>
-                <input type="text" id="joinCodeInput" class="code-input" placeholder="Code" maxlength="4" inputmode="numeric">
-                <button id="joinRoomBtn" class="btn">🔗 Beitreten</button>
-            </div>
-            <div id="onlineStatus" class="duel-result">Kein aktives Duell.</div>
-        </div>
-        <div id="onlineGameArea" style="display:none;">
-            <div class="timer" id="onlineTimer">30.0 s</div>
-            <div class="score-board" id="onlineScore">Klicks: 0</div>
-            <button id="onlineClickBtn" class="click-btn">👆</button>
-            <button id="onlineCancelBtn" class="btn back-btn">Abbrechen</button>
-        </div>
-        <button class="btn back-btn" data-back="online">⬅ Zurück zur Startseite</button>
-    </div>
-
-    <!-- Bot-Duell (gegen KI) -->
-    <div id="botMode" class="game-card bot-card hidden">
-        <h2>🤖 Gegen Bot · Wer klickt schneller?</h2>
-        <div><input type="text" id="botName" class="name-input" placeholder="Dein Name"><button id="botStartBtn" class="btn">START (30 Sek.)</button></div>
-        <div id="botGamePanel" style="display:none;">
-            <div class="timer" id="botTimer">30.0 s</div>
-            <div class="score-board" id="botScore">Klicks: 0</div>
-            <button id="botClickBtn" class="click-btn">👆</button>
-            <button id="botGameBackBtn" class="btn back-btn">Abbrechen</button>
-        </div>
-        <div id="botResult" class="duel-result"></div>
-        <button class="btn back-btn" data-back="bot">⬅ Zurück zur Startseite</button>
-    </div>
+<div class="left-bottom-card">
+    <h3>📌 Info / Kontakt</h3>
+    <p>Hier kannst du später deinen Discord, Twitch oder News eintragen.</p>
+    <p style="font-size:0.75rem; margin-top:6px;">⚡ Deine Gaming-Zone</p>
 </div>
 
-<script>
-    // ========== KONFIGURATION ==========
-    const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbzxuSlkSnorvT59C-aYkwLH7EXvaDb2qCUd7sQapb4YLrPHZ9mVpihpEPUyHlLYqHH2pA/exec";
-
-    // ========== GLOBALE BESTENLISTE ==========
-    async function loadGlobalLeaderboard() {
-        try {
-            const res = await fetch(SHEETS_API_URL);
-            const data = await res.json();
-            renderLeaderboard(data, document.getElementById('globalLeaderboard'));
-            renderLeaderboard(data, document.getElementById('soloLeaderboard'));
-        } catch(e) { console.error(e); }
-    }
-    function renderLeaderboard(entries, element) {
-        if (!element) return;
-        element.innerHTML = '';
-        if (!entries || entries.length === 0) { element.innerHTML = '<li>Noch keine Einträge.</li>'; return; }
-        entries.forEach((entry, idx) => {
-            const li = document.createElement('li');
-            li.textContent = `${idx+1}. ${entry.name}: ${entry.score} Klicks`;
-            element.appendChild(li);
-        });
-    }
-
-    // ========== EINZELSPIELER ==========
-    let soloActive = false, soloCount = 0, soloCountdown = null, soloTimeLeft = 30;
-    const soloNameInput = document.getElementById('soloName');
-    const soloStartBtn = document.getElementById('soloStartBtn');
-    const soloGamePanel = document.getElementById('soloGamePanel');
-    const soloClickBtn = document.getElementById('soloClickBtn');
-    const soloTimer = document.getElementById('soloTimer');
-    const soloScoreSpan = document.getElementById('soloScore');
-    const soloBackBtn = document.getElementById('soloBackBtn');
-
-    function loadSavedName() {
-        const saved = localStorage.getItem('clickChallengePlayerName');
-        if (saved) soloNameInput.value = saved;
-        if (document.getElementById('botName')) document.getElementById('botName').value = saved;
-    }
-    function saveName(name) { localStorage.setItem('clickChallengePlayerName', name); }
-    async function saveGlobalScore(name, score) {
-        try {
-            await fetch(SHEETS_API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, score }) });
-            setTimeout(loadGlobalLeaderboard, 500);
-        } catch(e) { alert("Fehler beim Speichern"); }
-    }
-
-    function startSolo() {
-        let name = soloNameInput.value.trim();
-        if (!name) { alert("Bitte Namen eingeben!"); return; }
-        saveName(name);
-        soloNameInput.disabled = true;
-        soloStartBtn.style.display = 'none';
-        soloGamePanel.style.display = 'block';
-        soloActive = true; soloCount = 0; soloTimeLeft = 30;
-        soloScoreSpan.innerText = `Klicks: 0`;
-        soloTimer.innerText = `30.0 s`;
-        soloClickBtn.disabled = false;
-        if (soloCountdown) clearInterval(soloCountdown);
-        const start = Date.now();
-        soloCountdown = setInterval(() => {
-            if (!soloActive) return;
-            const elapsed = (Date.now() - start) / 1000;
-            const rem = Math.max(0, 30 - elapsed);
-            soloTimeLeft = rem;
-            soloTimer.innerText = `${rem.toFixed(1)} s`;
-            if (rem <= 0) { clearInterval(soloCountdown); endSolo(); }
-        }, 100);
-    }
-    async function endSolo() {
-        if (!soloActive) return;
-        soloActive = false; soloClickBtn.disabled = true; clearInterval(soloCountdown);
-        const final = soloCount;
-        const name = soloNameInput.value.trim();
-        await saveGlobalScore(name, final);
-        alert(`Zeit vorbei! Du hast ${final} Klicks.`);
-        soloGamePanel.style.display = 'none';
-        soloNameInput.disabled = false;
-        soloStartBtn.style.display = 'inline-block';
-    }
-    function cancelSolo() { if (soloCountdown) clearInterval(soloCountdown); soloActive = false; soloGamePanel.style.display = 'none'; soloNameInput.disabled = false; soloStartBtn.style.display = 'inline-block'; }
-    soloClickBtn.addEventListener('click', () => { if (soloActive && soloTimeLeft > 0) { soloCount++; soloScoreSpan.innerText = `Klicks: ${soloCount}`; soloClickBtn.style.transform = 'scale(0.95)'; setTimeout(() => soloClickBtn.style.transform = '', 100); } });
-    soloStartBtn.addEventListener('click', startSolo);
-    soloBackBtn.addEventListener('click', cancelSolo);
-
-    // ========== LOKALES DUELL ==========
-    let p1Active = false, p2Active = false, p1Clicks = 0, p2Clicks = 0, p1TimerInt = null, p2TimerInt = null, p1Time = 30, p2Time = 30;
-    const p1Start = document.getElementById('p1StartBtn'), p1Game = document.getElementById('p1GameArea'), p1Click = document.getElementById('p1ClickBtn'), p1Cancel = document.getElementById('p1CancelBtn'), p1TimerEl = document.getElementById('p1Timer'), p1ScoreEl = document.getElementById('p1Score');
-    const p2Start = document.getElementById('p2StartBtn'), p2Game = document.getElementById('p2GameArea'), p2Click = document.getElementById('p2ClickBtn'), p2Cancel = document.getElementById('p2CancelBtn'), p2TimerEl = document.getElementById('p2Timer'), p2ScoreEl = document.getElementById('p2Score');
-    const localResultDiv = document.getElementById('localResult'), localResetBtn = document.getElementById('localResetBtn');
-    function updateLocalResult() {
-        if (!p1Active && !p2Active && (p1Clicks > 0 || p2Clicks > 0)) {
-            if (p1Clicks > p2Clicks) localResultDiv.innerHTML = `🏆 Spieler 1 gewinnt! ${p1Clicks} : ${p2Clicks}`;
-            else if (p2Clicks > p1Clicks) localResultDiv.innerHTML = `🏆 Spieler 2 gewinnt! ${p1Clicks} : ${p2Clicks}`;
-            else if (p1Clicks === p2Clicks && p1Clicks > 0) localResultDiv.innerHTML = `🤝 Unentschieden! ${p1Clicks} : ${p2Clicks}`;
-            else localResultDiv.innerHTML = `⭐ Wer gewinnt? Starte beide Spieler nacheinander!`;
-        } else if (!p1Active && !p2Active && p1Clicks === 0 && p2Clicks === 0) localResultDiv.innerHTML = `⭐ Wer gewinnt? Starte beide Spieler nacheinander!`;
-    }
-    function startPlayer1() { if (p1Active) return; p1Start.style.display='none'; p1Game.style.display='block'; p1Active=true; p1Clicks=0; p1Time=30; p1ScoreEl.innerText="0"; p1TimerEl.innerText="30.0 s"; p1Click.disabled=false; if(p1TimerInt) clearInterval(p1TimerInt); const start=Date.now(); p1TimerInt=setInterval(()=>{ if(!p1Active) return; const elapsed=(Date.now()-start)/1000; const rem=Math.max(0,30-elapsed); p1Time=rem; p1TimerEl.innerText=`${rem.toFixed(1)} s`; if(rem<=0){ clearInterval(p1TimerInt); endPlayer1(); } },100); }
-    function endPlayer1() { if(!p1Active) return; p1Active=false; p1Click.disabled=true; clearInterval(p1TimerInt); p1ScoreEl.innerText=p1Clicks; p1Game.style.display='none'; p1Start.style.display='inline-block'; updateLocalResult(); }
-    function cancelPlayer1() { if(p1TimerInt) clearInterval(p1TimerInt); p1Active=false; p1Game.style.display='none'; p1Start.style.display='inline-block'; p1Clicks=0; p1ScoreEl.innerText="0"; updateLocalResult(); }
-    p1Click.addEventListener('click',()=>{ if(p1Active && p1Time>0){ p1Clicks++; p1ScoreEl.innerText=p1Clicks; p1Click.style.transform='scale(0.95)'; setTimeout(()=>p1Click.style.transform='',100); } });
-    p1Start.addEventListener('click', startPlayer1);
-    p1Cancel.addEventListener('click', cancelPlayer1);
-    function startPlayer2() { if (p2Active) return; p2Start.style.display='none'; p2Game.style.display='block'; p2Active=true; p2Clicks=0; p2Time=30; p2ScoreEl.innerText="0"; p2TimerEl.innerText="30.0 s"; p2Click.disabled=false; if(p2TimerInt) clearInterval(p2TimerInt); const start=Date.now(); p2TimerInt=setInterval(()=>{ if(!p2Active) return; const elapsed=(Date.now()-start)/1000; const rem=Math.max(0,30-elapsed); p2Time=rem; p2TimerEl.innerText=`${rem.toFixed(1)} s`; if(rem<=0){ clearInterval(p2TimerInt); endPlayer2(); } },100); }
-    function endPlayer2() { if(!p2Active) return; p2Active=false; p2Click.disabled=true; clearInterval(p2TimerInt); p2ScoreEl.innerText=p2Clicks; p2Game.style.display='none'; p2Start.style.display='inline-block'; updateLocalResult(); }
-    function cancelPlayer2() { if(p2TimerInt) clearInterval(p2TimerInt); p2Active=false; p2Game.style.display='none'; p2Start.style.display='inline-block'; p2Clicks=0; p2ScoreEl.innerText="0"; updateLocalResult(); }
-    p2Click.addEventListener('click',()=>{ if(p2Active && p2Time>0){ p2Clicks++; p2ScoreEl.innerText=p2Clicks; p2Click.style.transform='scale(0.95)'; setTimeout(()=>p2Click.style.transform='',100); } });
-    p2Start.addEventListener('click', startPlayer2);
-    p2Cancel.addEventListener('click', cancelPlayer2);
-    function resetLocal() { if(p1Active) cancelPlayer1(); else { p1Start.style.display='inline-block'; p1Game.style.display='none'; p1Clicks=0; p1ScoreEl.innerText="0"; } if(p2Active) cancelPlayer2(); else { p2Start.style.display='inline-block'; p2Game.style.display='none'; p2Clicks=0; p2ScoreEl.innerText="0"; } localResultDiv.innerHTML="⭐ Wer gewinnt? Starte beide Spieler nacheinander!"; }
-    localResetBtn.addEventListener('click', resetLocal);
-
-    // ========== ONLINE-DUELL (mit Code) ==========
-    let onlineRoomId = null, onlinePlayerRole = null, onlineGameActive = false, onlineClickCount = 0, onlineCountdown = null, onlineTimeLeft = 30;
-    const createRoomBtn = document.getElementById('createRoomBtn');
-    const codeDisplayArea = document.getElementById('codeDisplayArea');
-    const roomCodeDisplaySpan = document.getElementById('roomCodeDisplay');
-    const copyCodeBtn = document.getElementById('copyCodeBtn');
-    const joinCodeInput = document.getElementById('joinCodeInput');
-    const joinRoomBtn = document.getElementById('joinRoomBtn');
-    const onlineStatusDiv = document.getElementById('onlineStatus');
-    const onlineGameArea = document.getElementById('onlineGameArea');
-    const onlineTimer = document.getElementById('onlineTimer');
-    const onlineScoreSpan = document.getElementById('onlineScore');
-    const onlineClickBtn = document.getElementById('onlineClickBtn');
-    const onlineCancelBtn = document.getElementById('onlineCancelBtn');
-
-    async function callDuellAPI(action, data) {
-        const url = SHEETS_API_URL;
-        if (action === 'get') {
-            const res = await fetch(`${url}?action=duell&id=${data.raumId}`);
-            return await res.json();
-        } else if (action === 'post') {
-            await fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'duell', ...data }) });
-            return { success: true };
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
         }
     }
+</script>
 
-    async function checkOnlineStatus() {
-        if (!onlineRoomId) return;
-        try {
-            const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${onlineRoomId}`);
-            const data = await res.json();
-            if (data.error) return;
-            if (data.status === "fertig") {
-                onlineStatusDiv.innerHTML = `Duell beendet!<br>${data.spieler1Name}: ${data.spieler1Score} – ${data.spieler2Name}: ${data.spieler2Score}<br>Sieger: ${data.spieler1Score > data.spieler2Score ? data.spieler1Name : (data.spieler2Score > data.spieler1Score ? data.spieler2Name : "Unentschieden")}`;
-                onlineGameArea.style.display = 'none';
-                return;
+<script type="module">
+    import * as THREE from 'three';
+
+    // DOM Elemente
+    const gameContainer = document.getElementById('gameContainer');
+    const startBtn = document.getElementById('startGameBtn');
+    const stopBtn = document.getElementById('stopGameBtn');
+    const restartBtn = document.getElementById('restartGameBtn');
+    const gameOverMsgDiv = document.getElementById('gameOverMsg');
+    const scoreSpan = document.getElementById('scoreDisplay');
+    const canvas = document.getElementById('canvas3d');
+    const autoMenuLink = document.getElementById('autoMenuLink'); // Menü-Link
+
+    // Globale Variablen
+    let scene, camera, renderer;
+    let car;
+    let obstacles = [];
+    let roadSegments = [];
+    let isGameRunning = false;
+    let gameOverFlag = false;
+    let score = 0;
+    let baseSpeed = 0.22;
+    let currentSpeed = baseSpeed;
+    let animationId = null;
+    
+    // Bewegung
+    let leftPressed = false, rightPressed = false;
+    let carX = 0;
+    const minX = -2.8;
+    const maxX = 2.8;
+    
+    // Weltparameter
+    const roadLength = 30;
+    const obstacleSpawnDistance = 25;
+    let nextObstacleZ = -15;
+    
+    // Hilfsfunktionen
+    function init3D() {
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a2a2a);
+        scene.fog = new THREE.FogExp2(0x0a2a2a, 0.008);
+        
+        camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 200);
+        camera.position.set(0, 5, 12);
+        camera.lookAt(0, 0, 0);
+        
+        renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.shadowMap.enabled = true;
+        
+        // Licht
+        const ambient = new THREE.AmbientLight(0x404060);
+        scene.add(ambient);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(5, 12, 8);
+        dirLight.castShadow = true;
+        dirLight.receiveShadow = true;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        scene.add(dirLight);
+        const fillLight = new THREE.PointLight(0x4466cc, 0.5);
+        fillLight.position.set(0, 4, -5);
+        scene.add(fillLight);
+        
+        // Boden (Gras)
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(40, 200),
+            new THREE.MeshStandardMaterial({ color: 0x2a5a2a, roughness: 0.9 })
+        );
+        ground.rotation.x = -Math.PI/2;
+        ground.position.y = -0.2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        // Auto erstellen
+        car = new THREE.Group();
+        const bodyGeo = new THREE.BoxGeometry(1.0, 0.4, 2.0);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xe34234, metalness: 0.7, roughness: 0.3 });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.castShadow = true;
+        body.receiveShadow = true;
+        body.position.y = 0.2;
+        car.add(body);
+        
+        const roofGeo = new THREE.BoxGeometry(0.8, 0.3, 1.2);
+        const roofMat = new THREE.MeshStandardMaterial({ color: 0xcc5533 });
+        const roof = new THREE.Mesh(roofGeo, roofMat);
+        roof.position.y = 0.55;
+        roof.castShadow = true;
+        car.add(roof);
+        
+        const windowMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, emissive: 0x224466 });
+        const frontWind = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 0.1), windowMat);
+        frontWind.position.set(0, 0.5, 0.85);
+        car.add(frontWind);
+        
+        const rearWind = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 0.1), windowMat);
+        rearWind.position.set(0, 0.5, -0.85);
+        car.add(rearWind);
+        
+        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.3 });
+        const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.3, 16);
+        const wheelPos = [[-0.7, 0.12, 0.85], [0.7, 0.12, 0.85], [-0.7, 0.12, -0.85], [0.7, 0.12, -0.85]];
+        wheelPos.forEach(pos => {
+            const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+            wheel.rotation.z = Math.PI/2;
+            wheel.position.set(pos[0], pos[1], pos[2]);
+            wheel.castShadow = true;
+            car.add(wheel);
+        });
+        car.position.y = 0.1;
+        car.castShadow = true;
+        scene.add(car);
+        
+        // Straßen-Segmente
+        function createRoadSegment(zPos) {
+            const group = new THREE.Group();
+            const roadMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.6 });
+            const roadPlane = new THREE.Mesh(new THREE.PlaneGeometry(6, roadLength), roadMat);
+            roadPlane.rotation.x = -Math.PI/2;
+            roadPlane.position.y = -0.05;
+            roadPlane.receiveShadow = true;
+            group.add(roadPlane);
+            
+            const stripeMat = new THREE.MeshStandardMaterial({ color: 0xffcc44 });
+            for (let i = -roadLength/2 + 1; i < roadLength/2; i+= 1.8) {
+                const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.05, 0.6), stripeMat);
+                stripe.position.set(0, 0.02, i);
+                stripe.castShadow = false;
+                group.add(stripe);
             }
-            if (onlinePlayerRole === "spieler1" && data.spieler2Name && data.spieler2Name !== "") {
-                onlineStatusDiv.innerHTML = `Gegner (${data.spieler2Name}) ist beigetreten! Du kannst jetzt deine Runde spielen.`;
-            } else if (onlinePlayerRole === "spieler2" && data.spieler1Name && data.spieler1Score === 0) {
-                onlineStatusDiv.innerHTML = `Gegner ${data.spieler1Name} wartet auf deinen Zug. Klicke auf "Runde spielen".`;
+            const edgeMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
+            const leftEdge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, roadLength), edgeMat);
+            leftEdge.position.set(-2.95, 0.02, 0);
+            group.add(leftEdge);
+            const rightEdge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, roadLength), edgeMat);
+            rightEdge.position.set(2.95, 0.02, 0);
+            group.add(rightEdge);
+            
+            group.position.z = zPos;
+            return group;
+        }
+        
+        for (let i = -2; i <= 2; i++) {
+            const seg = createRoadSegment(i * roadLength);
+            scene.add(seg);
+            roadSegments.push(seg);
+        }
+        
+        function updateCamera() {
+            camera.position.x += (car.position.x - camera.position.x) * 0.1;
+            camera.lookAt(car.position.x, 0.5, 0);
+        }
+        return { updateCamera };
+    }
+    
+    function createTree(x, z) {
+        const group = new THREE.Group();
+        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B5A2B, roughness: 0.8 });
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 1.0, 6), trunkMat);
+        trunk.position.y = 0.5;
+        trunk.castShadow = true;
+        group.add(trunk);
+        
+        const leafMat = new THREE.MeshStandardMaterial({ color: 0x3c9e3c });
+        const foliage1 = new THREE.Mesh(new THREE.ConeGeometry(0.6, 0.8, 8), leafMat);
+        foliage1.position.y = 1.0;
+        foliage1.castShadow = true;
+        group.add(foliage1);
+        const foliage2 = new THREE.Mesh(new THREE.ConeGeometry(0.5, 0.7, 8), leafMat);
+        foliage2.position.y = 1.5;
+        foliage2.castShadow = true;
+        group.add(foliage2);
+        
+        group.position.set(x, 0, z);
+        return group;
+    }
+    
+    function spawnObstacle(zPos) {
+        const xPos = (Math.random() - 0.5) * 5.0;
+        const clampedX = Math.min(maxX - 0.5, Math.max(minX + 0.5, xPos));
+        const tree = createTree(clampedX, zPos);
+        scene.add(tree);
+        obstacles.push({
+            mesh: tree,
+            collisionRadius: 0.7,
+            x: clampedX,
+            z: zPos
+        });
+    }
+    
+    function updateObstacles(speed) {
+        for (let i = 0; i < obstacles.length; i++) {
+            const obs = obstacles[i];
+            obs.z -= speed;
+            obs.mesh.position.z = obs.z;
+        }
+        obstacles = obstacles.filter(obs => {
+            if (obs.z < -12) {
+                scene.remove(obs.mesh);
+                return false;
             }
-        } catch(e) { console.log(e); }
-        setTimeout(checkOnlineStatus, 2000);
-    }
-
-    function generateRoomCode() { return Math.floor(1000 + Math.random() * 9000).toString(); }
-
-    createRoomBtn.addEventListener('click', async () => {
-        const name = soloNameInput.value.trim() || "Spieler1";
-        if (!name) { alert("Bitte im Einzelspieler-Feld deinen Namen eingeben."); return; }
-        let code = generateRoomCode();
-        let exists = true;
-        while (exists) {
-            const check = await fetch(`${SHEETS_API_URL}?action=duell&id=${code}`);
-            const data = await check.json();
-            if (data.error || !data.raumId) exists = false;
-            else { code = generateRoomCode(); }
-        }
-        await callDuellAPI('post', { raumId: code, spieler1Name: name, spieler1Score: 0, status: "wartet" });
-        onlineRoomId = code;
-        roomCodeDisplaySpan.innerText = code;
-        codeDisplayArea.style.display = 'block';
-        onlineStatusDiv.innerHTML = `Raum erstellt! Teile den Code ${code}. Warte auf Gegner...<br>Du bist Spieler 1.`;
-        onlinePlayerRole = "spieler1";
-        checkOnlineStatus();
-    });
-
-    joinRoomBtn.addEventListener('click', async () => {
-        let code = joinCodeInput.value.trim();
-        if (!code || code.length !== 4 || isNaN(code)) { alert("Bitte einen 4‑stelligen Code eingeben."); return; }
-        const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${code}`);
-        const data = await res.json();
-        if (data.error) { alert("Raum nicht gefunden. Prüfe den Code."); return; }
-        onlineRoomId = code;
-        onlinePlayerRole = "spieler2";
-        onlineStatusDiv.innerHTML = `Raum beigetreten. Warte auf Gegner...`;
-        const name = soloNameInput.value.trim();
-        if (name) await callDuellAPI('post', { raumId: code, spieler2Name: name, status: "wartet" });
-        checkOnlineStatus();
-    });
-
-    copyCodeBtn.addEventListener('click', () => { navigator.clipboard.writeText(roomCodeDisplaySpan.innerText); alert("Code kopiert!"); });
-
-    function startOnlineGame() {
-        if (onlineGameActive) return;
-        if (!onlineRoomId) { alert("Kein aktives Duell."); return; }
-        onlineGameArea.style.display = 'block';
-        onlineGameActive = true;
-        onlineClickCount = 0;
-        onlineTimeLeft = 30;
-        onlineScoreSpan.innerText = `Klicks: 0`;
-        onlineTimer.innerText = `30.0 s`;
-        onlineClickBtn.disabled = false;
-        if (onlineCountdown) clearInterval(onlineCountdown);
-        const start = Date.now();
-        onlineCountdown = setInterval(() => {
-            if (!onlineGameActive) return;
-            const elapsed = (Date.now() - start) / 1000;
-            const rem = Math.max(0, 30 - elapsed);
-            onlineTimeLeft = rem;
-            onlineTimer.innerText = `${rem.toFixed(1)} s`;
-            if (rem <= 0) { clearInterval(onlineCountdown); endOnlineGame(); }
-        }, 100);
-    }
-
-    async function endOnlineGame() {
-        if (!onlineGameActive) return;
-        onlineGameActive = false;
-        onlineClickBtn.disabled = true;
-        clearInterval(onlineCountdown);
-        const finalScore = onlineClickCount;
-        const updateData = { raumId: onlineRoomId };
-        if (onlinePlayerRole === "spieler1") updateData.spieler1Score = finalScore;
-        else updateData.spieler2Score = finalScore;
-        const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${onlineRoomId}`);
-        const data = await res.json();
-        let newStatus = "wartet";
-        if (onlinePlayerRole === "spieler1" && data.spieler2Score !== undefined && data.spieler2Score > 0) newStatus = "fertig";
-        if (onlinePlayerRole === "spieler2" && data.spieler1Score !== undefined && data.spieler1Score > 0) newStatus = "fertig";
-        updateData.status = newStatus;
-        await callDuellAPI('post', updateData);
-        alert(`Dein Ergebnis: ${finalScore} Klicks. ${newStatus === "fertig" ? "Duell beendet!" : "Warte auf Gegner..."}`);
-        onlineGameArea.style.display = 'none';
-        checkOnlineStatus();
-    }
-
-    onlineClickBtn.addEventListener('click', () => {
-        if (onlineGameActive && onlineTimeLeft > 0) {
-            onlineClickCount++;
-            onlineScoreSpan.innerText = `Klicks: ${onlineClickCount}`;
-            onlineClickBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => onlineClickBtn.style.transform = '', 100);
-        }
-    });
-    onlineCancelBtn.addEventListener('click', () => {
-        if (onlineCountdown) clearInterval(onlineCountdown);
-        onlineGameActive = false;
-        onlineGameArea.style.display = 'none';
-    });
-
-    const startOnlineRoundBtn = document.createElement('button');
-    startOnlineRoundBtn.innerText = "🎮 Runde spielen (30s)";
-    startOnlineRoundBtn.className = "btn";
-    startOnlineRoundBtn.style.margin = "10px";
-    startOnlineRoundBtn.addEventListener('click', startOnlineGame);
-    if (onlineStatusDiv) onlineStatusDiv.parentElement.appendChild(startOnlineRoundBtn);
-
-    // ========== BOT-DUELL (gegen KI) ==========
-    let botActive = false, botCount = 0, botCountdown = null, botTimeLeft = 30;
-    const botNameInput = document.getElementById('botName');
-    const botStartBtn = document.getElementById('botStartBtn');
-    const botGamePanel = document.getElementById('botGamePanel');
-    const botClickBtn = document.getElementById('botClickBtn');
-    const botTimer = document.getElementById('botTimer');
-    const botScoreSpan = document.getElementById('botScore');
-    const botGameBackBtn = document.getElementById('botGameBackBtn');
-    const botResultDiv = document.getElementById('botResult');
-
-    function startBotGame() {
-        let name = botNameInput.value.trim();
-        if (!name) { alert("Bitte deinen Namen eingeben!"); return; }
-        saveName(name);
-        botNameInput.disabled = true;
-        botStartBtn.style.display = 'none';
-        botGamePanel.style.display = 'block';
-        botResultDiv.innerHTML = "";
-        botActive = true; botCount = 0; botTimeLeft = 30;
-        botScoreSpan.innerText = `Klicks: 0`;
-        botTimer.innerText = `30.0 s`;
-        botClickBtn.disabled = false;
-        if (botCountdown) clearInterval(botCountdown);
-        const start = Date.now();
-        botCountdown = setInterval(() => {
-            if (!botActive) return;
-            const elapsed = (Date.now() - start) / 1000;
-            const rem = Math.max(0, 30 - elapsed);
-            botTimeLeft = rem;
-            botTimer.innerText = `${rem.toFixed(1)} s`;
-            if (rem <= 0) { clearInterval(botCountdown); endBotGame(); }
-        }, 100);
-    }
-
-    async function endBotGame() {
-        if (!botActive) return;
-        botActive = false;
-        botClickBtn.disabled = true;
-        clearInterval(botCountdown);
-        const playerScore = botCount;
-        const name = botNameInput.value.trim();
-        await saveGlobalScore(name, playerScore);
-        
-        let min = Math.floor(playerScore * 0.8);
-        let max = Math.floor(playerScore * 1.2);
-        if (max < min) max = min + 5;
-        const botScore = Math.floor(Math.random() * (max - min + 1) + min);
-        const finalBot = Math.max(0, botScore);
-        
-        let resultText = "";
-        if (playerScore > finalBot) resultText = `🎉 Du gewinnst! ${playerScore} : ${finalBot} 🎉`;
-        else if (finalBot > playerScore) resultText = `🤖 Der Bot gewinnt! ${playerScore} : ${finalBot} 🤖`;
-        else resultText = `🤝 Unentschieden! ${playerScore} : ${finalBot} 🤝`;
-        botResultDiv.innerHTML = resultText;
-        
-        alert(`Deine Punktzahl: ${playerScore}\nBot: ${finalBot}\n${resultText}`);
-        botGamePanel.style.display = 'none';
-        botNameInput.disabled = false;
-        botStartBtn.style.display = 'inline-block';
-    }
-
-    function cancelBotGame() {
-        if (botCountdown) clearInterval(botCountdown);
-        botActive = false;
-        botGamePanel.style.display = 'none';
-        botNameInput.disabled = false;
-        botStartBtn.style.display = 'inline-block';
-        botResultDiv.innerHTML = "";
-    }
-
-    botClickBtn.addEventListener('click', () => {
-        if (botActive && botTimeLeft > 0) {
-            botCount++;
-            botScoreSpan.innerText = `Klicks: ${botCount}`;
-            botClickBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => botClickBtn.style.transform = '', 100);
-        }
-    });
-    botStartBtn.addEventListener('click', startBotGame);
-    botGameBackBtn.addEventListener('click', cancelBotGame);
-
-    // ========== NAVIGATION ==========
-    const startPage = document.getElementById('startPage');
-    const soloDiv = document.getElementById('soloMode');
-    const localDiv = document.getElementById('localMode');
-    const onlineDiv = document.getElementById('onlineMode');
-    const botDiv = document.getElementById('botMode');
-
-    function showStart() {
-        startPage.classList.remove('hidden');
-        soloDiv.classList.add('hidden');
-        localDiv.classList.add('hidden');
-        onlineDiv.classList.add('hidden');
-        botDiv.classList.add('hidden');
-        loadGlobalLeaderboard();
-    }
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const mode = btn.getAttribute('data-mode');
-            startPage.classList.add('hidden');
-            if (mode === 'solo') soloDiv.classList.remove('hidden');
-            else if (mode === 'local') localDiv.classList.remove('hidden');
-            else if (mode === 'online') onlineDiv.classList.remove('hidden');
-            else if (mode === 'bot') botDiv.classList.remove('hidden');
+            return true;
         });
-    });
-    document.querySelectorAll('[data-back]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (btn.getAttribute('data-back') === 'solo') cancelSolo();
-            else if (btn.getAttribute('data-back') === 'local') resetLocal();
-            else if (btn.getAttribute('data-back') === 'online') {
-                if (onlineCountdown) clearInterval(onlineCountdown);
-                onlineGameActive = false;
-                onlineGameArea.style.display = 'none';
-                onlineRoomId = null;
-                onlinePlayerRole = null;
-                onlineStatusDiv.innerHTML = "Kein aktives Duell.";
-                codeDisplayArea.style.display = 'none';
-            } else if (btn.getAttribute('data-back') === 'bot') cancelBotGame();
-            showStart();
+    }
+    
+    function manageObstacleSpawning() {
+        if (!isGameRunning) return;
+        let maxZ = -30;
+        for (let obs of obstacles) {
+            if (obs.z > maxZ) maxZ = obs.z;
+        }
+        while (maxZ < 20) {
+            const newZ = maxZ + obstacleSpawnDistance;
+            spawnObstacle(newZ);
+            maxZ = newZ;
+        }
+    }
+    
+    function checkCollisions() {
+        const carRadius = 0.6;
+        for (let obs of obstacles) {
+            const dx = car.position.x - obs.x;
+            const dz = 0 - obs.z;
+            const dist = Math.hypot(dx, dz);
+            if (dist < carRadius + obs.collisionRadius) {
+                gameOver();
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    function gameOver() {
+        if (!isGameRunning) return;
+        isGameRunning = false;
+        gameOverFlag = true;
+        gameOverMsgDiv.style.display = 'block';
+        restartBtn.style.display = 'inline-block';
+        if (animationId) cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+    
+    function restartGame() {
+        for (let obs of obstacles) {
+            scene.remove(obs.mesh);
+        }
+        obstacles = [];
+        score = 0;
+        scoreSpan.innerText = `Score: 0`;
+        currentSpeed = baseSpeed;
+        carX = 0;
+        car.position.x = 0;
+        gameOverFlag = false;
+        gameOverMsgDiv.style.display = 'none';
+        restartBtn.style.display = 'none';
+        for (let i = 0; i < roadSegments.length; i++) {
+            roadSegments[i].position.z = (i - 2) * roadLength;
+        }
+        nextObstacleZ = -15;
+        for (let i = 0; i < 4; i++) {
+            spawnObstacle(-10 + i * obstacleSpawnDistance);
+        }
+        isGameRunning = true;
+        gameLoop();
+    }
+    
+    function updateRoad(speed) {
+        for (let seg of roadSegments) {
+            seg.position.z -= speed;
+        }
+        for (let i = 0; i < roadSegments.length; i++) {
+            if (roadSegments[i].position.z < -roadLength) {
+                roadSegments[i].position.z += roadLength * roadSegments.length;
+            }
+        }
+    }
+    
+    let lastScoreUpdate = 0;
+    function updateScore(speed) {
+        if (!isGameRunning) return;
+        score += speed * 2;
+        scoreSpan.innerText = `Score: ${Math.floor(score)}`;
+        if (Math.floor(score) > lastScoreUpdate + 200) {
+            lastScoreUpdate = Math.floor(score);
+            currentSpeed = Math.min(0.55, currentSpeed + 0.02);
+        }
+    }
+    
+    function handleKeyDown(e) {
+        if (!isGameRunning || gameOverFlag) return;
+        if (e.key === 'ArrowLeft') {
+            leftPressed = true;
+            e.preventDefault();
+        } else if (e.key === 'ArrowRight') {
+            rightPressed = true;
+            e.preventDefault();
+        }
+    }
+    function handleKeyUp(e) {
+        if (e.key === 'ArrowLeft') leftPressed = false;
+        else if (e.key === 'ArrowRight') rightPressed = false;
+    }
+    
+    function updateCar() {
+        if (!isGameRunning || gameOverFlag) return;
+        let move = 0;
+        if (leftPressed) move = -0.18;
+        if (rightPressed) move = 0.18;
+        carX += move;
+        carX = Math.min(maxX, Math.max(minX, carX));
+        car.position.x = carX;
+    }
+    
+    let cameraHelper;
+    function gameLoop() {
+        if (!isGameRunning) return;
+        updateCar();
+        const speed = currentSpeed;
+        updateRoad(speed);
+        updateObstacles(speed);
+        manageObstacleSpawning();
+        updateScore(speed);
+        if (checkCollisions()) {
+            return;
+        }
+        if (cameraHelper) cameraHelper.updateCamera();
+        renderer.render(scene, camera);
+        animationId = requestAnimationFrame(gameLoop);
+    }
+    
+    let threeInit = false;
+    function startGame() {
+        if (isGameRunning) return;
+        gameContainer.style.display = "flex";
+        if (!threeInit) {
+            const initRes = init3D();
+            cameraHelper = initRes;
+            threeInit = true;
+            window.addEventListener('keydown', handleKeyDown);
+            window.addEventListener('keyup', handleKeyUp);
+            for (let i = 0; i < 5; i++) {
+                spawnObstacle(-10 + i * obstacleSpawnDistance);
+            }
+        } else {
+            restartGame();
+            return;
+        }
+        isGameRunning = true;
+        gameOverFlag = false;
+        score = 0;
+        currentSpeed = baseSpeed;
+        scoreSpan.innerText = "Score: 0";
+        gameOverMsgDiv.style.display = 'none';
+        restartBtn.style.display = 'none';
+        gameLoop();
+        
+        function handleResize() {
+            const w = canvas.clientWidth;
+            const h = canvas.clientHeight;
+            renderer.setSize(w, h);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
+    }
+    
+    function stopGame() {
+        if (animationId) cancelAnimationFrame(animationId);
+        isGameRunning = false;
+        gameContainer.style.display = "none";
+    }
+    
+    startBtn.addEventListener('click', startGame);
+    stopBtn.addEventListener('click', stopGame);
+    restartBtn.addEventListener('click', () => restartGame());
+    
+    // Menütaste "Auto" löst das Spiel aus und scrollt ggf. zur Spiel-Container
+    if (autoMenuLink) {
+        autoMenuLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            startGame();
+            // Sanft zum Spiel-Container scrollen (optional)
+            gameContainer.scrollIntoView({ behavior: 'smooth' });
         });
-    });
-    if (soloBackBtn) soloBackBtn.addEventListener('click', () => { cancelSolo(); showStart(); });
-
-    loadSavedName();
-    loadGlobalLeaderboard();
-    setInterval(loadGlobalLeaderboard, 5000);
-    showStart();
+    }
+    
+    gameContainer.style.display = "none";
+    console.log("✅ 3D-Rennen mit Bäumen – Menütaste 'Auto' hinzugefügt");
 </script>
 </body>
 </html>
