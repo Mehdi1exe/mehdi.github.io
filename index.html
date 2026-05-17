@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Klick-Challenge | 1+2 Spieler</title>
+    <title>Klick-Challenge | Einzel + Online-Duell</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto;
         }
         h1 {
@@ -35,20 +35,20 @@
             margin-bottom: 20px;
             color: #ccc;
         }
-        /* Einzelspieler-Bereich */
-        .solo-card {
+        .solo-card, .duel-card, .online-duel-card {
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(12px);
             border-radius: 48px;
             padding: 20px;
-            border: 1px solid #ffaa44;
             margin-bottom: 30px;
         }
-        .solo-card h2 {
-            color: #ffaa44;
-            text-align: center;
-            margin-bottom: 15px;
-        }
+        .solo-card { border: 1px solid #ffaa44; }
+        .duel-card { border: 1px solid #44aaff; }
+        .online-duel-card { border: 1px solid #ff66cc; }
+        h2 { text-align: center; margin-bottom: 15px; }
+        .solo-card h2 { color: #ffaa44; }
+        .duel-card h2 { color: #44aaff; }
+        .online-duel-card h2 { color: #ff66cc; }
         .name-input {
             padding: 12px 20px;
             border-radius: 40px;
@@ -92,55 +92,12 @@
         .leaderboard { background: rgba(0,0,0,0.6); border-radius: 24px; padding: 15px; margin-top: 20px; text-align: left; }
         .leaderboard h3 { color: #ffaa44; text-align: center; margin-bottom: 10px; }
         .leaderboard ol { padding-left: 25px; }
-
-        /* Zwei-Spieler-Bereich */
-        .duel-card {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(12px);
-            border-radius: 48px;
-            padding: 20px;
-            border: 1px solid #44aaff;
-            margin-top: 20px;
-        }
-        .duel-card h2 {
-            color: #44aaff;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .duel-players {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-        .player-box {
-            background: rgba(20, 30, 50, 0.7);
-            border-radius: 32px;
-            padding: 15px;
-            flex: 1;
-            min-width: 200px;
-            text-align: center;
-        }
-        .player-box h3 {
-            margin-bottom: 10px;
-        }
-        .player-score {
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .duel-result {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 1.3rem;
-            background: #000000aa;
-            border-radius: 40px;
-            padding: 10px;
-        }
-        .reset-duel {
-            background: #2c1a3a;
-            margin-top: 10px;
-        }
+        .duel-players { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .player-box { background: rgba(20,30,50,0.7); border-radius: 32px; padding: 15px; flex: 1; min-width: 200px; text-align: center; }
+        .player-score { font-size: 1.8rem; font-weight: bold; margin: 10px 0; }
+        .duel-result { text-align: center; margin-top: 15px; font-size: 1.2rem; background: #000000aa; border-radius: 40px; padding: 10px; word-break: break-all; }
+        .reset-duel { background: #2c1a3a; margin-top: 10px; }
+        .link-box { background: #111; padding: 8px; border-radius: 30px; margin: 10px 0; word-break: break-all; font-size: 0.8rem; }
         @media (max-width: 550px) {
             .click-btn { width: 140px; height: 140px; font-size: 1.5rem; }
             .player-box { min-width: 150px; }
@@ -150,9 +107,9 @@
 <body>
 <div class="container">
     <h1>⚡ KLICK-CHALLENGE ⚡</h1>
-    <p class="sub">Einzelspieler (global) + Duell auf einem Gerät</p>
+    <p class="sub">Einzel + lokales Duell + Online-Duell (asynchron)</p>
 
-    <!-- ========== EINZELSPIELER (global, wie gehabt) ========== -->
+    <!-- ========== EINZELSPIELER (global) ========== -->
     <div class="solo-card">
         <h2>👤 Einzelspieler · Globale Bestenliste</h2>
         <div>
@@ -171,41 +128,65 @@
         </div>
     </div>
 
-    <!-- ========== ZWEI-SPIELER-DUELL (lokal) ========== -->
+    <!-- ========== ONLINE-DUELL (asynchron über Link) ========== -->
+    <div class="online-duel-card" id="onlineDuelCard">
+        <h2>🌐 Online-Duell · Per Link einladen</h2>
+        <div id="duellMain">
+            <button id="createDuellBtn" class="btn">➕ Neues Duell erstellen</button>
+            <div id="duellLinkArea" style="margin-top:15px; display:none;">
+                <p>Link zum Teilen:</p>
+                <div class="link-box" id="duellLink"></div>
+                <button id="copyLinkBtn" class="btn">📋 Link kopieren</button>
+                <button id="joinDuellBtn" class="btn">📎 Duell beitreten (Link eingeben)</button>
+                <input type="text" id="duellCodeInput" class="name-input" placeholder="Link oder Raum-ID einfügen" style="width:90%;">
+                <div id="duellStatus" class="duel-result">Kein aktives Duell.</div>
+            </div>
+        </div>
+        <div id="duellGameArea" style="display: none;">
+            <div id="duellInfo"></div>
+            <div class="timer" id="duellTimer">20.0 s</div>
+            <div class="score-board" id="duellScore">Klicks: 0</div>
+            <button id="duellClickButton" class="click-btn">👆</button>
+            <button id="duellCancelBtn" class="btn reset-duel">Abbrechen</button>
+        </div>
+    </div>
+
+    <!-- ========== LOKALES DUELL (auf einem Gerät) ========== -->
     <div class="duel-card">
-        <h2>👥 Duell-Modus · Zwei Spieler (lokal)</h2>
+        <h2>👥 Lokales Duell · Zwei Spieler (ein Gerät)</h2>
         <div class="duel-players">
-            <div class="player-box" id="player1Box">
+            <div class="player-box">
                 <h3>⚡ Spieler 1</h3>
                 <div id="p1ScoreDisplay" class="player-score">0</div>
                 <button id="startP1Btn" class="btn">Start (20s)</button>
                 <div id="p1GameArea" style="display: none;">
                     <div class="timer" id="p1Timer">20.0 s</div>
                     <button id="p1ClickBtn" class="click-btn" style="width:120px; height:120px;">👆</button>
-                    <button id="p1CancelBtn" class="btn reset-duel" style="margin-top:8px;">Abbrechen</button>
+                    <button id="p1CancelBtn" class="btn reset-duel">Abbrechen</button>
                 </div>
             </div>
-            <div class="player-box" id="player2Box">
+            <div class="player-box">
                 <h3>⚡ Spieler 2</h3>
                 <div id="p2ScoreDisplay" class="player-score">0</div>
                 <button id="startP2Btn" class="btn">Start (20s)</button>
                 <div id="p2GameArea" style="display: none;">
                     <div class="timer" id="p2Timer">20.0 s</div>
                     <button id="p2ClickBtn" class="click-btn" style="width:120px; height:120px;">👆</button>
-                    <button id="p2CancelBtn" class="btn reset-duel" style="margin-top:8px;">Abbrechen</button>
+                    <button id="p2CancelBtn" class="btn reset-duel">Abbrechen</button>
                 </div>
             </div>
         </div>
-        <div id="duelResult" class="duel-result">⭐ Wer gewinnt? Starte beide Spieler nacheinander!</div>
-        <button id="resetDuelBtn" class="btn reset-duel">🔄 Duell zurücksetzen</button>
+        <div id="localDuelResult" class="duel-result">⭐ Wer gewinnt? Starte beide Spieler nacheinander!</div>
+        <button id="resetLocalDuelBtn" class="btn reset-duel">🔄 Zurücksetzen</button>
     </div>
 </div>
 
 <script>
-    // -------------------- GLOBALE BESTENLISTE (Google Sheets) --------------------
-    const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbzj2eg9NINUK692grtQr7UE7R64Q5lcbEM8PP-IoYTqYDsp2OehUFjvYIgI6G8lgGJK_Q/exec";
+    // ⬇️⬇️⬇️ HIER DEINE ECHTE WEB-APP URL EINTRAGEN ⬇️⬇️⬇️
+    const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbxJbRfanfBq8XSQ3ABvKheqhoyxrAgKF7D1P6lnH2EsJtVsWOlfeWANNM8vRuVuTXwkKg/exec";
+    // ⬆️⬆️⬆️ NICHTS ANDERES ÄNDERN, NUR DIESE ZEILE ⬆️⬆️⬆️
 
-    // DOM für Einzelspieler
+    // DOM Einzelspieler
     const soloStartBtn = document.getElementById('startSoloBtn');
     const soloGamePanel = document.getElementById('soloGamePanel');
     const soloClickBtn = document.getElementById('soloClickButton');
@@ -215,55 +196,33 @@
     const soloScoreSpan = document.getElementById('soloScore');
     const globalLeaderboardList = document.getElementById('globalLeaderboard');
 
-    let soloActive = false;
-    let soloClickCount = 0;
-    let soloCountdown = null;
-    let soloTimeLeft = 20;
+    let soloActive = false, soloClickCount = 0, soloCountdown = null, soloTimeLeft = 20;
 
-    // --- Name speichern/laden ---
     function loadSavedName() {
         const saved = localStorage.getItem('clickChallengePlayerName');
         if (saved) soloNameInput.value = saved;
     }
     function saveName(name) { localStorage.setItem('clickChallengePlayerName', name); }
 
-    // --- Globale Bestenliste laden ---
     async function loadGlobalLeaderboard() {
         try {
             const res = await fetch(SHEETS_API_URL);
             const data = await res.json();
             renderGlobalLeaderboard(data);
-        } catch(e) {
-            console.error(e);
-            globalLeaderboardList.innerHTML = '<li>Fehler beim Laden. Prüfe URL.</li>';
-        }
+        } catch(e) { console.error(e); globalLeaderboardList.innerHTML = '<li>Fehler beim Laden.</li>'; }
     }
     function renderGlobalLeaderboard(entries) {
         globalLeaderboardList.innerHTML = '';
-        if (!entries || entries.length === 0) {
-            globalLeaderboardList.innerHTML = '<li>Noch keine Einträge.</li>';
-            return;
-        }
-        entries.forEach((entry, idx) => {
-            const li = document.createElement('li');
-            li.textContent = `${idx+1}. ${entry.name}: ${entry.score} Klicks`;
-            globalLeaderboardList.appendChild(li);
-        });
+        if (!entries || entries.length === 0) { globalLeaderboardList.innerHTML = '<li>Noch keine Einträge.</li>'; return; }
+        entries.forEach((entry, idx) => { const li = document.createElement('li'); li.textContent = `${idx+1}. ${entry.name}: ${entry.score} Klicks`; globalLeaderboardList.appendChild(li); });
     }
-
     async function saveGlobalScore(name, score) {
         try {
-            await fetch(SHEETS_API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: name, score: score })
-            });
+            await fetch(SHEETS_API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, score }) });
             setTimeout(loadGlobalLeaderboard, 500);
-        } catch(e) { console.error(e); alert("Score konnte nicht gespeichert werden."); }
+        } catch(e) { alert("Fehler beim Speichern"); }
     }
 
-    // --- Einzelspieler-Logik ---
     function startSoloGame() {
         let name = soloNameInput.value.trim();
         if (!name) { alert("Bitte Namen eingeben!"); return; }
@@ -271,9 +230,7 @@
         soloNameInput.disabled = true;
         soloStartBtn.style.display = 'none';
         soloGamePanel.style.display = 'block';
-        soloActive = true;
-        soloClickCount = 0;
-        soloTimeLeft = 20;
+        soloActive = true; soloClickCount = 0; soloTimeLeft = 20;
         soloScoreSpan.innerText = `Klicks: 0`;
         soloTimerDisplay.innerText = `20.0 s`;
         soloClickBtn.disabled = false;
@@ -285,226 +242,272 @@
             const remaining = Math.max(0, 20 - elapsed);
             soloTimeLeft = remaining;
             soloTimerDisplay.innerText = `${remaining.toFixed(1)} s`;
+            if (remaining <= 0) { clearInterval(soloCountdown); endSoloGame(); }
+        }, 100);
+    }
+    async function endSoloGame() {
+        if (!soloActive) return;
+        soloActive = false; soloClickBtn.disabled = true; clearInterval(soloCountdown);
+        const finalScore = soloClickCount;
+        const playerName = soloNameInput.value.trim();
+        await saveGlobalScore(playerName, finalScore);
+        alert(`Zeit vorbei! Du hast ${finalScore} Klicks.`);
+        soloGamePanel.style.display = 'none'; soloNameInput.disabled = false; soloStartBtn.style.display = 'inline-block';
+    }
+    function cancelSoloGame() { if (soloCountdown) clearInterval(soloCountdown); soloActive = false; soloGamePanel.style.display = 'none'; soloNameInput.disabled = false; soloStartBtn.style.display = 'inline-block'; }
+    soloClickBtn.addEventListener('click', () => { if (soloActive && soloTimeLeft > 0) { soloClickCount++; soloScoreSpan.innerText = `Klicks: ${soloClickCount}`; soloClickBtn.style.transform = 'scale(0.95)'; setTimeout(() => soloClickBtn.style.transform = '', 100); } });
+    soloStartBtn.addEventListener('click', startSoloGame); soloResetBtn.addEventListener('click', cancelSoloGame);
+
+    // -------------------- ONLINE-DUELL (asynchron über Google Sheets) --------------------
+    let currentRoomId = null;
+    let duellGameActive = false, duellClickCount = 0, duellCountdown = null, duellTimeLeft = 20;
+    let duellPlayerRole = null; // "spieler1" oder "spieler2"
+    let duellStatus = null;
+
+    const createDuellBtn = document.getElementById('createDuellBtn');
+    const duellLinkArea = document.getElementById('duellLinkArea');
+    const duellLinkSpan = document.getElementById('duellLink');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    const joinDuellBtn = document.getElementById('joinDuellBtn');
+    const duellCodeInput = document.getElementById('duellCodeInput');
+    const duellStatusDiv = document.getElementById('duellStatus');
+    const duellGameArea = document.getElementById('duellGameArea');
+    const duellInfo = document.getElementById('duellInfo');
+    const duellTimer = document.getElementById('duellTimer');
+    const duellScoreSpan = document.getElementById('duellScore');
+    const duellClickButton = document.getElementById('duellClickButton');
+    const duellCancelBtn = document.getElementById('duellCancelBtn');
+
+    // Hilfsfunktion für API-Aufrufe (gleiche URL, aber mit ?action=duell&...)
+    async function callDuellAPI(action, data) {
+        const url = SHEETS_API_URL; // gleiche Web-App
+        if (action === 'get') {
+            const res = await fetch(`${url}?action=duell&id=${data.raumId}`);
+            return await res.json();
+        } else if (action === 'post') {
+            // Wir rufen einfach die POST-Methode mit speziellem Parameter auf
+            const res = await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'duell', ...data })
+            });
+            return { success: true }; // no-cors liefert keine Antwort
+        }
+    }
+
+    // Raum erstellen
+    createDuellBtn.addEventListener('click', async () => {
+        const name = soloNameInput.value.trim() || "Spieler1";
+        if (!name) { alert("Bitte im Einzelspieler-Feld deinen Namen eingeben."); return; }
+        const raumId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+        // Raum in Google Sheets anlegen (initial)
+        await callDuellAPI('post', { raumId, spieler1Name: name, spieler1Score: 0, status: "wartet" });
+        currentRoomId = raumId;
+        const fullLink = window.location.href.split('?')[0] + `?duell=${raumId}`;
+        duellLinkSpan.innerText = fullLink;
+        duellLinkArea.style.display = 'block';
+        duellStatusDiv.innerHTML = `Raum erstellt! Teile den Link. Warte auf Gegner...<br>Du bist Spieler 1.`;
+        duellPlayerRole = "spieler1";
+        // Auf Änderungen prüfen (alle 2 Sekunden)
+        checkDuellStatus();
+    });
+
+    async function checkDuellStatus() {
+        if (!currentRoomId) return;
+        try {
+            const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${currentRoomId}`);
+            const data = await res.json();
+            if (data.error) return;
+            duellStatus = data;
+            if (data.status === "fertig") {
+                duellStatusDiv.innerHTML = `Duell beendet!<br>${data.spieler1Name}: ${data.spieler1Score} – ${data.spieler2Name}: ${data.spieler2Score}<br>Sieger: ${data.spieler1Score > data.spieler2Score ? data.spieler1Name : (data.spieler2Score > data.spieler1Score ? data.spieler2Name : "Unentschieden")}`;
+                duellGameArea.style.display = 'none';
+                duellLinkArea.style.display = 'block';
+                return;
+            }
+            if (duellPlayerRole === "spieler1" && data.spieler2Name && data.spieler2Name !== "") {
+                duellStatusDiv.innerHTML = `Gegner (${data.spieler2Name}) ist beigetreten! Du kannst jetzt deine Runde spielen.`;
+                if (!duellGameActive && duellGameArea.style.display !== 'block') {
+                    // starte automatisch? Nein, warte auf Knopfdruck. Biete Start-Button an.
+                }
+            } else if (duellPlayerRole === "spieler2" && data.spieler1Name && data.spieler1Score === 0) {
+                duellStatusDiv.innerHTML = `Gegner ${data.spieler1Name} wartet auf deinen Zug. Klicke auf "Runde spielen".`;
+            }
+        } catch(e) { console.log(e); }
+        setTimeout(checkDuellStatus, 2000);
+    }
+
+    // Beitreten über Link (wird beim Laden der Seite mit URL-Parameter ausgeführt)
+    function joinDuellByUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('duell');
+        if (roomId) {
+            currentRoomId = roomId;
+            duellLinkArea.style.display = 'block';
+            duellLinkSpan.innerText = window.location.href;
+            duellPlayerRole = "spieler2";
+            duellStatusDiv.innerHTML = `Du trittst dem Duell bei. Warte auf Spieler 1 oder starte deine Runde, falls er schon gespielt hat.`;
+            checkDuellStatus();
+            // Name des Spielers übernehmen (aus Einzelspieler-Feld)
+            const name = soloNameInput.value.trim();
+            if (name) {
+                callDuellAPI('post', { raumId: currentRoomId, spieler2Name: name, status: "wartet" });
+            }
+        }
+    }
+
+    // Button zum manuellen Beitreten (Link eingeben)
+    joinDuellBtn.addEventListener('click', () => {
+        let input = duellCodeInput.value.trim();
+        if (!input) return;
+        let roomId = input;
+        if (input.includes('duell=')) {
+            const match = input.match(/duell=([^&]+)/);
+            if (match) roomId = match[1];
+        }
+        currentRoomId = roomId;
+        duellPlayerRole = "spieler2";
+        duellLinkArea.style.display = 'block';
+        duellLinkSpan.innerText = window.location.origin + window.location.pathname + `?duell=${roomId}`;
+        duellStatusDiv.innerHTML = `Raum beigetreten. Warte auf Gegner...`;
+        const name = soloNameInput.value.trim();
+        if (name) callDuellAPI('post', { raumId: currentRoomId, spieler2Name: name, status: "wartet" });
+        checkDuellStatus();
+    });
+
+    copyLinkBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(duellLinkSpan.innerText);
+        alert("Link kopiert!");
+    });
+
+    // Spiel starten im Duell
+    function startDuellGame() {
+        if (duellGameActive) return;
+        if (!currentRoomId) { alert("Kein aktives Duell."); return; }
+        duellGameArea.style.display = 'block';
+        duellLinkArea.style.display = 'none';
+        duellGameActive = true;
+        duellClickCount = 0;
+        duellTimeLeft = 20;
+        duellScoreSpan.innerText = `Klicks: 0`;
+        duellTimer.innerText = `20.0 s`;
+        duellClickButton.disabled = false;
+        if (duellCountdown) clearInterval(duellCountdown);
+        const startTime = Date.now();
+        duellCountdown = setInterval(() => {
+            if (!duellGameActive) return;
+            const elapsed = (Date.now() - startTime) / 1000;
+            const remaining = Math.max(0, 20 - elapsed);
+            duellTimeLeft = remaining;
+            duellTimer.innerText = `${remaining.toFixed(1)} s`;
             if (remaining <= 0) {
-                clearInterval(soloCountdown);
-                endSoloGame();
+                clearInterval(duellCountdown);
+                endDuellGame();
             }
         }, 100);
     }
 
-    async function endSoloGame() {
-        if (!soloActive) return;
-        soloActive = false;
-        soloClickBtn.disabled = true;
-        clearInterval(soloCountdown);
-        const finalScore = soloClickCount;
-        const playerName = soloNameInput.value.trim();
-        await saveGlobalScore(playerName, finalScore);
-        alert(`Zeit vorbei! Du hast ${finalScore} Klicks.\nEintrag in globale Bestenliste.`);
-        soloGamePanel.style.display = 'none';
-        soloNameInput.disabled = false;
-        soloStartBtn.style.display = 'inline-block';
+    async function endDuellGame() {
+        if (!duellGameActive) return;
+        duellGameActive = false;
+        duellClickButton.disabled = true;
+        clearInterval(duellCountdown);
+        const finalScore = duellClickCount;
+        // Ergebnis in Google Sheets speichern
+        const updateData = { raumId: currentRoomId };
+        if (duellPlayerRole === "spieler1") {
+            updateData.spieler1Score = finalScore;
+        } else {
+            updateData.spieler2Score = finalScore;
+        }
+        // Prüfen ob beide gespielt haben: dazu aktuellen Status laden
+        const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${currentRoomId}`);
+        const data = await res.json();
+        let newStatus = "wartet";
+        if (duellPlayerRole === "spieler1" && data.spieler2Score !== undefined && data.spieler2Score > 0) newStatus = "fertig";
+        if (duellPlayerRole === "spieler2" && data.spieler1Score !== undefined && data.spieler1Score > 0) newStatus = "fertig";
+        updateData.status = newStatus;
+        await callDuellAPI('post', updateData);
+        alert(`Dein Ergebnis: ${finalScore} Klicks. ${newStatus === "fertig" ? "Duell beendet!" : "Warte auf Gegner..."}`);
+        duellGameArea.style.display = 'none';
+        duellLinkArea.style.display = 'block';
+        checkDuellStatus();
     }
 
-    function cancelSoloGame() {
-        if (soloCountdown) clearInterval(soloCountdown);
-        soloActive = false;
-        soloGamePanel.style.display = 'none';
-        soloNameInput.disabled = false;
-        soloStartBtn.style.display = 'inline-block';
-    }
-
-    soloClickBtn.addEventListener('click', () => {
-        if (soloActive && soloTimeLeft > 0) {
-            soloClickCount++;
-            soloScoreSpan.innerText = `Klicks: ${soloClickCount}`;
-            soloClickBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => soloClickBtn.style.transform = '', 100);
+    duellClickButton.addEventListener('click', () => {
+        if (duellGameActive && duellTimeLeft > 0) {
+            duellClickCount++;
+            duellScoreSpan.innerText = `Klicks: ${duellClickCount}`;
+            duellClickButton.style.transform = 'scale(0.95)';
+            setTimeout(() => duellClickButton.style.transform = '', 100);
         }
     });
-    soloStartBtn.addEventListener('click', startSoloGame);
-    soloResetBtn.addEventListener('click', cancelSoloGame);
+    duellCancelBtn.addEventListener('click', () => {
+        if (duellCountdown) clearInterval(duellCountdown);
+        duellGameActive = false;
+        duellGameArea.style.display = 'none';
+        duellLinkArea.style.display = 'block';
+    });
 
-    // -------------------- ZWEI-SPIELER-DUELL (lokal) --------------------
-    // Für beide Spieler separate Zustände
+    // Einen zusätzlichen Button zum Starten der Runde im Duell anbieten
+    const startDuellRoundBtn = document.createElement('button');
+    startDuellRoundBtn.innerText = "🎮 Runde spielen (20s)";
+    startDuellRoundBtn.className = "btn";
+    startDuellRoundBtn.style.margin = "10px";
+    startDuellRoundBtn.addEventListener('click', startDuellGame);
+    duellStatusDiv.parentElement.appendChild(startDuellRoundBtn);
+
+    // -------------------- LOKALES DUELL (unverändert) --------------------
     let p1Active = false, p2Active = false;
     let p1Clicks = 0, p2Clicks = 0;
     let p1Timer = null, p2Timer = null;
     let p1TimeLeft = 20, p2TimeLeft = 20;
-
-    // DOM für Spieler 1
     const startP1Btn = document.getElementById('startP1Btn');
     const p1GameArea = document.getElementById('p1GameArea');
     const p1ClickBtn = document.getElementById('p1ClickBtn');
     const p1CancelBtn = document.getElementById('p1CancelBtn');
     const p1TimerDisplay = document.getElementById('p1Timer');
     const p1ScoreDisplay = document.getElementById('p1ScoreDisplay');
-
-    // DOM für Spieler 2
     const startP2Btn = document.getElementById('startP2Btn');
     const p2GameArea = document.getElementById('p2GameArea');
     const p2ClickBtn = document.getElementById('p2ClickBtn');
     const p2CancelBtn = document.getElementById('p2CancelBtn');
     const p2TimerDisplay = document.getElementById('p2Timer');
     const p2ScoreDisplay = document.getElementById('p2ScoreDisplay');
-    const duelResultDiv = document.getElementById('duelResult');
-    const resetDuelBtn = document.getElementById('resetDuelBtn');
+    const localDuelResult = document.getElementById('localDuelResult');
+    const resetLocalDuelBtn = document.getElementById('resetLocalDuelBtn');
 
-    function updateDuelResult() {
-        // Nur wenn beide Spieler mindestens einmal gespielt haben (also nicht mehr im Startzustand)
-        // Wir zeigen Ergebnis nach jedem Ende eines Spielers an, aber final nach beiden.
+    function updateLocalResult() {
         if (!p1Active && !p2Active && (p1Clicks > 0 || p2Clicks > 0)) {
-            if (p1Clicks > p2Clicks) {
-                duelResultDiv.innerHTML = "🏆 Spieler 1 gewinnt! 🏆<br>" + p1Clicks + " : " + p2Clicks;
-            } else if (p2Clicks > p1Clicks) {
-                duelResultDiv.innerHTML = "🏆 Spieler 2 gewinnt! 🏆<br>" + p1Clicks + " : " + p2Clicks;
-            } else if (p1Clicks === p2Clicks && p1Clicks > 0) {
-                duelResultDiv.innerHTML = "🤝 Unentschieden! 🤝<br>" + p1Clicks + " : " + p2Clicks;
-            } else {
-                duelResultDiv.innerHTML = "⭐ Wer gewinnt? Starte beide Spieler nacheinander!";
-            }
-        } else {
-            // während ein Spiel läuft, keine Siegesmeldung überschreiben
-            if (!p1Active && !p2Active && p1Clicks === 0 && p2Clicks === 0)
-                duelResultDiv.innerHTML = "⭐ Wer gewinnt? Starte beide Spieler nacheinander!";
+            if (p1Clicks > p2Clicks) localDuelResult.innerHTML = `🏆 Spieler 1 gewinnt! ${p1Clicks} : ${p2Clicks}`;
+            else if (p2Clicks > p1Clicks) localDuelResult.innerHTML = `🏆 Spieler 2 gewinnt! ${p1Clicks} : ${p2Clicks}`;
+            else if (p1Clicks === p2Clicks && p1Clicks > 0) localDuelResult.innerHTML = `🤝 Unentschieden! ${p1Clicks} : ${p2Clicks}`;
+            else localDuelResult.innerHTML = `⭐ Wer gewinnt? Starte beide Spieler nacheinander!`;
+        } else if (!p1Active && !p2Active && p1Clicks === 0 && p2Clicks === 0) {
+            localDuelResult.innerHTML = `⭐ Wer gewinnt? Starte beide Spieler nacheinander!`;
         }
     }
-
-    // Spieler 1 Spiel
-    function startPlayer1() {
-        if (p1Active) return;
-        // UI
-        startP1Btn.style.display = 'none';
-        p1GameArea.style.display = 'block';
-        p1Active = true;
-        p1Clicks = 0;
-        p1TimeLeft = 20;
-        p1ScoreDisplay.innerText = "0";
-        p1TimerDisplay.innerText = "20.0 s";
-        p1ClickBtn.disabled = false;
-        if (p1Timer) clearInterval(p1Timer);
-        const startTime = Date.now();
-        p1Timer = setInterval(() => {
-            if (!p1Active) return;
-            const elapsed = (Date.now() - startTime) / 1000;
-            const remaining = Math.max(0, 20 - elapsed);
-            p1TimeLeft = remaining;
-            p1TimerDisplay.innerText = `${remaining.toFixed(1)} s`;
-            if (remaining <= 0) {
-                clearInterval(p1Timer);
-                endPlayer1();
-            }
-        }, 100);
-    }
-
-    function endPlayer1() {
-        if (!p1Active) return;
-        p1Active = false;
-        p1ClickBtn.disabled = true;
-        clearInterval(p1Timer);
-        p1ScoreDisplay.innerText = p1Clicks;
-        // Zurück zum Start-Button
-        p1GameArea.style.display = 'none';
-        startP1Btn.style.display = 'inline-block';
-        updateDuelResult();
-    }
-
-    function cancelPlayer1() {
-        if (p1Timer) clearInterval(p1Timer);
-        p1Active = false;
-        p1GameArea.style.display = 'none';
-        startP1Btn.style.display = 'inline-block';
-        // Zurücksetzen des Punktestands (optional)
-        p1Clicks = 0;
-        p1ScoreDisplay.innerText = "0";
-        updateDuelResult();
-    }
-
-    p1ClickBtn.addEventListener('click', () => {
-        if (p1Active && p1TimeLeft > 0) {
-            p1Clicks++;
-            p1ScoreDisplay.innerText = p1Clicks;
-            p1ClickBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => p1ClickBtn.style.transform = '', 100);
-        }
-    });
+    function startPlayer1() { if (p1Active) return; startP1Btn.style.display='none'; p1GameArea.style.display='block'; p1Active=true; p1Clicks=0; p1TimeLeft=20; p1ScoreDisplay.innerText="0"; p1TimerDisplay.innerText="20.0 s"; p1ClickBtn.disabled=false; if(p1Timer) clearInterval(p1Timer); const start=Date.now(); p1Timer=setInterval(()=>{ if(!p1Active) return; const elapsed=(Date.now()-start)/1000; const rem=Math.max(0,20-elapsed); p1TimeLeft=rem; p1TimerDisplay.innerText=`${rem.toFixed(1)} s`; if(rem<=0){ clearInterval(p1Timer); endPlayer1(); } },100); }
+    function endPlayer1() { if(!p1Active) return; p1Active=false; p1ClickBtn.disabled=true; clearInterval(p1Timer); p1ScoreDisplay.innerText=p1Clicks; p1GameArea.style.display='none'; startP1Btn.style.display='inline-block'; updateLocalResult(); }
+    function cancelPlayer1() { if(p1Timer) clearInterval(p1Timer); p1Active=false; p1GameArea.style.display='none'; startP1Btn.style.display='inline-block'; p1Clicks=0; p1ScoreDisplay.innerText="0"; updateLocalResult(); }
+    p1ClickBtn.addEventListener('click',()=>{ if(p1Active && p1TimeLeft>0){ p1Clicks++; p1ScoreDisplay.innerText=p1Clicks; p1ClickBtn.style.transform='scale(0.95)'; setTimeout(()=>p1ClickBtn.style.transform='',100); } });
     startP1Btn.addEventListener('click', startPlayer1);
     p1CancelBtn.addEventListener('click', cancelPlayer1);
-
-    // Spieler 2 (analog)
-    function startPlayer2() {
-        if (p2Active) return;
-        startP2Btn.style.display = 'none';
-        p2GameArea.style.display = 'block';
-        p2Active = true;
-        p2Clicks = 0;
-        p2TimeLeft = 20;
-        p2ScoreDisplay.innerText = "0";
-        p2TimerDisplay.innerText = "20.0 s";
-        p2ClickBtn.disabled = false;
-        if (p2Timer) clearInterval(p2Timer);
-        const startTime = Date.now();
-        p2Timer = setInterval(() => {
-            if (!p2Active) return;
-            const elapsed = (Date.now() - startTime) / 1000;
-            const remaining = Math.max(0, 20 - elapsed);
-            p2TimeLeft = remaining;
-            p2TimerDisplay.innerText = `${remaining.toFixed(1)} s`;
-            if (remaining <= 0) {
-                clearInterval(p2Timer);
-                endPlayer2();
-            }
-        }, 100);
-    }
-
-    function endPlayer2() {
-        if (!p2Active) return;
-        p2Active = false;
-        p2ClickBtn.disabled = true;
-        clearInterval(p2Timer);
-        p2ScoreDisplay.innerText = p2Clicks;
-        p2GameArea.style.display = 'none';
-        startP2Btn.style.display = 'inline-block';
-        updateDuelResult();
-    }
-
-    function cancelPlayer2() {
-        if (p2Timer) clearInterval(p2Timer);
-        p2Active = false;
-        p2GameArea.style.display = 'none';
-        startP2Btn.style.display = 'inline-block';
-        p2Clicks = 0;
-        p2ScoreDisplay.innerText = "0";
-        updateDuelResult();
-    }
-
-    p2ClickBtn.addEventListener('click', () => {
-        if (p2Active && p2TimeLeft > 0) {
-            p2Clicks++;
-            p2ScoreDisplay.innerText = p2Clicks;
-            p2ClickBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => p2ClickBtn.style.transform = '', 100);
-        }
-    });
+    function startPlayer2() { if (p2Active) return; startP2Btn.style.display='none'; p2GameArea.style.display='block'; p2Active=true; p2Clicks=0; p2TimeLeft=20; p2ScoreDisplay.innerText="0"; p2TimerDisplay.innerText="20.0 s"; p2ClickBtn.disabled=false; if(p2Timer) clearInterval(p2Timer); const start=Date.now(); p2Timer=setInterval(()=>{ if(!p2Active) return; const elapsed=(Date.now()-start)/1000; const rem=Math.max(0,20-elapsed); p2TimeLeft=rem; p2TimerDisplay.innerText=`${rem.toFixed(1)} s`; if(rem<=0){ clearInterval(p2Timer); endPlayer2(); } },100); }
+    function endPlayer2() { if(!p2Active) return; p2Active=false; p2ClickBtn.disabled=true; clearInterval(p2Timer); p2ScoreDisplay.innerText=p2Clicks; p2GameArea.style.display='none'; startP2Btn.style.display='inline-block'; updateLocalResult(); }
+    function cancelPlayer2() { if(p2Timer) clearInterval(p2Timer); p2Active=false; p2GameArea.style.display='none'; startP2Btn.style.display='inline-block'; p2Clicks=0; p2ScoreDisplay.innerText="0"; updateLocalResult(); }
+    p2ClickBtn.addEventListener('click',()=>{ if(p2Active && p2TimeLeft>0){ p2Clicks++; p2ScoreDisplay.innerText=p2Clicks; p2ClickBtn.style.transform='scale(0.95)'; setTimeout(()=>p2ClickBtn.style.transform='',100); } });
     startP2Btn.addEventListener('click', startPlayer2);
     p2CancelBtn.addEventListener('click', cancelPlayer2);
-
-    // Duell komplett zurücksetzen
-    function resetDuel() {
-        // Spieler 1 abbrechen falls aktiv
-        if (p1Active) cancelPlayer1();
-        else { startP1Btn.style.display = 'inline-block'; p1GameArea.style.display = 'none'; p1Clicks = 0; p1ScoreDisplay.innerText = "0"; }
-        // Spieler 2 abbrechen
-        if (p2Active) cancelPlayer2();
-        else { startP2Btn.style.display = 'inline-block'; p2GameArea.style.display = 'none'; p2Clicks = 0; p2ScoreDisplay.innerText = "0"; }
-        duelResultDiv.innerHTML = "⭐ Wer gewinnt? Starte beide Spieler nacheinander!";
-    }
-    resetDuelBtn.addEventListener('click', resetDuel);
+    function resetLocalDuel() { if(p1Active) cancelPlayer1(); else { startP1Btn.style.display='inline-block'; p1GameArea.style.display='none'; p1Clicks=0; p1ScoreDisplay.innerText="0"; } if(p2Active) cancelPlayer2(); else { startP2Btn.style.display='inline-block'; p2GameArea.style.display='none'; p2Clicks=0; p2ScoreDisplay.innerText="0"; } localDuelResult.innerHTML="⭐ Wer gewinnt? Starte beide Spieler nacheinander!"; }
+    resetLocalDuelBtn.addEventListener('click', resetLocalDuel);
 
     // Initialisierung
     loadSavedName();
     loadGlobalLeaderboard();
     setInterval(loadGlobalLeaderboard, 5000);
+    joinDuellByUrl(); // URL-Parameter auswerten
 </script>
 </body>
 </html>
