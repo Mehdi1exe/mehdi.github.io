@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Klick-Challenge | Einzel + Lokal + Online (Code)</title>
+    <title>Klick-Challenge | Solo + Lokal + Online + Bot</title>
     <style>
         * {
             margin: 0;
@@ -56,6 +56,7 @@
         .mode-btn.solo { border-color: #ffaa44; }
         .mode-btn.local { border-color: #44aaff; }
         .mode-btn.online { border-color: #ff66cc; }
+        .mode-btn.bot { border-color: #66ff66; }
         .mode-btn h2 { font-size: 1.5rem; margin-bottom: 8px; }
         .mode-btn p { font-size: 0.9rem; color: #ccc; }
         .mode-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.1); }
@@ -69,10 +70,12 @@
         .solo-card { border: 1px solid #ffaa44; }
         .duel-card { border: 1px solid #44aaff; }
         .online-card { border: 1px solid #ff66cc; }
+        .bot-card { border: 1px solid #66ff66; }
         .game-card h2 { text-align: center; margin-bottom: 15px; }
         .solo-card h2 { color: #ffaa44; }
         .duel-card h2 { color: #44aaff; }
         .online-card h2 { color: #ff66cc; }
+        .bot-card h2 { color: #66ff66; }
         .name-input, .code-input {
             padding: 12px 20px;
             border-radius: 40px;
@@ -145,6 +148,7 @@
             <div class="mode-btn solo" data-mode="solo"><h2>👤 Einzelspieler</h2><p>Globaler Highscore</p></div>
             <div class="mode-btn local" data-mode="local"><h2>👥 Lokales Duell</h2><p>Zwei Spieler, ein Gerät</p></div>
             <div class="mode-btn online" data-mode="online"><h2>🌐 Online-Duell</h2><p>Per 4‑stelligen Code</p></div>
+            <div class="mode-btn bot" data-mode="bot"><h2>🤖 Gegen Bot</h2><p>Klick gegen die KI</p></div>
         </div>
     </div>
 
@@ -203,11 +207,24 @@
         </div>
         <button class="btn back-btn" data-back="online">⬅ Zurück zur Startseite</button>
     </div>
+
+    <!-- Bot-Duell (gegen KI) -->
+    <div id="botMode" class="game-card bot-card hidden">
+        <h2>🤖 Gegen Bot · Wer klickt schneller?</h2>
+        <div><input type="text" id="botName" class="name-input" placeholder="Dein Name"><button id="botStartBtn" class="btn">START (20 Sek.)</button></div>
+        <div id="botGamePanel" style="display:none;">
+            <div class="timer" id="botTimer">20.0 s</div>
+            <div class="score-board" id="botScore">Klicks: 0</div>
+            <button id="botClickBtn" class="click-btn">👆</button>
+            <button id="botGameBackBtn" class="btn back-btn">Abbrechen</button>
+        </div>
+        <div id="botResult" class="duel-result"></div>
+        <button class="btn back-btn" data-back="bot">⬅ Zurück zur Startseite</button>
+    </div>
 </div>
 
 <script>
     // ========== KONFIGURATION ==========
-    // Deine Google Sheets Web-App URL (bleibt unverändert)
     const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbzxuSlkSnorvT59C-aYkwLH7EXvaDb2qCUd7sQapb4YLrPHZ9mVpihpEPUyHlLYqHH2pA/exec";
 
     // ========== GLOBALE BESTENLISTE ==========
@@ -243,6 +260,7 @@
     function loadSavedName() {
         const saved = localStorage.getItem('clickChallengePlayerName');
         if (saved) soloNameInput.value = saved;
+        if (document.getElementById('botName')) document.getElementById('botName').value = saved;
     }
     function saveName(name) { localStorage.setItem('clickChallengePlayerName', name); }
     async function saveGlobalScore(name, score) {
@@ -318,7 +336,7 @@
     function resetLocal() { if(p1Active) cancelPlayer1(); else { p1Start.style.display='inline-block'; p1Game.style.display='none'; p1Clicks=0; p1ScoreEl.innerText="0"; } if(p2Active) cancelPlayer2(); else { p2Start.style.display='inline-block'; p2Game.style.display='none'; p2Clicks=0; p2ScoreEl.innerText="0"; } localResultDiv.innerHTML="⭐ Wer gewinnt? Starte beide Spieler nacheinander!"; }
     localResetBtn.addEventListener('click', resetLocal);
 
-    // ========== ONLINE-DUELL mit 4‑stelligem Code ==========
+    // ========== ONLINE-DUELL (mit Code, unverändert) ==========
     let onlineRoomId = null, onlinePlayerRole = null, onlineGameActive = false, onlineClickCount = 0, onlineCountdown = null, onlineTimeLeft = 20;
     const createRoomBtn = document.getElementById('createRoomBtn');
     const codeDisplayArea = document.getElementById('codeDisplayArea');
@@ -466,17 +484,104 @@
     startOnlineRoundBtn.addEventListener('click', startOnlineGame);
     if (onlineStatusDiv) onlineStatusDiv.parentElement.appendChild(startOnlineRoundBtn);
 
-    // ========== NAVIGATION ==========
+    // ========== BOT-DUELL (gegen KI) ==========
+    let botActive = false, botCount = 0, botCountdown = null, botTimeLeft = 20;
+    const botNameInput = document.getElementById('botName');
+    const botStartBtn = document.getElementById('botStartBtn');
+    const botGamePanel = document.getElementById('botGamePanel');
+    const botClickBtn = document.getElementById('botClickBtn');
+    const botTimer = document.getElementById('botTimer');
+    const botScoreSpan = document.getElementById('botScore');
+    const botGameBackBtn = document.getElementById('botGameBackBtn');
+    const botResultDiv = document.getElementById('botResult');
+
+    function startBotGame() {
+        let name = botNameInput.value.trim();
+        if (!name) { alert("Bitte deinen Namen eingeben!"); return; }
+        saveName(name);
+        botNameInput.disabled = true;
+        botStartBtn.style.display = 'none';
+        botGamePanel.style.display = 'block';
+        botResultDiv.innerHTML = "";
+        botActive = true; botCount = 0; botTimeLeft = 20;
+        botScoreSpan.innerText = `Klicks: 0`;
+        botTimer.innerText = `20.0 s`;
+        botClickBtn.disabled = false;
+        if (botCountdown) clearInterval(botCountdown);
+        const start = Date.now();
+        botCountdown = setInterval(() => {
+            if (!botActive) return;
+            const elapsed = (Date.now() - start) / 1000;
+            const rem = Math.max(0, 20 - elapsed);
+            botTimeLeft = rem;
+            botTimer.innerText = `${rem.toFixed(1)} s`;
+            if (rem <= 0) { clearInterval(botCountdown); endBotGame(); }
+        }, 100);
+    }
+
+    async function endBotGame() {
+        if (!botActive) return;
+        botActive = false;
+        botClickBtn.disabled = true;
+        clearInterval(botCountdown);
+        const playerScore = botCount;
+        const name = botNameInput.value.trim();
+        // Spielerpunktzahl in globale Bestenliste eintragen
+        await saveGlobalScore(name, playerScore);
+        
+        // Bot-Punktzahl generieren (zufällig zwischen 80% und 120% der Spielerpunktzahl, mindestens 0)
+        let min = Math.floor(playerScore * 0.8);
+        let max = Math.floor(playerScore * 1.2);
+        if (max < min) max = min + 5;
+        const botScore = Math.floor(Math.random() * (max - min + 1) + min);
+        // Bot darf nicht negativ sein
+        const finalBot = Math.max(0, botScore);
+        
+        let resultText = "";
+        if (playerScore > finalBot) resultText = `🎉 Du gewinnst! ${playerScore} : ${finalBot} 🎉`;
+        else if (finalBot > playerScore) resultText = `🤖 Der Bot gewinnt! ${playerScore} : ${finalBot} 🤖`;
+        else resultText = `🤝 Unentschieden! ${playerScore} : ${finalBot} 🤝`;
+        botResultDiv.innerHTML = resultText;
+        
+        alert(`Deine Punktzahl: ${playerScore}\nBot: ${finalBot}\n${resultText}`);
+        botGamePanel.style.display = 'none';
+        botNameInput.disabled = false;
+        botStartBtn.style.display = 'inline-block';
+    }
+
+    function cancelBotGame() {
+        if (botCountdown) clearInterval(botCountdown);
+        botActive = false;
+        botGamePanel.style.display = 'none';
+        botNameInput.disabled = false;
+        botStartBtn.style.display = 'inline-block';
+        botResultDiv.innerHTML = "";
+    }
+
+    botClickBtn.addEventListener('click', () => {
+        if (botActive && botTimeLeft > 0) {
+            botCount++;
+            botScoreSpan.innerText = `Klicks: ${botCount}`;
+            botClickBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => botClickBtn.style.transform = '', 100);
+        }
+    });
+    botStartBtn.addEventListener('click', startBotGame);
+    botGameBackBtn.addEventListener('click', cancelBotGame);
+
+    // ========== NAVIGATION ZWISCHEN STARTSEITE UND MODI ==========
     const startPage = document.getElementById('startPage');
     const soloDiv = document.getElementById('soloMode');
     const localDiv = document.getElementById('localMode');
     const onlineDiv = document.getElementById('onlineMode');
+    const botDiv = document.getElementById('botMode');
 
     function showStart() {
         startPage.classList.remove('hidden');
         soloDiv.classList.add('hidden');
         localDiv.classList.add('hidden');
         onlineDiv.classList.add('hidden');
+        botDiv.classList.add('hidden');
         loadGlobalLeaderboard();
     }
     document.querySelectorAll('.mode-btn').forEach(btn => {
@@ -486,6 +591,7 @@
             if (mode === 'solo') soloDiv.classList.remove('hidden');
             else if (mode === 'local') localDiv.classList.remove('hidden');
             else if (mode === 'online') onlineDiv.classList.remove('hidden');
+            else if (mode === 'bot') botDiv.classList.remove('hidden');
         });
     });
     document.querySelectorAll('[data-back]').forEach(btn => {
@@ -500,11 +606,10 @@
                 onlinePlayerRole = null;
                 onlineStatusDiv.innerHTML = "Kein aktives Duell.";
                 codeDisplayArea.style.display = 'none';
-            }
+            } else if (btn.getAttribute('data-back') === 'bot') cancelBotGame();
             showStart();
         });
     });
-    // Zusätzlich den Solo-internen Zurück-Button
     if (soloBackBtn) soloBackBtn.addEventListener('click', () => { cancelSolo(); showStart(); });
 
     loadSavedName();
