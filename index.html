@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>GAMING | Auto-Spiel</title>
+    <title>MEHDI GAMING | Auto-Spiel</title>
     <style>
         * {
             margin: 0;
@@ -19,6 +19,7 @@
             scroll-behavior: smooth;
         }
 
+        /* ----- NAVIGATION ----- */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -39,6 +40,7 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            letter-spacing: 1px;
         }
 
         .nav-links a {
@@ -54,6 +56,7 @@
             text-shadow: 0 0 6px #00eaff;
         }
 
+        /* ----- HERO BEREICH (Name entfernt) ----- */
         .hero {
             padding: 100px 20px 120px;
             background: radial-gradient(circle at 20% 30%, #120024, #00040a);
@@ -72,6 +75,7 @@
             color: #ccc;
         }
 
+        /* ----- BUTTONS ----- */
         .btn-game {
             background: linear-gradient(135deg, #8a2be2, #5a1a9e);
             color: white;
@@ -104,6 +108,7 @@
             color: white;
         }
 
+        /* ----- SPIEL-CONTAINER ----- */
         #gameContainer {
             display: none;
             margin: 40px auto;
@@ -133,6 +138,7 @@
             text-shadow: 0 0 5px #00eaff;
         }
 
+        /* ----- CARDS (nur noch Brawl Stars & Roblox) ----- */
         .cards-container {
             display: flex;
             flex-wrap: wrap;
@@ -174,6 +180,7 @@
             color: #cfcfcf;
         }
 
+        /* ----- FOOTER ----- */
         footer {
             margin-top: 60px;
             padding: 30px 20px;
@@ -194,29 +201,56 @@
             color: #00eaff;
         }
 
-        @media (max-width: 700px) {
-            .navbar {
-                flex-direction: column;
-                gap: 12px;
+        /* ----- NEU: LINKER KASTEN UNTEN (fixed) ----- */
+        .left-bottom-card {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+            border-left: 4px solid #00eaff;
+            border-radius: 16px;
+            padding: 15px 20px;
+            width: 220px;
+            text-align: left;
+            z-index: 999;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            transition: 0.2s;
+        }
+
+        .left-bottom-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #00eaff;
+        }
+
+        .left-bottom-card p {
+            font-size: 0.85rem;
+            margin: 5px 0;
+            color: #ddd;
+        }
+
+        .left-bottom-card:hover {
+            transform: translateY(-3px);
+            border-left-width: 6px;
+            background: rgba(10, 0, 20, 0.9);
+        }
+
+        @media (max-width: 600px) {
+            .left-bottom-card {
+                width: 180px;
+                padding: 10px 15px;
+                bottom: 10px;
+                left: 10px;
             }
-            .nav-links a {
-                margin: 0 15px;
-                font-size: 16px;
-            }
-            .card {
-                width: 90%;
-            }
-            .btn-game {
-                padding: 12px 25px;
-                font-size: 1rem;
-            }
+            .left-bottom-card h3 { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
-    <div class="logo">⚡ MEHDI1exe ⚡</div>
+    <div class="logo">⚡ MEHDI GAMING ⚡</div>
     <div class="nav-links">
         <a href="#">🏠 Home</a>
         <a href="#">🎮 Games</a>
@@ -225,7 +259,7 @@
 </nav>
 
 <section class="hero">
-    <h1>MEHDI1exe GAMING</h1>
+    <h1>MEHDI GAMING</h1>
     <p>Willkommen auf meiner Next-Gen Gaming Zone 🎧🎮</p>
     <button class="btn-game" id="startGameBtn">▶ START GAME</button>
 </section>
@@ -234,7 +268,7 @@
     <div class="cards-container">
         <div class="card">
             <h2>🎯 Über Mich</h2>
-            <p>Hi! Ich bin <strong>Mehdi1exe</strong>.<br>
+            <p>Hi! Ich bin ein leidenschaftlicher Gamer.<br>
             Ich liebe Gaming, Coding und coole Projekte 🔥</p>
         </div>
         <div class="card">
@@ -244,6 +278,7 @@
         </div>
     </div>
 
+    <!-- SPIEL BEREICH -->
     <div id="gameContainer">
         <canvas id="gameCanvas" width="800" height="300" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/300"></canvas>
         <div class="game-info">🚗 Unendliche Straße – Dein Auto fährt immer geradeaus!</div>
@@ -260,6 +295,13 @@
         <a href="#">🎬 YouTube</a>
     </div>
 </footer>
+
+<!-- NEU: LINKER KASTEN UNTEN -->
+<div class="left-bottom-card">
+    <h3>📌 Info / Kontakt</h3>
+    <p>Hier kannst du später deinen Discord, Twitch oder News eintragen.</p>
+    <p style="font-size:0.75rem; margin-top:6px;">⚡ Deine Gaming-Zone</p>
+</div>
 
 <script>
     (function() {
@@ -388,15 +430,13 @@
 
         function startGame() {
             if (isGameRunning) return;
-            // Container anzeigen
             gameContainer.style.display = "flex";
-            // Canvas-Größe fixieren (wichtig für korrekte Berechnung)
             if (canvas.width !== 800) {
                 canvas.width = 800;
                 canvas.height = 300;
             }
             initMarkers();
-            drawScene(); // Sofort zeichnen
+            drawScene();
             isGameRunning = true;
             if (animationId) cancelAnimationFrame(animationId);
             animationId = requestAnimationFrame(gameLoop);
@@ -411,21 +451,18 @@
             gameContainer.style.display = "none";
         }
 
-        // Event-Listener mit Fehlervermeidung
         if (startBtn) startBtn.addEventListener('click', startGame);
         if (stopBtn) stopBtn.addEventListener('click', stopGame);
 
-        // Container zuerst verstecken
         gameContainer.style.display = "none";
         isGameRunning = false;
 
-        // Canvas initial leeren
         if (ctx) {
             ctx.fillStyle = "#1a2a1f";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
-        console.log("✅ Seite geladen – START GAME öffnet das Auto-Spiel!");
+        console.log("✅ Seite geladen – Name entfernt, linker Kasten unten hinzugefügt!");
     })();
 </script>
 </body>
