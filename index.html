@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>GAMING | 3D Racing - Rückansicht</title>
+    <title>GAMING | Realistic 3D Racing</title>
     <style>
         * {
             margin: 0;
@@ -108,7 +108,7 @@
             display: none;
             margin: 40px auto;
             width: 90%;
-            max-width: 1100px;
+            max-width: 1200px;
             background: #000000aa;
             border-radius: 32px;
             padding: 20px;
@@ -121,7 +121,7 @@
 
         #canvas3d {
             width: 100%;
-            height: 550px;
+            height: 600px;
             border-radius: 24px;
             display: block;
             background: #0a1a2a;
@@ -130,7 +130,6 @@
         .game-info {
             font-size: 1.2rem;
             color: #00eaff;
-            text-shadow: 0 0 5px #00eaff;
             display: flex;
             gap: 40px;
             justify-content: center;
@@ -230,7 +229,6 @@
             text-align: left;
             z-index: 999;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            transition: 0.2s;
         }
 
         .left-bottom-card h3 {
@@ -245,19 +243,8 @@
             color: #ddd;
         }
 
-        .left-bottom-card:hover {
-            transform: translateY(-3px);
-            border-left-width: 6px;
-            background: rgba(10, 0, 20, 0.9);
-        }
-
         @media (max-width: 600px) {
-            .left-bottom-card {
-                width: 180px;
-                padding: 10px 15px;
-                bottom: 10px;
-                left: 10px;
-            }
+            .left-bottom-card { width: 180px; padding: 10px 15px; }
             #canvas3d { height: 300px; }
         }
     </style>
@@ -274,22 +261,20 @@
 </nav>
 
 <section class="hero">
-    <h1>3D RACING - RÜCKANSICHT</h1>
-    <p>Weiche den Bäumen aus – Kamera von hinten! 🌲🚗</p>
-    <button class="btn-game" id="startGameBtn">▶ START GAME (3D)</button>
+    <h1>REALISTIC 3D RACING</h1>
+    <p>Weiche den Bäumen aus – Kamera von hinten mit echtem Fahrgefühl 🌲🚗</p>
+    <button class="btn-game" id="startGameBtn">▶ START GAME</button>
 </section>
 
 <main>
     <div class="cards-container">
         <div class="card">
             <h2>🎯 Über Mich</h2>
-            <p>Hi! Ich bin ein leidenschaftlicher Gamer.<br>
-            Ich liebe Gaming, Coding und coole Projekte 🔥</p>
+            <p>Leidenschaftlicher Gamer und Entwickler.<br>Realistische Rennsimulation mit Hindernissen.</p>
         </div>
         <div class="card">
             <h2>📀 Empfohlene Games</h2>
-            <p>⭐ Brawl Stars • Roblox ⭐<br>
-            Mehr Games folgen bald...</p>
+            <p>⭐ Brawl Stars • Roblox ⭐<br>Mehr Games folgen bald...</p>
         </div>
     </div>
 
@@ -306,7 +291,7 @@
 </main>
 
 <footer>
-    <p>© 2025 GAMING – Level up your life!</p>
+    <p>© 2025 GAMING – Realistic Racing</p>
     <div class="social-links">
         <a href="#">🐦 Twitter</a>
         <a href="#">📺 Twitch</a>
@@ -317,8 +302,8 @@
 
 <div class="left-bottom-card">
     <h3>📌 Info / Kontakt</h3>
-    <p>Hier kannst du später deinen Discord, Twitch oder News eintragen.</p>
-    <p style="font-size:0.75rem; margin-top:6px;">⚡ Deine Gaming-Zone</p>
+    <p>Discord, Twitch & News – bald hier!</p>
+    <p style="font-size:0.75rem;">⚡ Deine Gaming-Zone</p>
 </div>
 
 <script type="importmap">
@@ -332,208 +317,300 @@
 <script type="module">
     import * as THREE from 'three';
 
-    // DOM Elemente
+    // ----- DOM Elemente -----
     const gameContainer = document.getElementById('gameContainer');
     const startBtn = document.getElementById('startGameBtn');
     const stopBtn = document.getElementById('stopGameBtn');
     const restartBtn = document.getElementById('restartGameBtn');
-    const gameOverMsgDiv = document.getElementById('gameOverMsg');
+    const gameOverMsg = document.getElementById('gameOverMsg');
     const scoreSpan = document.getElementById('scoreDisplay');
     const canvas = document.getElementById('canvas3d');
 
-    // Globale Variablen
+    // ----- Spielvariablen -----
     let scene, camera, renderer;
     let car;
-    let obstacles = [];
-    let roadSegments = [];
+    let obstacles = [];          // Hindernisse (Bäume)
+    let roadSegments = [];       // Straßenabschnitte
     let isGameRunning = false;
     let gameOverFlag = false;
     let score = 0;
-    let baseSpeed = 0.22;
+    let baseSpeed = 0.28;        // Geschwindigkeit (Welt bewegt sich auf uns zu)
     let currentSpeed = baseSpeed;
     let animationId = null;
     
-    // Bewegung
+    // Steuerung
     let leftPressed = false, rightPressed = false;
     let carX = 0;
     const minX = -2.8;
     const maxX = 2.8;
     
     // Weltparameter
-    const roadLength = 30;
-    const obstacleSpawnDistance = 25;
+    const roadLength = 40;        // Länge eines Segments
+    const obstacleSpawnDistance = 28;
+    let nextObstacleZ = -15;      // Startposition vor dem Auto (negativ, da Welt auf uns zukommt)
     
     // Kamera-Offset von hinten (relativ zum Auto)
-    const cameraOffset = new THREE.Vector3(0, 2.2, 7); // x relativ zum Auto (0 = mittig), y hoch, z Abstand hinten
+    const cameraOffset = new THREE.Vector3(0, 2.8, 7.5);
     
+    // Partikel für Staub
+    let dustParticles = [];
+    
+    // ----- Realistische 3D-Initialisierung -----
     function init3D() {
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a2a2a);
-        scene.fog = new THREE.FogExp2(0x0a2a2a, 0.008);
+        scene.background = new THREE.Color(0x071a2b);
+        scene.fog = new THREE.FogExp2(0x071a2b, 0.008);
         
-        // Kamera: Position wird später dynamisch gesetzt
-        camera = new THREE.PerspectiveCamera(65, canvas.clientWidth / canvas.clientHeight, 0.1, 200);
+        // Kamera
+        camera = new THREE.PerspectiveCamera(70, canvas.clientWidth / canvas.clientHeight, 0.1, 200);
         
+        // Renderer
         renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
         renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         
-        // Licht
-        const ambient = new THREE.AmbientLight(0x404060);
+        // ----- Beleuchtung (realistisch) -----
+        const ambient = new THREE.AmbientLight(0x2c3e4e);
         scene.add(ambient);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        dirLight.position.set(5, 12, 8);
-        dirLight.castShadow = true;
-        dirLight.receiveShadow = true;
-        scene.add(dirLight);
-        const fillLight = new THREE.PointLight(0x4466cc, 0.5);
-        fillLight.position.set(0, 4, -5);
+        
+        const mainLight = new THREE.DirectionalLight(0xfff5e6, 1.4);
+        mainLight.position.set(8, 20, 5);
+        mainLight.castShadow = true;
+        mainLight.receiveShadow = true;
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        mainLight.shadow.camera.near = 0.5;
+        mainLight.shadow.camera.far = 40;
+        mainLight.shadow.camera.left = -10;
+        mainLight.shadow.camera.right = 10;
+        mainLight.shadow.camera.top = 10;
+        mainLight.shadow.camera.bottom = -10;
+        scene.add(mainLight);
+        
+        const fillLight = new THREE.PointLight(0x5577aa, 0.6);
+        fillLight.position.set(0, 5, -5);
         scene.add(fillLight);
         
-        // Boden
-        const ground = new THREE.Mesh(
-            new THREE.PlaneGeometry(40, 200),
-            new THREE.MeshStandardMaterial({ color: 0x2a5a2a, roughness: 0.9 })
-        );
+        const backLight = new THREE.PointLight(0xffaa66, 0.4);
+        backLight.position.set(0, 2, 8);
+        scene.add(backLight);
+        
+        // Boden (Gras + Schatten)
+        const groundMat = new THREE.MeshStandardMaterial({ color: 0x2a5a2a, roughness: 0.9, metalness: 0.1 });
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(50, 200), groundMat);
         ground.rotation.x = -Math.PI/2;
-        ground.position.y = -0.2;
+        ground.position.y = -0.25;
         ground.receiveShadow = true;
         scene.add(ground);
         
-        // Auto
-        car = new THREE.Group();
-        const bodyGeo = new THREE.BoxGeometry(1.0, 0.4, 2.0);
-        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xe34234, metalness: 0.7, roughness: 0.3 });
-        const body = new THREE.Mesh(bodyGeo, bodyMat);
-        body.castShadow = true;
-        body.receiveShadow = true;
-        body.position.y = 0.2;
-        car.add(body);
-        
-        const roofGeo = new THREE.BoxGeometry(0.8, 0.3, 1.2);
-        const roofMat = new THREE.MeshStandardMaterial({ color: 0xcc5533 });
-        const roof = new THREE.Mesh(roofGeo, roofMat);
-        roof.position.y = 0.55;
-        roof.castShadow = true;
-        car.add(roof);
-        
-        const windowMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, emissive: 0x224466 });
-        const frontWind = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 0.1), windowMat);
-        frontWind.position.set(0, 0.5, 0.85);
-        car.add(frontWind);
-        
-        const rearWind = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 0.1), windowMat);
-        rearWind.position.set(0, 0.5, -0.85);
-        car.add(rearWind);
-        
-        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.3 });
-        const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.3, 16);
-        const wheelPos = [[-0.7, 0.12, 0.85], [0.7, 0.12, 0.85], [-0.7, 0.12, -0.85], [0.7, 0.12, -0.85]];
-        wheelPos.forEach(pos => {
-            const wheel = new THREE.Mesh(wheelGeo, wheelMat);
-            wheel.rotation.z = Math.PI/2;
-            wheel.position.set(pos[0], pos[1], pos[2]);
-            wheel.castShadow = true;
-            car.add(wheel);
-        });
-        car.position.y = 0.1;
-        car.castShadow = true;
-        scene.add(car);
-        
-        // Straßensegmente
+        // ----- Straßen-Segment erstellen (realistisch)-----
         function createRoadSegment(zPos) {
             const group = new THREE.Group();
-            const roadMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.6 });
-            const roadPlane = new THREE.Mesh(new THREE.PlaneGeometry(6, roadLength), roadMat);
+            // Asphalt mit leichter Textur (dunkelgrau, leicht rau)
+            const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.7, metalness: 0.05 });
+            const roadPlane = new THREE.Mesh(new THREE.PlaneGeometry(6.2, roadLength), asphaltMat);
             roadPlane.rotation.x = -Math.PI/2;
-            roadPlane.position.y = -0.05;
+            roadPlane.position.y = -0.08;
             roadPlane.receiveShadow = true;
             group.add(roadPlane);
             
-            // Mittelstreifen
-            const stripeMat = new THREE.MeshStandardMaterial({ color: 0xffcc44 });
-            for (let i = -roadLength/2 + 1; i < roadLength/2; i+= 1.8) {
-                const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.05, 0.6), stripeMat);
-                stripe.position.set(0, 0.02, i);
-                stripe.castShadow = false;
-                group.add(stripe);
+            // Fahrbahnmarkierungen (Mittelstreifen – gestrichelt)
+            const lineMat = new THREE.MeshStandardMaterial({ color: 0xffdd99, emissive: 0x442200 });
+            const dashLength = 1.2;
+            const gap = 1.8;
+            for (let z = -roadLength/2 + dashLength/2; z < roadLength/2; z += dashLength + gap) {
+                const dash = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.05, dashLength), lineMat);
+                dash.position.set(0, 0.02, z);
+                dash.castShadow = false;
+                group.add(dash);
             }
-            // Seitenstreifen
+            
+            // Seitenstreifen (weiße Linien)
             const edgeMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
-            const leftEdge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, roadLength), edgeMat);
-            leftEdge.position.set(-2.95, 0.02, 0);
+            const leftEdge = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.05, roadLength), edgeMat);
+            leftEdge.position.set(-3.0, 0.02, 0);
             group.add(leftEdge);
-            const rightEdge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, roadLength), edgeMat);
-            rightEdge.position.set(2.95, 0.02, 0);
+            const rightEdge = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.05, roadLength), edgeMat);
+            rightEdge.position.set(3.0, 0.02, 0);
             group.add(rightEdge);
+            
+            // Straßenrillen (Längsnutten) – kleine Vertiefungen (optisch)
+            const grooveMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+            for (let x = -2.0; x <= 2.0; x += 2.0) {
+                const groove = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, roadLength), grooveMat);
+                groove.position.set(x, -0.06, 0);
+                groove.castShadow = false;
+                group.add(groove);
+            }
             
             group.position.z = zPos;
             return group;
         }
         
+        // 5 Segmente für endlose Straße
         for (let i = -2; i <= 2; i++) {
             const seg = createRoadSegment(i * roadLength);
             scene.add(seg);
             roadSegments.push(seg);
         }
         
-        // Kamera von hinten – Update-Funktion
+        // ----- Realistisches Auto (mit Glanz)-----
+        car = new THREE.Group();
+        // Karosserie (metallic rot)
+        const bodyMatCar = new THREE.MeshStandardMaterial({ color: 0xcc3300, metalness: 0.85, roughness: 0.25, emissive: 0x220000 });
+        const bodyGeo = new THREE.BoxGeometry(1.1, 0.45, 2.2);
+        const body = new THREE.Mesh(bodyGeo, bodyMatCar);
+        body.castShadow = true;
+        body.receiveShadow = true;
+        body.position.y = 0.22;
+        car.add(body);
+        
+        // Dach (schwarz glänzend)
+        const roofMatCar = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.7, roughness: 0.3 });
+        const roofGeo = new THREE.BoxGeometry(0.85, 0.28, 1.3);
+        const roof = new THREE.Mesh(roofGeo, roofMatCar);
+        roof.position.y = 0.6;
+        roof.castShadow = true;
+        car.add(roof);
+        
+        // Fenster (dunkelblau, transparent)
+        const glassMat = new THREE.MeshStandardMaterial({ color: 0x88aacc, metalness: 0.9, roughness: 0.2, emissive: 0x112233 });
+        const frontWind = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.2, 0.12), glassMat);
+        frontWind.position.set(0, 0.55, 0.95);
+        car.add(frontWind);
+        const rearWind = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.2, 0.12), glassMat);
+        rearWind.position.set(0, 0.55, -0.95);
+        car.add(rearWind);
+        
+        // Räder (schwarz, glänzend)
+        const wheelMatCar = new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.4, roughness: 0.6 });
+        const wheelGeoCar = new THREE.CylinderGeometry(0.32, 0.32, 0.35, 24);
+        const wheelPositions = [[-0.8, 0.15, 0.95], [0.8, 0.15, 0.95], [-0.8, 0.15, -0.95], [0.8, 0.15, -0.95]];
+        wheelPositions.forEach(pos => {
+            const wheel = new THREE.Mesh(wheelGeoCar, wheelMatCar);
+            wheel.rotation.z = Math.PI/2;
+            wheel.position.set(pos[0], pos[1], pos[2]);
+            wheel.castShadow = true;
+            car.add(wheel);
+        });
+        
+        // Scheinwerfer (orange/weiß)
+        const lightMat = new THREE.MeshStandardMaterial({ color: 0xffaa66, emissive: 0xff4411 });
+        const leftLight = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), lightMat);
+        leftLight.position.set(-0.45, 0.2, 1.1);
+        car.add(leftLight);
+        const rightLight = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), lightMat);
+        rightLight.position.set(0.45, 0.2, 1.1);
+        car.add(rightLight);
+        
+        car.position.y = 0.1;
+        car.castShadow = true;
+        scene.add(car);
+        
+        // ----- Bäume (realistisch mit Schatten)-----
+        function createTree(x, z) {
+            const group = new THREE.Group();
+            const trunkMatTree = new THREE.MeshStandardMaterial({ color: 0x6b4c3b, roughness: 0.8 });
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.6, 1.2, 8), trunkMatTree);
+            trunk.position.y = 0.6;
+            trunk.castShadow = true;
+            trunk.receiveShadow = true;
+            group.add(trunk);
+            
+            const leafMatTree = new THREE.MeshStandardMaterial({ color: 0x4c8c3a, roughness: 0.4, metalness: 0.1 });
+            const foliage1 = new THREE.Mesh(new THREE.ConeGeometry(0.8, 1.0, 12), leafMatTree);
+            foliage1.position.y = 1.2;
+            foliage1.castShadow = true;
+            group.add(foliage1);
+            const foliage2 = new THREE.Mesh(new THREE.ConeGeometry(0.65, 0.9, 12), leafMatTree);
+            foliage2.position.y = 1.8;
+            foliage2.castShadow = true;
+            group.add(foliage2);
+            const foliage3 = new THREE.Mesh(new THREE.ConeGeometry(0.5, 0.7, 12), leafMatTree);
+            foliage3.position.y = 2.3;
+            foliage3.castShadow = true;
+            group.add(foliage3);
+            
+            group.position.set(x, 0, z);
+            return group;
+        }
+        
+        // ----- Partikel (Staub) -----
+        const dustGeo = new THREE.BufferGeometry();
+        const dustCount = 400;
+        const dustPositions = new Float32Array(dustCount * 3);
+        for (let i = 0; i < dustCount; i++) {
+            dustPositions[i*3] = (Math.random() - 0.5) * 8;
+            dustPositions[i*3+1] = Math.random() * 0.5;
+            dustPositions[i*3+2] = (Math.random() - 0.5) * 20;
+        }
+        dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+        const dustMat = new THREE.PointsMaterial({ color: 0xaa9977, size: 0.08, transparent: true, opacity: 0.6 });
+        const dustSystem = new THREE.Points(dustGeo, dustMat);
+        scene.add(dustSystem);
+        
+        // Kamera-Update (hinter dem Auto)
         function updateCamera() {
-            // Kamera positioniert sich relativ zum Auto: (car.x + offsetX, car.y + offsetY, car.z + offsetZ)
-            // Auto ist immer bei z = 0, aber wir wollen hinten, also offsetZ positiv (weil Kamera nach vorne schaut)
-            // Da die Kamera auf das Auto blicken soll, setzen wir ihre Position auf car.position + offset.
             const targetPos = car.position.clone();
             camera.position.copy(targetPos.clone().add(cameraOffset));
             camera.lookAt(targetPos);
         }
         
-        return { updateCamera };
+        // Wolken am Himmel (Dekoration)
+        const cloudMat = new THREE.MeshStandardMaterial({ color: 0xeef4ff, roughness: 0.9 });
+        for (let i = 0; i < 12; i++) {
+            const cloudGroup = new THREE.Group();
+            const parts = [0.8, 0.6, 1.0];
+            parts.forEach((size, idx) => {
+                const part = new THREE.Mesh(new THREE.SphereGeometry(size, 7, 7), cloudMat);
+                part.position.set((idx-1)*0.7, 0, idx*0.5);
+                cloudGroup.add(part);
+            });
+            cloudGroup.position.set((Math.random() - 0.5)*25, 12 + Math.random()*4, (Math.random() - 0.5)*40);
+            cloudGroup.castShadow = false;
+            scene.add(cloudGroup);
+        }
+        
+        return { updateCamera, dustSystem };
     }
     
-    // Baum erstellen
-    function createTree(x, z) {
-        const group = new THREE.Group();
-        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B5A2B, roughness: 0.8 });
-        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 1.0, 6), trunkMat);
-        trunk.position.y = 0.5;
-        trunk.castShadow = true;
-        group.add(trunk);
-        
-        const leafMat = new THREE.MeshStandardMaterial({ color: 0x3c9e3c });
-        const foliage1 = new THREE.Mesh(new THREE.ConeGeometry(0.6, 0.8, 8), leafMat);
-        foliage1.position.y = 1.0;
-        foliage1.castShadow = true;
-        group.add(foliage1);
-        const foliage2 = new THREE.Mesh(new THREE.ConeGeometry(0.5, 0.7, 8), leafMat);
-        foliage2.position.y = 1.5;
-        foliage2.castShadow = true;
-        group.add(foliage2);
-        
-        group.position.set(x, 0, z);
-        return group;
-    }
-    
+    // ----- Hindernisse spawnen (vor dem Auto) -----
     function spawnObstacle(zPos) {
-        const xPos = (Math.random() - 0.5) * 5.0;
-        const clampedX = Math.min(maxX - 0.5, Math.max(minX + 0.5, xPos));
+        // zPos ist negativ, weil die Welt auf uns zukommt (vor dem Auto)
+        const xPos = (Math.random() - 0.5) * 5.2;
+        const clampedX = Math.min(maxX - 0.6, Math.max(minX + 0.6, xPos));
         const tree = createTree(clampedX, zPos);
         scene.add(tree);
         obstacles.push({
             mesh: tree,
-            collisionRadius: 0.7,
+            collisionRadius: 0.75,
             x: clampedX,
             z: zPos
         });
     }
     
-    function updateObstacles(speed) {
-        for (let i = 0; i < obstacles.length; i++) {
-            const obs = obstacles[i];
-            obs.z -= speed;
+    // ----- Welt bewegt sich auf das Auto zu (positive Z Richtung) -----
+    function updateWorld(speed) {
+        // Straßen scrollen nach vorne (positive Z)
+        for (let seg of roadSegments) {
+            seg.position.z += speed;
+        }
+        // Zurücksetzen der Segmente
+        for (let i = 0; i < roadSegments.length; i++) {
+            if (roadSegments[i].position.z > roadLength * 1.5) {
+                roadSegments[i].position.z -= roadLength * roadSegments.length;
+            }
+        }
+        
+        // Hindernisse bewegen sich nach vorne
+        for (let obs of obstacles) {
+            obs.z += speed;
             obs.mesh.position.z = obs.z;
         }
+        // Entferne Hindernisse, die hinter dem Auto sind (z > 12)
         obstacles = obstacles.filter(obs => {
-            if (obs.z < -12) {
+            if (obs.z > 14) {
                 scene.remove(obs.mesh);
                 return false;
             }
@@ -541,24 +618,28 @@
         });
     }
     
+    // ----- Neue Hindernisse spawnen (vor dem Auto, also negative Z-Werte) -----
     function manageObstacleSpawning() {
         if (!isGameRunning) return;
-        let maxZ = -30;
+        // Finde das am weitesten hinten liegende Hindernis (kleinster Z-Wert)
+        let minZ = 0;
         for (let obs of obstacles) {
-            if (obs.z > maxZ) maxZ = obs.z;
+            if (obs.z < minZ) minZ = obs.z;
         }
-        while (maxZ < 20) {
-            const newZ = maxZ + obstacleSpawnDistance;
+        // Spawnen, wenn der Abstand zum nächsten Hindernis zu groß ist (hinter dem Auto)
+        while (minZ > -obstacleSpawnDistance) {
+            const newZ = minZ - obstacleSpawnDistance;
             spawnObstacle(newZ);
-            maxZ = newZ;
+            minZ = newZ;
         }
     }
     
+    // ----- Kollisionserkennung -----
     function checkCollisions() {
-        const carRadius = 0.6;
+        const carRadius = 0.65;
         for (let obs of obstacles) {
             const dx = car.position.x - obs.x;
-            const dz = 0 - obs.z;
+            const dz = 0 - obs.z;   // Auto z = 0, Hindernis z (negativ)
             const dist = Math.hypot(dx, dz);
             if (dist < carRadius + obs.collisionRadius) {
                 gameOver();
@@ -568,17 +649,19 @@
         return false;
     }
     
+    // ----- Game Over & Neustart -----
     function gameOver() {
         if (!isGameRunning) return;
         isGameRunning = false;
         gameOverFlag = true;
-        gameOverMsgDiv.style.display = 'block';
+        gameOverMsg.style.display = 'block';
         restartBtn.style.display = 'inline-block';
         if (animationId) cancelAnimationFrame(animationId);
         animationId = null;
     }
     
     function restartGame() {
+        // Hindernisse entfernen
         for (let obs of obstacles) {
             scene.remove(obs.mesh);
         }
@@ -589,40 +672,33 @@
         carX = 0;
         car.position.x = 0;
         gameOverFlag = false;
-        gameOverMsgDiv.style.display = 'none';
+        gameOverMsg.style.display = 'none';
         restartBtn.style.display = 'none';
+        // Straßensegmente zurücksetzen
         for (let i = 0; i < roadSegments.length; i++) {
             roadSegments[i].position.z = (i - 2) * roadLength;
         }
-        for (let i = 0; i < 4; i++) {
-            spawnObstacle(-10 + i * obstacleSpawnDistance);
+        // Neue Hindernisse spawnen
+        for (let i = 1; i <= 5; i++) {
+            spawnObstacle(-i * obstacleSpawnDistance);
         }
         isGameRunning = true;
         gameLoop();
     }
     
-    function updateRoad(speed) {
-        for (let seg of roadSegments) {
-            seg.position.z -= speed;
-        }
-        for (let i = 0; i < roadSegments.length; i++) {
-            if (roadSegments[i].position.z < -roadLength) {
-                roadSegments[i].position.z += roadLength * roadSegments.length;
-            }
-        }
-    }
-    
+    // ----- Punktestand & Geschwindigkeitsanstieg -----
     let lastScoreUpdate = 0;
     function updateScore(speed) {
         if (!isGameRunning) return;
-        score += speed * 2;
+        score += speed * 1.5;
         scoreSpan.innerText = `Score: ${Math.floor(score)}`;
-        if (Math.floor(score) > lastScoreUpdate + 200) {
+        if (Math.floor(score) > lastScoreUpdate + 250) {
             lastScoreUpdate = Math.floor(score);
-            currentSpeed = Math.min(0.55, currentSpeed + 0.02);
+            currentSpeed = Math.min(0.68, currentSpeed + 0.015);
         }
     }
     
+    // ----- Steuerung -----
     function handleKeyDown(e) {
         if (!isGameRunning || gameOverFlag) return;
         if (e.key === 'ArrowLeft') {
@@ -638,23 +714,39 @@
         else if (e.key === 'ArrowRight') rightPressed = false;
     }
     
-    function updateCar() {
+    function updateCarPosition() {
         if (!isGameRunning || gameOverFlag) return;
         let move = 0;
-        if (leftPressed) move = -0.18;
-        if (rightPressed) move = 0.18;
+        if (leftPressed) move = -0.21;
+        if (rightPressed) move = 0.21;
         carX += move;
         carX = Math.min(maxX, Math.max(minX, carX));
         car.position.x = carX;
     }
     
+    // ----- Partikel-Animation (Staub) -----
+    let dustSystemRef = null;
+    function animateDust() {
+        if (!dustSystemRef || !isGameRunning) return;
+        const positions = dustSystemRef.geometry.attributes.position.array;
+        for (let i = 0; i < positions.length / 3; i++) {
+            // Staub wirbelt auf
+            positions[i*3+1] += 0.01;
+            if (positions[i*3+1] > 0.6) positions[i*3+1] = 0;
+            // Leichte Bewegung in X
+            positions[i*3] += (Math.random() - 0.5) * 0.02;
+        }
+        dustSystemRef.geometry.attributes.position.needsUpdate = true;
+        requestAnimationFrame(animateDust);
+    }
+    
+    // ----- Hauptloop -----
     let cameraHelper;
     function gameLoop() {
         if (!isGameRunning) return;
-        updateCar();
+        updateCarPosition();
         const speed = currentSpeed;
-        updateRoad(speed);
-        updateObstacles(speed);
+        updateWorld(speed);
         manageObstacleSpawning();
         updateScore(speed);
         if (checkCollisions()) return;
@@ -663,21 +755,23 @@
         animationId = requestAnimationFrame(gameLoop);
     }
     
-    let threeInit = false;
+    // ----- Start & Stop -----
+    let threeInitialized = false;
     function startGame() {
         if (isGameRunning) return;
         gameContainer.style.display = "flex";
-        if (!threeInit) {
+        if (!threeInitialized) {
             const initRes = init3D();
-            cameraHelper = initRes;
-            threeInit = true;
+            cameraHelper = initRes.updateCamera;
+            dustSystemRef = initRes.dustSystem;
+            threeInitialized = true;
             window.addEventListener('keydown', handleKeyDown);
             window.addEventListener('keyup', handleKeyUp);
-            for (let i = 0; i < 5; i++) {
-                spawnObstacle(-10 + i * obstacleSpawnDistance);
+            // Erste Hindernisse
+            for (let i = 1; i <= 6; i++) {
+                spawnObstacle(-i * obstacleSpawnDistance);
             }
-            // Kamera initial einmal positionieren
-            cameraHelper.updateCamera();
+            animateDust();
         } else {
             restartGame();
             return;
@@ -687,17 +781,17 @@
         score = 0;
         currentSpeed = baseSpeed;
         scoreSpan.innerText = "Score: 0";
-        gameOverMsgDiv.style.display = 'none';
+        gameOverMsg.style.display = 'none';
         restartBtn.style.display = 'none';
         gameLoop();
         
-        function handleResize() {
+        const handleResize = () => {
             const w = canvas.clientWidth;
             const h = canvas.clientHeight;
             renderer.setSize(w, h);
             camera.aspect = w / h;
             camera.updateProjectionMatrix();
-        }
+        };
         window.addEventListener('resize', handleResize);
         handleResize();
     }
@@ -713,7 +807,7 @@
     restartBtn.addEventListener('click', () => restartGame());
     
     gameContainer.style.display = "none";
-    console.log("✅ 3D-Racing mit Rückansicht – Kamera folgt dem Auto von hinten!");
+    console.log("✅ Realistisches 3D-Rennspiel geladen – Kamera von hinten, Welt scrollt nach vorne!");
 </script>
 </body>
 </html>
