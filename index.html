@@ -2,15 +2,13 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>GAMING | Rennspiel + Klick-Challenge mit Bestenlisten</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GAMING | Rennspiel + Klick-Challenge</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -107,11 +105,11 @@
             color: white;
         }
 
-        /* ----- Rennspiel-Container (keine Touch-Buttons) ----- */
+        /* ----- Rennspiel-Container ----- */
         #gameContainer {
             display: none;
             margin: 40px auto;
-            width: 95%;
+            width: 90%;
             max-width: 1100px;
             background: #000000aa;
             border-radius: 32px;
@@ -125,14 +123,41 @@
 
         #canvas3d {
             width: 100%;
-            height: auto;
-            aspect-ratio: 16 / 9;
+            height: 550px;
             border-radius: 24px;
             display: block;
             background: #0a1a2a;
         }
 
-        /* ----- Zwei Bestenlisten nebeneinander (Desktop) ----- */
+        .game-info {
+            font-size: 1.2rem;
+            color: #00eaff;
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+        }
+
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: #000000aa;
+            padding: 5px 15px;
+            border-radius: 30px;
+        }
+
+        .game-over-msg {
+            font-size: 1.5rem;
+            color: #ff6666;
+            text-shadow: 0 0 10px red;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; transform: scale(1);}
+            100% { opacity: 1; transform: scale(1.05);}
+        }
+
+        /* ----- Bestenlisten nebeneinander ----- */
         .leaderboards {
             display: flex;
             flex-wrap: wrap;
@@ -225,32 +250,6 @@
             margin: 10px;
         }
 
-        .game-info {
-            font-size: 1rem;
-            color: #00eaff;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-        .score {
-            font-size: 1.3rem;
-            font-weight: bold;
-            background: #000000aa;
-            padding: 5px 15px;
-            border-radius: 30px;
-        }
-        .game-over-msg {
-            font-size: 1.3rem;
-            color: #ff6666;
-            text-shadow: 0 0 10px red;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.7; transform: scale(1);}
-            100% { opacity: 1; transform: scale(1.05);}
-        }
-
         .cards-container {
             display: flex;
             flex-wrap: wrap;
@@ -300,6 +299,7 @@
         @media (max-width: 700px) {
             .leaderboards { flex-direction: column; align-items: center; }
             .click-btn { width: 130px; height: 130px; font-size: 1.8rem; }
+            #canvas3d { height: 300px; }
         }
     </style>
 </head>
@@ -315,8 +315,8 @@
 </nav>
 
 <section class="hero">
-    <h1>2 SPIELE – 2 BESTENLISTEN</h1>
-    <p>🚗 Rennspiel (NUR PC mit Pfeiltasten) & 🖱️ Klick-Challenge (50 Sek.)</p>
+    <h1>RENNSPIEL + KLICK-CHALLENGE</h1>
+    <p>🚗 Rennspiel (nur PC mit Pfeiltasten) & 🖱️ Klick-Challenge (50 Sek.)</p>
     <button class="btn-game" id="startGameBtn">▶ START RENNSPIEL</button>
 </section>
 
@@ -324,7 +324,7 @@
     <div class="cards-container">
         <div class="card">
             <h2>🏎️ Rennspiel</h2>
-            <p>Weiche Bäumen, Steinen & Autowracks aus. Steuere mit ← → (nur Tastatur).</p>
+            <p>Weiche den Bäumen aus. Steuere mit ← → (nur Tastatur). Nach Game Over: Name eintragen für Bestenliste.</p>
         </div>
         <div class="card">
             <h2>🖱️ Klick-Challenge</h2>
@@ -332,11 +332,11 @@
         </div>
     </div>
 
-    <!-- RENNSPIEL BEREICH (ohne Touch-Buttons) -->
+    <!-- RENNSPIEL BEREICH (exakt dein Code, aber mit Bestenliste) -->
     <div id="gameContainer">
         <canvas id="canvas3d"></canvas>
         <div class="game-info">
-            <span>🚗 Steuere mit ← → (Pfeiltasten)</span>
+            <span>🚗 Steuere mit ← →</span>
             <span class="score" id="scoreDisplay">Score: 0</span>
         </div>
         <div id="gameOverMsg" class="game-over-msg" style="display: none;">💥 GAME OVER! 💥</div>
@@ -400,7 +400,7 @@
 <script type="module">
     import * as THREE from 'three';
 
-    // ==================== RENNSPIEL (3D, nur Tastatur) ====================
+    // ==================== RENNSPIEL (dein Code, erweitert um Bestenliste) ====================
     const gameContainer = document.getElementById('gameContainer');
     const startBtn = document.getElementById('startGameBtn');
     const stopBtn = document.getElementById('stopGameBtn');
@@ -418,18 +418,17 @@
     let cameraHelper, threeInit = false;
     let lastScoreUpdate = 0;
 
-    // --- Bestenliste für Rennspiel (lokal) ---
-    let racingLeaderboard = []; // { name, score }
+    // Bestenliste Rennspiel (lokal)
+    let racingLeaderboard = [];
     const racingLeaderboardList = document.getElementById('racingLeaderboardList');
     function loadRacingLeaderboard() {
         const stored = localStorage.getItem('racingLeaderboard');
-        if(stored) racingLeaderboard = JSON.parse(stored);
-        else racingLeaderboard = [];
+        racingLeaderboard = stored ? JSON.parse(stored) : [];
         renderRacingLeaderboard();
     }
     function saveRacingLeaderboard() { localStorage.setItem('racingLeaderboard', JSON.stringify(racingLeaderboard)); }
     function addRacingScore(name, scoreVal) {
-        if(!name.trim()) name = "Fahrer";
+        if (!name.trim()) name = "Fahrer";
         racingLeaderboard.push({ name: name.substring(0,20), score: Math.floor(scoreVal) });
         racingLeaderboard.sort((a,b) => b.score - a.score);
         racingLeaderboard = racingLeaderboard.slice(0,5);
@@ -438,7 +437,7 @@
     }
     function renderRacingLeaderboard() {
         racingLeaderboardList.innerHTML = '';
-        if(racingLeaderboard.length === 0) {
+        if (racingLeaderboard.length === 0) {
             racingLeaderboardList.innerHTML = '<li>Noch keine Einträge</li>';
             return;
         }
@@ -449,159 +448,311 @@
         });
     }
 
-    // Hindernis-Funktionen
+    // --- Deine ursprünglichen Funktionen (unverändert) ---
+    function init3D() {
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a2a2a);
+        scene.fog = new THREE.FogExp2(0x0a2a2a, 0.008);
+        
+        camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 200);
+        camera.position.set(0, 5, 12);
+        camera.lookAt(0, 0, 0);
+        
+        renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.shadowMap.enabled = true;
+        
+        const ambient = new THREE.AmbientLight(0x404060);
+        scene.add(ambient);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(5, 12, 8);
+        dirLight.castShadow = true;
+        dirLight.receiveShadow = true;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        scene.add(dirLight);
+        const fillLight = new THREE.PointLight(0x4466cc, 0.5);
+        fillLight.position.set(0, 4, -5);
+        scene.add(fillLight);
+        
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(40, 200),
+            new THREE.MeshStandardMaterial({ color: 0x2a5a2a, roughness: 0.9 })
+        );
+        ground.rotation.x = -Math.PI/2;
+        ground.position.y = -0.2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        car = new THREE.Group();
+        const bodyGeo = new THREE.BoxGeometry(1.0, 0.4, 2.0);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xe34234, metalness: 0.7, roughness: 0.3 });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.castShadow = true;
+        body.receiveShadow = true;
+        body.position.y = 0.2;
+        car.add(body);
+        
+        const roofGeo = new THREE.BoxGeometry(0.8, 0.3, 1.2);
+        const roofMat = new THREE.MeshStandardMaterial({ color: 0xcc5533 });
+        const roof = new THREE.Mesh(roofGeo, roofMat);
+        roof.position.y = 0.55;
+        roof.castShadow = true;
+        car.add(roof);
+        
+        const windowMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, emissive: 0x224466 });
+        const frontWind = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 0.1), windowMat);
+        frontWind.position.set(0, 0.5, 0.85);
+        car.add(frontWind);
+        const rearWind = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 0.1), windowMat);
+        rearWind.position.set(0, 0.5, -0.85);
+        car.add(rearWind);
+        
+        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.3 });
+        const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.3, 16);
+        const wheelPos = [[-0.7, 0.12, 0.85], [0.7, 0.12, 0.85], [-0.7, 0.12, -0.85], [0.7, 0.12, -0.85]];
+        wheelPos.forEach(pos => {
+            const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+            wheel.rotation.z = Math.PI/2;
+            wheel.position.set(pos[0], pos[1], pos[2]);
+            wheel.castShadow = true;
+            car.add(wheel);
+        });
+        car.position.y = 0.1;
+        car.castShadow = true;
+        scene.add(car);
+        
+        function createRoadSegment(zPos) {
+            const group = new THREE.Group();
+            const roadMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.6 });
+            const roadPlane = new THREE.Mesh(new THREE.PlaneGeometry(6, roadLength), roadMat);
+            roadPlane.rotation.x = -Math.PI/2;
+            roadPlane.position.y = -0.05;
+            roadPlane.receiveShadow = true;
+            group.add(roadPlane);
+            
+            const stripeMat = new THREE.MeshStandardMaterial({ color: 0xffcc44 });
+            for (let i = -roadLength/2 + 1; i < roadLength/2; i+= 1.8) {
+                const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.05, 0.6), stripeMat);
+                stripe.position.set(0, 0.02, i);
+                stripe.castShadow = false;
+                group.add(stripe);
+            }
+            const edgeMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
+            const leftEdge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, roadLength), edgeMat);
+            leftEdge.position.set(-2.95, 0.02, 0);
+            group.add(leftEdge);
+            const rightEdge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, roadLength), edgeMat);
+            rightEdge.position.set(2.95, 0.02, 0);
+            group.add(rightEdge);
+            
+            group.position.z = zPos;
+            return group;
+        }
+        
+        for (let i = -2; i <= 2; i++) {
+            const seg = createRoadSegment(i * roadLength);
+            scene.add(seg);
+            roadSegments.push(seg);
+        }
+        
+        function updateCamera() {
+            camera.position.x += (car.position.x - camera.position.x) * 0.1;
+            camera.lookAt(car.position.x, 0.5, 0);
+        }
+        return { updateCamera };
+    }
+    
     function createTree(x, z) {
         const group = new THREE.Group();
         const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B5A2B, roughness: 0.8 });
-        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.55, 1.2, 6), trunkMat);
-        trunk.position.y = 0.6; trunk.castShadow = true; group.add(trunk);
-        const leafMat = new THREE.MeshStandardMaterial({ color: 0x4c9e3c });
-        const fol1 = new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.9, 8), leafMat);
-        fol1.position.y = 1.2; fol1.castShadow = true; group.add(fol1);
-        const fol2 = new THREE.Mesh(new THREE.ConeGeometry(0.55, 0.8, 8), leafMat);
-        fol2.position.y = 1.8; fol2.castShadow = true; group.add(fol2);
-        group.position.set(x, 0, z); return group;
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 1.0, 6), trunkMat);
+        trunk.position.y = 0.5;
+        trunk.castShadow = true;
+        group.add(trunk);
+        const leafMat = new THREE.MeshStandardMaterial({ color: 0x3c9e3c });
+        const foliage1 = new THREE.Mesh(new THREE.ConeGeometry(0.6, 0.8, 8), leafMat);
+        foliage1.position.y = 1.0;
+        foliage1.castShadow = true;
+        group.add(foliage1);
+        const foliage2 = new THREE.Mesh(new THREE.ConeGeometry(0.5, 0.7, 8), leafMat);
+        foliage2.position.y = 1.5;
+        foliage2.castShadow = true;
+        group.add(foliage2);
+        group.position.set(x, 0, z);
+        return group;
     }
-    function createRock(x, z) {
-        const group = new THREE.Group();
-        const rockMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.9 });
-        const main = new THREE.Mesh(new THREE.DodecahedronGeometry(0.5), rockMat);
-        main.scale.set(0.9, 0.7, 1.1); main.position.y = 0.3; main.castShadow = true; group.add(main);
-        const small = new THREE.Mesh(new THREE.DodecahedronGeometry(0.3), rockMat);
-        small.position.set(0.4, 0.15, 0.3); small.castShadow = true; group.add(small);
-        const small2 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.3), rockMat);
-        small2.position.set(-0.3, 0.2, -0.4); small2.castShadow = true; group.add(small2);
-        group.position.set(x, 0, z); return group;
-    }
-    function createBrokenCar(x, z) {
-        const group = new THREE.Group();
-        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xaa5533, metalness: 0.3 });
-        const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.4, 1.8), bodyMat);
-        chassis.position.y = 0.25; chassis.castShadow = true; group.add(chassis);
-        const roof = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.2, 1.2), new THREE.MeshStandardMaterial({ color: 0x884422 }));
-        roof.position.y = 0.55; roof.rotation.z = 0.2; group.add(roof);
-        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.3, 12), wheelMat);
-        wheel.rotation.z = Math.PI/2; wheel.position.set(0.6, 0.1, 0.7); group.add(wheel);
-        const smokeMat = new THREE.MeshStandardMaterial({ color: 0x555555, emissive: 0x222222 });
-        const smoke = new THREE.Mesh(new THREE.SphereGeometry(0.2, 6, 6), smokeMat);
-        smoke.position.set(0.2, 0.6, -0.9); group.add(smoke);
-        group.position.set(x, 0, z); return group;
-    }
+    
     function spawnObstacle(zPos) {
-        const rand = Math.random();
-        let obstacleMesh, radius;
-        if (rand < 0.4) { obstacleMesh = createTree(0,0); radius = 0.7; }
-        else if (rand < 0.7) { obstacleMesh = createRock(0,0); radius = 0.6; }
-        else { obstacleMesh = createBrokenCar(0,0); radius = 0.75; }
         const xPos = (Math.random() - 0.5) * 5.0;
-        const clampedX = Math.min(maxX - 0.6, Math.max(minX + 0.6, xPos));
-        obstacleMesh.position.set(clampedX, 0, zPos);
-        scene.add(obstacleMesh);
-        obstacles.push({ mesh: obstacleMesh, collisionRadius: radius, x: clampedX, z: zPos });
+        const clampedX = Math.min(maxX - 0.5, Math.max(minX + 0.5, xPos));
+        const tree = createTree(clampedX, zPos);
+        scene.add(tree);
+        obstacles.push({ mesh: tree, collisionRadius: 0.7, x: clampedX, z: zPos });
     }
-
-    function init3D() {
-        scene = new THREE.Scene(); scene.background = new THREE.Color(0x0a2a2a); scene.fog = new THREE.FogExp2(0x0a2a2a, 0.008);
-        camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 200);
-        camera.position.set(0, 5, 12);
-        renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight); renderer.shadowMap.enabled = true;
-        const ambient = new THREE.AmbientLight(0x404060); scene.add(ambient);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2); dirLight.position.set(5,12,8); dirLight.castShadow = true; scene.add(dirLight);
-        const fillLight = new THREE.PointLight(0x4466cc, 0.5); fillLight.position.set(0,4,-5); scene.add(fillLight);
-        const ground = new THREE.Mesh(new THREE.PlaneGeometry(40,200), new THREE.MeshStandardMaterial({ color: 0x2a5a2a, roughness:0.9 }));
-        ground.rotation.x = -Math.PI/2; ground.position.y = -0.2; ground.receiveShadow = true; scene.add(ground);
-        // Auto
-        car = new THREE.Group();
-        const bodyMatCar = new THREE.MeshStandardMaterial({ color: 0xe34234, metalness: 0.7 });
-        const body = new THREE.Mesh(new THREE.BoxGeometry(1.0,0.4,2.0), bodyMatCar); body.position.y=0.2; body.castShadow=true; car.add(body);
-        const roof = new THREE.Mesh(new THREE.BoxGeometry(0.8,0.3,1.2), new THREE.MeshStandardMaterial({ color: 0xcc5533 }));
-        roof.position.y=0.55; roof.castShadow=true; car.add(roof);
-        const glass = new THREE.MeshStandardMaterial({ color: 0x88ccff });
-        const fw = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.2,0.1), glass); fw.position.set(0,0.5,0.85); car.add(fw);
-        const rw = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.2,0.1), glass); rw.position.set(0,0.5,-0.85); car.add(rw);
-        const wheelMatCar = new THREE.MeshStandardMaterial({ color: 0x111111 });
-        const wheelGeo = new THREE.CylinderGeometry(0.28,0.28,0.3,16);
-        [[-0.7,0.12,0.85],[0.7,0.12,0.85],[-0.7,0.12,-0.85],[0.7,0.12,-0.85]].forEach(pos => {
-            const w = new THREE.Mesh(wheelGeo, wheelMatCar); w.rotation.z = Math.PI/2; w.position.set(pos[0],pos[1],pos[2]); w.castShadow=true; car.add(w);
-        });
-        car.position.y=0.1; scene.add(car);
-        // Straße
-        function createRoadSegment(zPos) {
-            const group = new THREE.Group();
-            const roadPlane = new THREE.Mesh(new THREE.PlaneGeometry(6, roadLength), new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness:0.6 }));
-            roadPlane.rotation.x = -Math.PI/2; roadPlane.position.y = -0.05; roadPlane.receiveShadow = true; group.add(roadPlane);
-            const stripeMat = new THREE.MeshStandardMaterial({ color: 0xffcc44 });
-            for (let i = -roadLength/2+1; i<roadLength/2; i+=1.8) {
-                const s = new THREE.Mesh(new THREE.BoxGeometry(0.2,0.05,0.6), stripeMat); s.position.set(0,0.02,i); group.add(s);
-            }
-            const edgeMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
-            const left = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.05,roadLength), edgeMat); left.position.set(-2.95,0.02,0); group.add(left);
-            const right = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.05,roadLength), edgeMat); right.position.set(2.95,0.02,0); group.add(right);
-            group.position.z = zPos; return group;
+    
+    function updateObstacles(speed) {
+        for (let i = 0; i < obstacles.length; i++) {
+            obstacles[i].z -= speed;
+            obstacles[i].mesh.position.z = obstacles[i].z;
         }
-        for (let i=-2; i<=2; i++) { const seg = createRoadSegment(i*roadLength); scene.add(seg); roadSegments.push(seg); }
-        function updateCamera() { camera.position.x += (car.position.x - camera.position.x)*0.1; camera.lookAt(car.position.x,0.5,0); }
-        return { updateCamera };
+        obstacles = obstacles.filter(obs => {
+            if (obs.z < -12) {
+                scene.remove(obs.mesh);
+                return false;
+            }
+            return true;
+        });
     }
-
-    function updateObstacles(speed) { for(let o of obstacles) { o.z -= speed; o.mesh.position.z = o.z; } obstacles = obstacles.filter(o => { if(o.z < -12) { scene.remove(o.mesh); return false; } return true; }); }
-    function manageObstacleSpawning() { if(!isGameRunning) return; let maxZ = -30; for(let o of obstacles) if(o.z > maxZ) maxZ = o.z; while(maxZ < 20) { const newZ = maxZ + obstacleSpawnDistance; spawnObstacle(newZ); maxZ = newZ; } }
-    function updateRoad(speed) { for(let seg of roadSegments) seg.position.z -= speed; for(let i=0;i<roadSegments.length;i++) if(roadSegments[i].position.z < -roadLength) roadSegments[i].position.z += roadLength * roadSegments.length; }
-    function checkCollisions() { const carR=0.6; for(let o of obstacles) if(Math.hypot(car.position.x - o.x, 0 - o.z) < carR + o.collisionRadius) { gameOver(); return true; } return false; }
-    function updateScore(speed) { if(!isGameRunning) return; score += speed*2; scoreSpan.innerText = `Score: ${Math.floor(score)}`; if(Math.floor(score) > lastScoreUpdate+200) { lastScoreUpdate = Math.floor(score); currentSpeed = Math.min(0.55, currentSpeed+0.02); } }
-
+    
+    function manageObstacleSpawning() {
+        if (!isGameRunning) return;
+        let maxZ = -30;
+        for (let obs of obstacles) if (obs.z > maxZ) maxZ = obs.z;
+        while (maxZ < 20) {
+            const newZ = maxZ + obstacleSpawnDistance;
+            spawnObstacle(newZ);
+            maxZ = newZ;
+        }
+    }
+    
+    function updateRoad(speed) {
+        for (let seg of roadSegments) seg.position.z -= speed;
+        for (let i = 0; i < roadSegments.length; i++) {
+            if (roadSegments[i].position.z < -roadLength)
+                roadSegments[i].position.z += roadLength * roadSegments.length;
+        }
+    }
+    
+    function checkCollisions() {
+        const carRadius = 0.6;
+        for (let obs of obstacles) {
+            const dx = car.position.x - obs.x;
+            const dz = 0 - obs.z;
+            if (Math.hypot(dx, dz) < carRadius + obs.collisionRadius) {
+                gameOver();
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    function updateScore(speed) {
+        if (!isGameRunning) return;
+        score += speed * 2;
+        scoreSpan.innerText = `Score: ${Math.floor(score)}`;
+        if (Math.floor(score) > lastScoreUpdate + 200) {
+            lastScoreUpdate = Math.floor(score);
+            currentSpeed = Math.min(0.55, currentSpeed + 0.02);
+        }
+    }
+    
     function gameOver() {
-        if(!isGameRunning) return;
-        isGameRunning=false; gameOverFlag=true; gameOverMsgDiv.style.display='block'; restartGameBtn.style.display='inline-block';
-        if(animationId) cancelAnimationFrame(animationId); animationId=null;
-        // Nach Game Over: Name für Bestenliste abfragen
+        if (!isGameRunning) return;
+        isGameRunning = false;
+        gameOverFlag = true;
+        gameOverMsgDiv.style.display = 'block';
+        restartGameBtn.style.display = 'inline-block';
+        if (animationId) cancelAnimationFrame(animationId);
+        animationId = null;
+        
         const finalScore = Math.floor(score);
         const playerName = prompt(`Game Over! Du hast ${finalScore} Punkte erreicht.\nGib deinen Namen für die Bestenliste ein:`, "Fahrer");
-        if(playerName !== null) {
-            addRacingScore(playerName, finalScore);
-        }
+        if (playerName !== null) addRacingScore(playerName, finalScore);
     }
-
+    
     function restartGame() {
-        for(let o of obstacles) scene.remove(o.mesh);
-        obstacles=[]; score=0; scoreSpan.innerText="Score: 0"; currentSpeed=baseSpeed; carX=0; car.position.x=0;
-        gameOverFlag=false; gameOverMsgDiv.style.display='none'; restartGameBtn.style.display='none';
-        for(let i=0;i<roadSegments.length;i++) roadSegments[i].position.z = (i-2)*roadLength;
-        for(let i=1;i<=5;i++) spawnObstacle(10 + i*obstacleSpawnDistance);
-        isGameRunning=true; gameLoop();
-    }
-
-    function handleKeyDown(e) {
-        if(!isGameRunning || gameOverFlag) return;
-        if(e.key==='ArrowLeft') { leftPressed=true; e.preventDefault(); }
-        else if(e.key==='ArrowRight') { rightPressed=true; e.preventDefault(); }
-    }
-    function handleKeyUp(e) { if(e.key==='ArrowLeft') leftPressed=false; else if(e.key==='ArrowRight') rightPressed=false; }
-    function updateCar() { if(!isGameRunning || gameOverFlag) return; let move=0; if(leftPressed) move=-0.18; if(rightPressed) move=0.18; carX+=move; carX=Math.min(maxX,Math.max(minX,carX)); car.position.x=carX; }
-
-    function gameLoop() { if(!isGameRunning) return; updateCar(); const s=currentSpeed; updateRoad(s); updateObstacles(s); manageObstacleSpawning(); updateScore(s); if(checkCollisions()) return; if(cameraHelper) cameraHelper.updateCamera(); renderer.render(scene,camera); animationId = requestAnimationFrame(gameLoop); }
-
-    function startRennspiel() {
-        if(isGameRunning) return;
-        gameContainer.style.display = "flex";
-        if(!threeInit) {
-            const init = init3D(); cameraHelper = init.updateCamera; threeInit=true;
-            window.addEventListener('keydown', handleKeyDown); window.addEventListener('keyup', handleKeyUp);
-            for(let i=1;i<=5;i++) spawnObstacle(10 + i*obstacleSpawnDistance);
-        } else { restartGame(); return; }
-        isGameRunning=true; gameOverFlag=false; score=0; currentSpeed=baseSpeed; scoreSpan.innerText="Score: 0"; gameOverMsgDiv.style.display='none'; restartGameBtn.style.display='none';
+        for (let obs of obstacles) scene.remove(obs.mesh);
+        obstacles = [];
+        score = 0;
+        scoreSpan.innerText = "Score: 0";
+        currentSpeed = baseSpeed;
+        carX = 0;
+        car.position.x = 0;
+        gameOverFlag = false;
+        gameOverMsgDiv.style.display = 'none';
+        restartGameBtn.style.display = 'none';
+        for (let i = 0; i < roadSegments.length; i++) roadSegments[i].position.z = (i - 2) * roadLength;
+        for (let i = 0; i < 4; i++) spawnObstacle(-10 + i * obstacleSpawnDistance);
+        isGameRunning = true;
         gameLoop();
-        const resize = () => { const w=canvas.clientWidth, h=canvas.clientHeight; renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); };
-        window.addEventListener('resize',resize); resize();
     }
-    function stopRennspiel() { if(animationId) cancelAnimationFrame(animationId); isGameRunning=false; gameContainer.style.display="none"; leftPressed=false; rightPressed=false; }
-
+    
+    function handleKeyDown(e) {
+        if (!isGameRunning || gameOverFlag) return;
+        if (e.key === 'ArrowLeft') { leftPressed = true; e.preventDefault(); }
+        else if (e.key === 'ArrowRight') { rightPressed = true; e.preventDefault(); }
+    }
+    function handleKeyUp(e) {
+        if (e.key === 'ArrowLeft') leftPressed = false;
+        else if (e.key === 'ArrowRight') rightPressed = false;
+    }
+    
+    function updateCar() {
+        if (!isGameRunning || gameOverFlag) return;
+        let move = 0;
+        if (leftPressed) move = -0.18;
+        if (rightPressed) move = 0.18;
+        carX += move;
+        carX = Math.min(maxX, Math.max(minX, carX));
+        car.position.x = carX;
+    }
+    
+    function gameLoop() {
+        if (!isGameRunning) return;
+        updateCar();
+        const speed = currentSpeed;
+        updateRoad(speed);
+        updateObstacles(speed);
+        manageObstacleSpawning();
+        updateScore(speed);
+        if (checkCollisions()) return;
+        if (cameraHelper) cameraHelper.updateCamera();
+        renderer.render(scene, camera);
+        animationId = requestAnimationFrame(gameLoop);
+    }
+    
+    function startRennspiel() {
+        if (isGameRunning) return;
+        gameContainer.style.display = "flex";
+        if (!threeInit) {
+            const initRes = init3D();
+            cameraHelper = initRes.updateCamera;
+            threeInit = true;
+            window.addEventListener('keydown', handleKeyDown);
+            window.addEventListener('keyup', handleKeyUp);
+            for (let i = 0; i < 5; i++) spawnObstacle(-10 + i * obstacleSpawnDistance);
+        } else {
+            restartGame();
+            return;
+        }
+        isGameRunning = true;
+        gameOverFlag = false;
+        score = 0;
+        currentSpeed = baseSpeed;
+        scoreSpan.innerText = "Score: 0";
+        gameOverMsgDiv.style.display = 'none';
+        restartGameBtn.style.display = 'none';
+        gameLoop();
+        const handleResize = () => {
+            const w = canvas.clientWidth, h = canvas.clientHeight;
+            renderer.setSize(w, h);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+        };
+        window.addEventListener('resize', handleResize);
+        handleResize();
+    }
+    
+    function stopRennspiel() {
+        if (animationId) cancelAnimationFrame(animationId);
+        isGameRunning = false;
+        gameContainer.style.display = "none";
+    }
+    
     startBtn.addEventListener('click', startRennspiel);
     stopBtn.addEventListener('click', stopRennspiel);
     restartGameBtn.addEventListener('click', () => restartGame());
-
     gameContainer.style.display = "none";
     loadRacingLeaderboard();
 
@@ -615,21 +766,17 @@
     const resetClickBtn = document.getElementById('resetClickBtn');
     const clickLeaderboardList = document.getElementById('clickLeaderboardList');
 
-    let clickCount = 0;
-    let timeLeft = 50;
-    let clickGameActive = false;
-    let countdownInterval = null;
+    let clickCount = 0, timeLeft = 50, clickGameActive = false, countdownInterval = null;
     let clickLeaderboard = [];
 
     function loadClickLeaderboard() {
         const stored = localStorage.getItem('clickLeaderboard');
-        if(stored) clickLeaderboard = JSON.parse(stored);
-        else clickLeaderboard = [];
+        clickLeaderboard = stored ? JSON.parse(stored) : [];
         renderClickLeaderboard();
     }
     function saveClickLeaderboard() { localStorage.setItem('clickLeaderboard', JSON.stringify(clickLeaderboard)); }
     function addClickScore(name, scoreVal) {
-        if(!name.trim()) name = "Klicker";
+        if (!name.trim()) name = "Klicker";
         clickLeaderboard.push({ name: name.substring(0,20), score: scoreVal });
         clickLeaderboard.sort((a,b) => b.score - a.score);
         clickLeaderboard = clickLeaderboard.slice(0,5);
@@ -638,7 +785,7 @@
     }
     function renderClickLeaderboard() {
         clickLeaderboardList.innerHTML = '';
-        if(clickLeaderboard.length === 0) {
+        if (clickLeaderboard.length === 0) {
             clickLeaderboardList.innerHTML = '<li>Noch keine Einträge</li>';
             return;
         }
@@ -651,23 +798,23 @@
 
     function startClickChallenge() {
         const name = playerNameInput.value.trim();
-        if(name === "") { alert("Bitte gib deinen Namen für die Bestenliste ein!"); return; }
+        if (name === "") { alert("Bitte gib deinen Namen für die Bestenliste ein!"); return; }
         document.querySelector('#clickChallengeArea .name-input').style.display = 'none';
         startClickBtn.style.display = 'none';
         clickGamePanel.style.display = 'block';
         clickCount = 0; timeLeft = 50; clickGameActive = true;
         clickScoreSpan.innerText = `Klicks: 0`;
-        timerDisplay.innerText = `${timeLeft}.0 s`;
+        timerDisplay.innerText = `50.0 s`;
         clickButton.disabled = false;
-        if(countdownInterval) clearInterval(countdownInterval);
+        if (countdownInterval) clearInterval(countdownInterval);
         const startTime = Date.now();
         countdownInterval = setInterval(() => {
-            if(!clickGameActive) return;
+            if (!clickGameActive) return;
             const elapsed = (Date.now() - startTime) / 1000;
             const remaining = Math.max(0, 50 - elapsed);
             timeLeft = remaining;
             timerDisplay.innerText = `${remaining.toFixed(1)} s`;
-            if(remaining <= 0) {
+            if (remaining <= 0) {
                 clearInterval(countdownInterval);
                 endClickGame();
             }
@@ -675,7 +822,7 @@
     }
 
     function endClickGame() {
-        if(!clickGameActive) return;
+        if (!clickGameActive) return;
         clickGameActive = false;
         clickButton.disabled = true;
         clearInterval(countdownInterval);
@@ -690,7 +837,7 @@
     }
 
     function cancelClickGame() {
-        if(countdownInterval) clearInterval(countdownInterval);
+        if (countdownInterval) clearInterval(countdownInterval);
         clickGameActive = false;
         clickGamePanel.style.display = 'none';
         document.querySelector('#clickChallengeArea .name-input').style.display = 'inline-block';
@@ -698,7 +845,7 @@
     }
 
     clickButton.addEventListener('click', () => {
-        if(clickGameActive && timeLeft > 0) {
+        if (clickGameActive && timeLeft > 0) {
             clickCount++;
             clickScoreSpan.innerText = `Klicks: ${clickCount}`;
             clickButton.style.transform = 'scale(0.95)';
