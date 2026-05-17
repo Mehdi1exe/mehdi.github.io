@@ -94,7 +94,7 @@
 
     <div class="click-card">
         <div>
-            <input type="text" id="playerName" class="name-input" placeholder="Dein Name">
+            <input type="text" id="playerName" class="name-input" placeholder="Dein Name" maxlength="20">
             <button id="startBtn" class="btn">START</button>
         </div>
         <div id="gamePanel" style="display: none;">
@@ -116,6 +116,7 @@
 <script>
     const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbzj2eg9NINUK692grtQr7UE7R64Q5lcbEM8PP-IoYTqYDsp2OehUFjvYIgI6G8lgGJK_Q/exec";
 
+    // DOM-Elemente
     const startBtn = document.getElementById('startBtn');
     const resetBtn = document.getElementById('resetBtn');
     const gamePanel = document.getElementById('gamePanel');
@@ -127,6 +128,19 @@
 
     let clickCount = 0, timeLeft = 50, gameActive = false, countdownInterval = null;
 
+    // --- Name im localStorage speichern und laden ---
+    function loadSavedName() {
+        const savedName = localStorage.getItem('clickChallengePlayerName');
+        if (savedName) {
+            playerNameInput.value = savedName;
+        }
+    }
+
+    function saveName(name) {
+        localStorage.setItem('clickChallengePlayerName', name);
+    }
+
+    // --- Bestenliste (unverändert) ---
     async function loadLeaderboard() {
         try {
             const res = await fetch(SHEETS_API_URL);
@@ -166,12 +180,21 @@
         }
     }
 
+    // --- Spielstart (mit gespeichertem Namen) ---
     function startGame() {
-        const name = playerNameInput.value.trim();
-        if (!name) { alert("Bitte Name eingeben!"); return; }
-        playerNameInput.style.display = 'none';
+        let name = playerNameInput.value.trim();
+        if (name === "") {
+            alert("Bitte gib deinen Namen ein!");
+            return;
+        }
+        // Namen speichern für später
+        saveName(name);
+        
+        // UI umschalten: Eingabefeld deaktivieren (aber nicht ausblenden)
+        playerNameInput.disabled = true;
         startBtn.style.display = 'none';
         gamePanel.style.display = 'block';
+        
         clickCount = 0;
         timeLeft = 50;
         gameActive = true;
@@ -203,8 +226,10 @@
         const playerName = playerNameInput.value.trim();
         await saveScore(playerName, finalScore);
         alert(`Zeit vorbei! Du hast ${finalScore} Klicks.\nEintrag wurde zur globalen Bestenliste hinzugefügt.`);
+        
+        // Zurück zur Startansicht: Eingabefeld wieder aktivieren, START-Button einblenden
         gamePanel.style.display = 'none';
-        playerNameInput.style.display = 'inline-block';
+        playerNameInput.disabled = false;
         startBtn.style.display = 'inline-block';
     }
 
@@ -212,10 +237,11 @@
         if (countdownInterval) clearInterval(countdownInterval);
         gameActive = false;
         gamePanel.style.display = 'none';
-        playerNameInput.style.display = 'inline-block';
+        playerNameInput.disabled = false;
         startBtn.style.display = 'inline-block';
     }
 
+    // --- Event-Listener ---
     clickButton.addEventListener('click', () => {
         if (gameActive && timeLeft > 0) {
             clickCount++;
@@ -227,6 +253,8 @@
     startBtn.addEventListener('click', startGame);
     resetBtn.addEventListener('click', cancelGame);
 
+    // --- Initialisierung: gespeicherten Namen laden, Bestenliste laden ---
+    loadSavedName();
     loadLeaderboard();
     setInterval(loadLeaderboard, 3000);
 </script>
