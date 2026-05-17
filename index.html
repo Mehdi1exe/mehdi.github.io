@@ -421,36 +421,7 @@
         const playerName = playerNameInput.value.trim();
         addScore(playerName, finalScore);
         alert(`Zeit vorbei! Du hast ${finalScore} Klicks geschafft. Eintrag in Bestenliste!`);
-        // Zurück zur Eingabe
-        clickGamePanel.style.display = 'none';
-        document.querySelector('#click-game .name-input').style.display = 'inline-block';
-        startClickBtn.style.display = 'inline-block';
-        playerNameInput.value = playerName;
-    }
-
-    function cancelClickGame() {
-        if(countdownInterval) clearInterval(countdownInterval);
-        clickGameActive = false;
-        clickGamePanel.style.display = 'none';
-        document.querySelector('#click-game .name-input').style.display = 'inline-block';
-        startClickBtn.style.display = 'inline-block';
-    }
-
-    clickButton.addEventListener('click', () => {
-        if(clickGameActive && timeLeft > 0) {
-            clickCount++;
-            clickScoreSpan.innerText = `Klicks: ${clickCount}`;
-            clickButton.style.transform = 'scale(0.95)';
-            setTimeout(() => { clickButton.style.transform = ''; }, 100);
-        }
-    });
-    startClickBtn.addEventListener('click', startClickChallenge);
-    resetClickBtn.addEventListener('click', cancelClickGame);
-    loadLeaderboard();
-</script>
-</body>
-</html>
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -566,7 +537,7 @@
 </div>
 
 <script>
-    https://script.google.com/macros/s/AKfycbw66O7G5-EhYYu3YZJBmhQtv_CQLUW6UppHgmwaaaZwcBWEqvkqk15okR4huDNI9Wm9IA/exec
+   https://script.google.com/macros/s/AKfycbw66O7G5-EhYYu3YZJBmhQtv_CQLUW6UppHgmwaaaZwcBWEqvkqk15okR4huDNI9Wm9IA/exec
 
     // DOM-Elemente
     const startBtn = document.getElementById('startBtn');
@@ -586,8 +557,8 @@
             const data = await res.json();
             renderLeaderboard(data);
         } catch(e) {
-            console.error(e);
-            leaderboardList.innerHTML = '<li>Fehler beim Laden. Prüfe URL.</li>';
+            console.error("Fehler beim Laden:", e);
+            leaderboardList.innerHTML = '<li>Fehler beim Laden. Prüfe URL oder Netzwerk.</li>';
         }
     }
 
