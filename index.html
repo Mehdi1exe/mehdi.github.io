@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Klick-Challenge | Solo + Lokal + Online + Bot (30 Sek.)</title>
+    <title>Klick-Challenge | Solo + Lokal + Online (Link) + Bot</title>
     <style>
         * {
             margin: 0;
@@ -76,18 +76,17 @@
         .duel-card h2 { color: #44aaff; }
         .online-card h2 { color: #ff66cc; }
         .bot-card h2 { color: #66ff66; }
-        .name-input, .code-input {
+        .name-input {
             padding: 12px 20px;
             border-radius: 40px;
             border: none;
             font-size: 1rem;
+            width: 220px;
+            margin: 10px;
             background: #111;
             color: white;
             text-align: center;
-            margin: 10px;
         }
-        .name-input { width: 220px; }
-        .code-input { width: 140px; letter-spacing: 4px; }
         .btn {
             background: linear-gradient(135deg, #8a2be2, #5a1a9e);
             color: white;
@@ -125,6 +124,7 @@
         .player-score { font-size: 1.8rem; font-weight: bold; margin: 10px 0; }
         .duel-result { text-align: center; margin-top: 15px; font-size: 1.2rem; background: #000000aa; border-radius: 40px; padding: 10px; word-break: break-all; }
         .back-btn { background: #2c1a3a; margin-top: 20px; display: inline-block; }
+        .link-box { background: #111; padding: 8px; border-radius: 30px; margin: 10px 0; word-break: break-all; font-size: 0.8rem; }
         .hidden { display: none; }
         @media (max-width: 550px) {
             .click-btn { width: 140px; height: 140px; font-size: 1.5rem; }
@@ -147,7 +147,7 @@
         <div class="start-buttons">
             <div class="mode-btn solo" data-mode="solo"><h2>👤 Einzelspieler</h2><p>Globaler Highscore</p></div>
             <div class="mode-btn local" data-mode="local"><h2>👥 Lokales Duell</h2><p>Zwei Spieler, ein Gerät</p></div>
-            <div class="mode-btn online" data-mode="online"><h2>🌐 Online-Duell</h2><p>Per 4‑stelligen Code</p></div>
+            <div class="mode-btn online" data-mode="online"><h2>🌐 Online-Duell</h2><p>Per Link gegeneinander</p></div>
             <div class="mode-btn bot" data-mode="bot"><h2>🤖 Gegen Bot</h2><p>Klick gegen die KI</p></div>
         </div>
     </div>
@@ -182,22 +182,17 @@
         <button class="btn back-btn" data-back="local">⬅ Zurück zur Startseite</button>
     </div>
 
-    <!-- Online-Duell mit 4‑stelligem Code -->
+    <!-- Online-Duell mit Link -->
     <div id="onlineMode" class="game-card online-card hidden">
-        <h2>🌐 Online-Duell · 4‑stelliger Code</h2>
+        <h2>🌐 Online-Duell · Per Link einladen</h2>
         <div id="onlineMain">
-            <button id="createRoomBtn" class="btn">➕ Raum erstellen</button>
-            <div id="codeDisplayArea" style="margin-top:15px; display:none;">
-                <p>Dein Raum-Code:</p>
-                <div class="link-box" id="roomCodeDisplay"></div>
-                <button id="copyCodeBtn" class="btn">📋 Code kopieren</button>
+            <button id="createOnlineRoomBtn" class="btn">➕ Duell erstellen</button>
+            <div id="onlineLinkArea" style="margin-top:15px; display:none;">
+                <p>Link zum Teilen:</p>
+                <div class="link-box" id="onlineDuellLink"></div>
+                <button id="copyOnlineLinkBtn" class="btn">📋 Link kopieren</button>
+                <div id="onlineStatus" class="duel-result">Kein aktives Duell.</div>
             </div>
-            <div style="margin-top:20px;">
-                <p>Raum beitreten</p>
-                <input type="text" id="joinCodeInput" class="code-input" placeholder="Code" maxlength="4" inputmode="numeric">
-                <button id="joinRoomBtn" class="btn">🔗 Beitreten</button>
-            </div>
-            <div id="onlineStatus" class="duel-result">Kein aktives Duell.</div>
         </div>
         <div id="onlineGameArea" style="display:none;">
             <div class="timer" id="onlineTimer">30.0 s</div>
@@ -208,7 +203,7 @@
         <button class="btn back-btn" data-back="online">⬅ Zurück zur Startseite</button>
     </div>
 
-    <!-- Bot-Duell (gegen KI) -->
+    <!-- Bot-Duell -->
     <div id="botMode" class="game-card bot-card hidden">
         <h2>🤖 Gegen Bot · Wer klickt schneller?</h2>
         <div><input type="text" id="botName" class="name-input" placeholder="Dein Name"><button id="botStartBtn" class="btn">START (30 Sek.)</button></div>
@@ -224,8 +219,8 @@
 </div>
 
 <script>
-    // ========== KONFIGURATION ==========
-    const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbzxuSlkSnorvT59C-aYkwLH7EXvaDb2qCUd7sQapb4YLrPHZ9mVpihpEPUyHlLYqHH2pA/exec";
+    // ========== NEUE URL HIER EINGEFÜGT ==========
+    const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbxFCFY_yTCgCpJCFHxWXAms9dtv2X2PA3i7Bi5K6kCdl6Krs7hn5Kr6vsK8P5ZLT2YpEQ/exec";
 
     // ========== GLOBALE BESTENLISTE ==========
     async function loadGlobalLeaderboard() {
@@ -336,14 +331,14 @@
     function resetLocal() { if(p1Active) cancelPlayer1(); else { p1Start.style.display='inline-block'; p1Game.style.display='none'; p1Clicks=0; p1ScoreEl.innerText="0"; } if(p2Active) cancelPlayer2(); else { p2Start.style.display='inline-block'; p2Game.style.display='none'; p2Clicks=0; p2ScoreEl.innerText="0"; } localResultDiv.innerHTML="⭐ Wer gewinnt? Starte beide Spieler nacheinander!"; }
     localResetBtn.addEventListener('click', resetLocal);
 
-    // ========== ONLINE-DUELL (mit Code) ==========
-    let onlineRoomId = null, onlinePlayerRole = null, onlineGameActive = false, onlineClickCount = 0, onlineCountdown = null, onlineTimeLeft = 30;
-    const createRoomBtn = document.getElementById('createRoomBtn');
-    const codeDisplayArea = document.getElementById('codeDisplayArea');
-    const roomCodeDisplaySpan = document.getElementById('roomCodeDisplay');
-    const copyCodeBtn = document.getElementById('copyCodeBtn');
-    const joinCodeInput = document.getElementById('joinCodeInput');
-    const joinRoomBtn = document.getElementById('joinRoomBtn');
+    // ========== ONLINE-DUELL (per Link) ==========
+    let currentRoomId = null;
+    let onlinePlayerRole = null;
+    let onlineGameActive = false, onlineClickCount = 0, onlineCountdown = null, onlineTimeLeft = 30;
+    const createRoomBtn = document.getElementById('createOnlineRoomBtn');
+    const onlineLinkArea = document.getElementById('onlineLinkArea');
+    const onlineDuellLinkSpan = document.getElementById('onlineDuellLink');
+    const copyOnlineLinkBtn = document.getElementById('copyOnlineLinkBtn');
     const onlineStatusDiv = document.getElementById('onlineStatus');
     const onlineGameArea = document.getElementById('onlineGameArea');
     const onlineTimer = document.getElementById('onlineTimer');
@@ -363,11 +358,14 @@
     }
 
     async function checkOnlineStatus() {
-        if (!onlineRoomId) return;
+        if (!currentRoomId) return;
         try {
-            const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${onlineRoomId}`);
+            const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${currentRoomId}`);
             const data = await res.json();
-            if (data.error) return;
+            if (data.error) {
+                onlineStatusDiv.innerHTML = "Fehler: Raum nicht gefunden.";
+                return;
+            }
             if (data.status === "fertig") {
                 onlineStatusDiv.innerHTML = `Duell beendet!<br>${data.spieler1Name}: ${data.spieler1Score} – ${data.spieler2Name}: ${data.spieler2Score}<br>Sieger: ${data.spieler1Score > data.spieler2Score ? data.spieler1Name : (data.spieler2Score > data.spieler1Score ? data.spieler2Name : "Unentschieden")}`;
                 onlineGameArea.style.display = 'none';
@@ -382,47 +380,47 @@
         setTimeout(checkOnlineStatus, 2000);
     }
 
-    function generateRoomCode() { return Math.floor(1000 + Math.random() * 9000).toString(); }
+    function generateRoomId() {
+        return Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+    }
 
     createRoomBtn.addEventListener('click', async () => {
         const name = soloNameInput.value.trim() || "Spieler1";
         if (!name) { alert("Bitte im Einzelspieler-Feld deinen Namen eingeben."); return; }
-        let code = generateRoomCode();
-        let exists = true;
-        while (exists) {
-            const check = await fetch(`${SHEETS_API_URL}?action=duell&id=${code}`);
-            const data = await check.json();
-            if (data.error || !data.raumId) exists = false;
-            else { code = generateRoomCode(); }
-        }
-        await callDuellAPI('post', { raumId: code, spieler1Name: name, spieler1Score: 0, status: "wartet" });
-        onlineRoomId = code;
-        roomCodeDisplaySpan.innerText = code;
-        codeDisplayArea.style.display = 'block';
-        onlineStatusDiv.innerHTML = `Raum erstellt! Teile den Code ${code}. Warte auf Gegner...<br>Du bist Spieler 1.`;
+        const roomId = generateRoomId();
+        await callDuellAPI('post', { raumId: roomId, spieler1Name: name, spieler1Score: 0, status: "wartet" });
+        currentRoomId = roomId;
+        const fullLink = window.location.href.split('?')[0] + `?duell=${roomId}`;
+        onlineDuellLinkSpan.innerText = fullLink;
+        onlineLinkArea.style.display = 'block';
+        onlineStatusDiv.innerHTML = `Raum erstellt! Teile den Link. Warte auf Gegner...<br>Du bist Spieler 1.`;
         onlinePlayerRole = "spieler1";
         checkOnlineStatus();
     });
 
-    joinRoomBtn.addEventListener('click', async () => {
-        let code = joinCodeInput.value.trim();
-        if (!code || code.length !== 4 || isNaN(code)) { alert("Bitte einen 4‑stelligen Code eingeben."); return; }
-        const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${code}`);
-        const data = await res.json();
-        if (data.error) { alert("Raum nicht gefunden. Prüfe den Code."); return; }
-        onlineRoomId = code;
-        onlinePlayerRole = "spieler2";
-        onlineStatusDiv.innerHTML = `Raum beigetreten. Warte auf Gegner...`;
-        const name = soloNameInput.value.trim();
-        if (name) await callDuellAPI('post', { raumId: code, spieler2Name: name, status: "wartet" });
-        checkOnlineStatus();
-    });
+    function joinDuellByUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('duell');
+        if (roomId && !currentRoomId) {
+            currentRoomId = roomId;
+            onlineLinkArea.style.display = 'block';
+            onlineDuellLinkSpan.innerText = window.location.href;
+            onlinePlayerRole = "spieler2";
+            onlineStatusDiv.innerHTML = `Du trittst dem Duell bei. Warte auf Spieler 1 oder starte deine Runde, falls er schon gespielt hat.`;
+            checkOnlineStatus();
+            const name = soloNameInput.value.trim();
+            if (name) callDuellAPI('post', { raumId: currentRoomId, spieler2Name: name, status: "wartet" });
+        }
+    }
 
-    copyCodeBtn.addEventListener('click', () => { navigator.clipboard.writeText(roomCodeDisplaySpan.innerText); alert("Code kopiert!"); });
+    copyOnlineLinkBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(onlineDuellLinkSpan.innerText);
+        alert("Link kopiert!");
+    });
 
     function startOnlineGame() {
         if (onlineGameActive) return;
-        if (!onlineRoomId) { alert("Kein aktives Duell."); return; }
+        if (!currentRoomId) { alert("Kein aktives Duell."); return; }
         onlineGameArea.style.display = 'block';
         onlineGameActive = true;
         onlineClickCount = 0;
@@ -438,7 +436,10 @@
             const rem = Math.max(0, 30 - elapsed);
             onlineTimeLeft = rem;
             onlineTimer.innerText = `${rem.toFixed(1)} s`;
-            if (rem <= 0) { clearInterval(onlineCountdown); endOnlineGame(); }
+            if (rem <= 0) {
+                clearInterval(onlineCountdown);
+                endOnlineGame();
+            }
         }, 100);
     }
 
@@ -448,10 +449,10 @@
         onlineClickBtn.disabled = true;
         clearInterval(onlineCountdown);
         const finalScore = onlineClickCount;
-        const updateData = { raumId: onlineRoomId };
+        const updateData = { raumId: currentRoomId };
         if (onlinePlayerRole === "spieler1") updateData.spieler1Score = finalScore;
         else updateData.spieler2Score = finalScore;
-        const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${onlineRoomId}`);
+        const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${currentRoomId}`);
         const data = await res.json();
         let newStatus = "wartet";
         if (onlinePlayerRole === "spieler1" && data.spieler2Score !== undefined && data.spieler2Score > 0) newStatus = "fertig";
@@ -484,7 +485,7 @@
     startOnlineRoundBtn.addEventListener('click', startOnlineGame);
     if (onlineStatusDiv) onlineStatusDiv.parentElement.appendChild(startOnlineRoundBtn);
 
-    // ========== BOT-DUELL (gegen KI) ==========
+    // ========== BOT-DUELL ==========
     let botActive = false, botCount = 0, botCountdown = null, botTimeLeft = 30;
     const botNameInput = document.getElementById('botName');
     const botStartBtn = document.getElementById('botStartBtn');
@@ -527,19 +528,16 @@
         const playerScore = botCount;
         const name = botNameInput.value.trim();
         await saveGlobalScore(name, playerScore);
-        
         let min = Math.floor(playerScore * 0.8);
         let max = Math.floor(playerScore * 1.2);
         if (max < min) max = min + 5;
         const botScore = Math.floor(Math.random() * (max - min + 1) + min);
         const finalBot = Math.max(0, botScore);
-        
         let resultText = "";
         if (playerScore > finalBot) resultText = `🎉 Du gewinnst! ${playerScore} : ${finalBot} 🎉`;
         else if (finalBot > playerScore) resultText = `🤖 Der Bot gewinnt! ${playerScore} : ${finalBot} 🤖`;
         else resultText = `🤝 Unentschieden! ${playerScore} : ${finalBot} 🤝`;
         botResultDiv.innerHTML = resultText;
-        
         alert(`Deine Punktzahl: ${playerScore}\nBot: ${finalBot}\n${resultText}`);
         botGamePanel.style.display = 'none';
         botNameInput.disabled = false;
@@ -599,10 +597,10 @@
                 if (onlineCountdown) clearInterval(onlineCountdown);
                 onlineGameActive = false;
                 onlineGameArea.style.display = 'none';
-                onlineRoomId = null;
+                currentRoomId = null;
                 onlinePlayerRole = null;
                 onlineStatusDiv.innerHTML = "Kein aktives Duell.";
-                codeDisplayArea.style.display = 'none';
+                onlineLinkArea.style.display = 'none';
             } else if (btn.getAttribute('data-back') === 'bot') cancelBotGame();
             showStart();
         });
@@ -612,7 +610,13 @@
     loadSavedName();
     loadGlobalLeaderboard();
     setInterval(loadGlobalLeaderboard, 5000);
-    showStart();
+    joinDuellByUrl();
+    if (window.location.search.includes('duell=')) {
+        startPage.classList.add('hidden');
+        onlineDiv.classList.remove('hidden');
+    } else {
+        showStart();
+    }
 </script>
 </body>
 </html>
