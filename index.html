@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>MEHDI GAMING | Auto-Spiel</title>
+    <title>GAMING | Auto-Spiel</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,6 @@
             scroll-behavior: smooth;
         }
 
-        /* ----- NAVIGATION ----- */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -40,7 +39,6 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: 1px;
         }
 
         .nav-links a {
@@ -56,7 +54,6 @@
             text-shadow: 0 0 6px #00eaff;
         }
 
-        /* ----- HERO BEREICH ----- */
         .hero {
             padding: 100px 20px 120px;
             background: radial-gradient(circle at 20% 30%, #120024, #00040a);
@@ -67,7 +64,6 @@
             font-size: clamp(2.5rem, 8vw, 5rem);
             color: #00eaff;
             text-shadow: 0 0 15px #00eaff, 0 0 30px #8a2be2;
-            letter-spacing: 2px;
         }
 
         .hero p {
@@ -76,7 +72,6 @@
             color: #ccc;
         }
 
-        /* ----- BUTTONS ----- */
         .btn-game {
             background: linear-gradient(135deg, #8a2be2, #5a1a9e);
             color: white;
@@ -109,7 +104,6 @@
             color: white;
         }
 
-        /* ----- SPIEL-CONTAINER (anfangs unsichtbar) ----- */
         #gameContainer {
             display: none;
             margin: 40px auto;
@@ -130,7 +124,6 @@
             box-shadow: 0 0 30px rgba(0, 234, 255, 0.3);
             width: 100%;
             height: auto;
-            cursor: pointer;
             display: block;
         }
 
@@ -140,7 +133,6 @@
             text-shadow: 0 0 5px #00eaff;
         }
 
-        /* ----- CARDS (normal) ----- */
         .cards-container {
             display: flex;
             flex-wrap: wrap;
@@ -243,17 +235,15 @@
         <div class="card">
             <h2>🎯 Über Mich</h2>
             <p>Hi! Ich bin <strong>Mehdi1exe</strong>.<br>
-            Ich liebe Gaming, Coding, coole Projekte und zocke mit meiner Crew bis Mitternacht 🔥</p>
+            Ich liebe Gaming, Coding und coole Projekte 🔥</p>
         </div>
         <div class="card">
             <h2>📀 Empfohlene Games</h2>
-            <p>🎮 Minecraft • Fortnite • Roblox<br>
-            🕹️ Valorant • GTA V • Call of Duty<br>
-            ➕ und viele mehr ...</p>
+            <p>⭐ Brawl Stars • Roblox ⭐<br>
+            Mehr Games folgen bald...</p>
         </div>
     </div>
 
-    <!-- SPIEL BEREICH (zuerst versteckt) -->
     <div id="gameContainer">
         <canvas id="gameCanvas" width="800" height="300" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/300"></canvas>
         <div class="game-info">🚗 Unendliche Straße – Dein Auto fährt immer geradeaus!</div>
@@ -272,201 +262,171 @@
 </footer>
 
 <script>
-    // ---------- AUTO-SPIEL: unendliche Strasse mit scrollenden Markierungen ----------
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const gameContainer = document.getElementById('gameContainer');
-    const startBtn = document.getElementById('startGameBtn');
-    const stopBtn = document.getElementById('stopGameBtn');
+    (function() {
+        // DOM-Elemente
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameContainer = document.getElementById('gameContainer');
+        const startBtn = document.getElementById('startGameBtn');
+        const stopBtn = document.getElementById('stopGameBtn');
 
-    // Spielvariablen
-    let animationId = null;
-    let isGameRunning = false;
+        // Spielvariablen
+        let animationId = null;
+        let isGameRunning = false;
 
-    // Strasse & Scrollen
-    let markers = [];         // Array mit { x, y, width, height }
-    const MARKER_WIDTH = 30;
-    const MARKER_HEIGHT = 12;
-    const MARKER_SPACING = 90;   // Abstand zwischen den Markierungen (Pixel)
-    let scrollSpeed = 4;          // Pixel pro Frame (nach links)
+        // Straßenparameter
+        const ROAD_Y = 210;
+        const ROAD_HEIGHT = 70;
+        const CAR_WIDTH = 50;
+        const CAR_HEIGHT = 30;
+        const CAR_X = 120;
+        const CAR_Y = ROAD_Y + (ROAD_HEIGHT - CAR_HEIGHT) / 2;
 
-    // Auto-Position (fest)
-    const CAR_WIDTH = 50;
-    const CAR_HEIGHT = 30;
-    const CAR_X = 120;            // fixer X-Wert (Auto steht, Welt scrollt)
+        const MARKER_WIDTH = 30;
+        const MARKER_HEIGHT = 12;
+        const MARKER_SPACING = 90;
+        let scrollSpeed = 4;
+        let markers = [];
 
-    // Y-Positionen (Straßen-Bereich)
-    const ROAD_Y = 210;
-    const ROAD_HEIGHT = 70;
-    const CAR_Y = ROAD_Y + (ROAD_HEIGHT - CAR_HEIGHT) / 2;  // Auto mittig auf Straße
-
-    // Initialisierung der Markierungen (gleichmäßig verteilt)
-    function initMarkers() {
-        markers = [];
-        // Anzahl Marker, die auf einmal auf dem Canvas sichtbar sein sollen
-        const startX = canvas.width + 50;
-        for (let i = 0; i < 12; i++) {
-            markers.push({
-                x: startX + i * MARKER_SPACING,
-                y: ROAD_Y + ROAD_HEIGHT/2 - MARKER_HEIGHT/2,
-                w: MARKER_WIDTH,
-                h: MARKER_HEIGHT
-            });
-        }
-    }
-
-    // Zeichnet die Straße, das Auto und alle Markierungen
-    function drawScene() {
-        if (!ctx) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // ---- Hintergrund (Gras / Erde) ----
-        ctx.fillStyle = "#2a5a2a";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // Himmel
-        ctx.fillStyle = "#0b2b3b";
-        ctx.fillRect(0, 0, canvas.width, ROAD_Y - 10);
-        
-        // ---- Straße (Asphalt) ----
-        ctx.fillStyle = "#2c2c2c";
-        ctx.fillRect(0, ROAD_Y, canvas.width, ROAD_HEIGHT);
-        // Straßenränder (weiß)
-        ctx.strokeStyle = "#f0f0f0";
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(0, ROAD_Y);
-        ctx.lineTo(canvas.width, ROAD_Y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(0, ROAD_Y + ROAD_HEIGHT);
-        ctx.lineTo(canvas.width, ROAD_Y + ROAD_HEIGHT);
-        ctx.stroke();
-
-        // ---- Fahrbahnmarkierungen (scrollend) ----
-        for (let m of markers) {
-            ctx.fillStyle = "#ffffff";
-            ctx.shadowBlur = 0;
-            ctx.fillRect(m.x, m.y, m.w, m.h);
-            // kleiner Glow für die Markierungen
-            ctx.fillStyle = "#aaffff";
-            ctx.fillRect(m.x+2, m.y+2, m.w-4, m.h-4);
-        }
-        ctx.shadowBlur = 0;
-
-        // ---- Auto (cooler Sportwagen) ----
-        // Karosserie
-        ctx.fillStyle = "#e34234";
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = "#ff6666";
-        ctx.fillRect(CAR_X, CAR_Y, CAR_WIDTH, CAR_HEIGHT);
-        // Fenster
-        ctx.fillStyle = "#88ccff";
-        ctx.fillRect(CAR_X + 8, CAR_Y - 6, 12, 8);
-        ctx.fillRect(CAR_X + CAR_WIDTH - 20, CAR_Y - 6, 12, 8);
-        // Räder
-        ctx.fillStyle = "#222";
-        ctx.fillRect(CAR_X + 5, CAR_Y + CAR_HEIGHT-6, 10, 6);
-        ctx.fillRect(CAR_X + CAR_WIDTH-15, CAR_Y + CAR_HEIGHT-6, 10, 6);
-        ctx.fillRect(CAR_X + 5, CAR_Y-2, 10, 6);
-        ctx.fillRect(CAR_X + CAR_WIDTH-15, CAR_Y-2, 10, 6);
-        // Scheinwerfer
-        ctx.fillStyle = "#ffffaa";
-        ctx.fillRect(CAR_X + CAR_WIDTH-6, CAR_Y+5, 4, 8);
-        ctx.fillStyle = "#ffaa66";
-        ctx.fillRect(CAR_X-2, CAR_Y+5, 4, 8);
-        
-        ctx.shadowBlur = 0;
-        
-        // kleine Straßendetails (Seitenstreifen)
-        ctx.fillStyle = "#ffdd99";
-        for (let i = 0; i < 4; i++) {
-            ctx.fillRect(20 + i*200, ROAD_Y + ROAD_HEIGHT-5, 10, 3);
-        }
-    }
-
-    // Aktualisiert die Position der Markierungen (scrollt nach links)
-    function updateMarkers() {
-        for (let i = 0; i < markers.length; i++) {
-            markers[i].x -= scrollSpeed;
-        }
-        // Entferne Markierungen, die komplett links verschwunden sind
-        markers = markers.filter(m => m.x + m.w > 0);
-        
-        // Füge neue Markierungen rechts hinzu, damit es nie endet
-        if (markers.length === 0) {
-            // Fallback: erste Markierung bei canvas.width + Abstand
-            markers.push({
-                x: canvas.width + MARKER_SPACING,
-                y: ROAD_Y + ROAD_HEIGHT/2 - MARKER_HEIGHT/2,
-                w: MARKER_WIDTH,
-                h: MARKER_HEIGHT
-            });
-        } else {
-            let lastMarker = markers[markers.length-1];
-            while (lastMarker.x + lastMarker.w < canvas.width + MARKER_SPACING) {
-                let newX = lastMarker.x + MARKER_SPACING;
+        function initMarkers() {
+            markers = [];
+            for (let i = 0; i < 12; i++) {
                 markers.push({
-                    x: newX,
+                    x: canvas.width + 50 + i * MARKER_SPACING,
                     y: ROAD_Y + ROAD_HEIGHT/2 - MARKER_HEIGHT/2,
                     w: MARKER_WIDTH,
                     h: MARKER_HEIGHT
                 });
-                lastMarker = markers[markers.length-1];
             }
         }
-    }
 
-    // Hauptspiel-Schleife
-    function gameLoop() {
-        if (!isGameRunning) return;
-        updateMarkers();
-        drawScene();
-        animationId = requestAnimationFrame(gameLoop);
-    }
+        function drawScene() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Spiel starten (Canvas wird sichtbar, Animation läuft)
-    function startGame() {
-        if (isGameRunning) return; // schon aktiv
-        // Container einblenden
-        gameContainer.style.display = "flex";
-        // Canvas-Größe sicherstellen (beim ersten Mal)
-        if (canvas.width !== 800) {
-            canvas.width = 800;
-            canvas.height = 300;
+            // Hintergrund Gras & Himmel
+            ctx.fillStyle = "#2a5a2a";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#0b2b3b";
+            ctx.fillRect(0, 0, canvas.width, ROAD_Y - 10);
+
+            // Straße
+            ctx.fillStyle = "#2c2c2c";
+            ctx.fillRect(0, ROAD_Y, canvas.width, ROAD_HEIGHT);
+            ctx.strokeStyle = "#f0f0f0";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, ROAD_Y);
+            ctx.lineTo(canvas.width, ROAD_Y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(0, ROAD_Y + ROAD_HEIGHT);
+            ctx.lineTo(canvas.width, ROAD_Y + ROAD_HEIGHT);
+            ctx.stroke();
+
+            // Fahrbahnmarkierungen
+            for (let m of markers) {
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(m.x, m.y, m.w, m.h);
+                ctx.fillStyle = "#aaffff";
+                ctx.fillRect(m.x+2, m.y+2, m.w-4, m.h-4);
+            }
+
+            // Auto zeichnen
+            ctx.fillStyle = "#e34234";
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "#ff6666";
+            ctx.fillRect(CAR_X, CAR_Y, CAR_WIDTH, CAR_HEIGHT);
+            ctx.fillStyle = "#88ccff";
+            ctx.fillRect(CAR_X + 8, CAR_Y - 6, 12, 8);
+            ctx.fillRect(CAR_X + CAR_WIDTH - 20, CAR_Y - 6, 12, 8);
+            ctx.fillStyle = "#222";
+            ctx.fillRect(CAR_X + 5, CAR_Y + CAR_HEIGHT-6, 10, 6);
+            ctx.fillRect(CAR_X + CAR_WIDTH-15, CAR_Y + CAR_HEIGHT-6, 10, 6);
+            ctx.fillRect(CAR_X + 5, CAR_Y-2, 10, 6);
+            ctx.fillRect(CAR_X + CAR_WIDTH-15, CAR_Y-2, 10, 6);
+            ctx.fillStyle = "#ffffaa";
+            ctx.fillRect(CAR_X + CAR_WIDTH-6, CAR_Y+5, 4, 8);
+            ctx.fillStyle = "#ffaa66";
+            ctx.fillRect(CAR_X-2, CAR_Y+5, 4, 8);
+            ctx.shadowBlur = 0;
         }
-        initMarkers();
-        isGameRunning = true;
-        drawScene();   // sofort zeichnen, bevor Loop startet
-        if (animationId) cancelAnimationFrame(animationId);
-        animationId = requestAnimationFrame(gameLoop);
-    }
 
-    // Spiel stoppen und Container ausblenden
-    function stopGame() {
-        if (animationId) {
-            cancelAnimationFrame(animationId);
-            animationId = null;
+        function updateMarkers() {
+            for (let i = 0; i < markers.length; i++) {
+                markers[i].x -= scrollSpeed;
+            }
+            markers = markers.filter(m => m.x + m.w > 0);
+            if (markers.length === 0) {
+                markers.push({
+                    x: canvas.width + MARKER_SPACING,
+                    y: ROAD_Y + ROAD_HEIGHT/2 - MARKER_HEIGHT/2,
+                    w: MARKER_WIDTH,
+                    h: MARKER_HEIGHT
+                });
+            } else {
+                let last = markers[markers.length-1];
+                while (last.x + last.w < canvas.width + MARKER_SPACING) {
+                    let newX = last.x + MARKER_SPACING;
+                    markers.push({
+                        x: newX,
+                        y: ROAD_Y + ROAD_HEIGHT/2 - MARKER_HEIGHT/2,
+                        w: MARKER_WIDTH,
+                        h: MARKER_HEIGHT
+                    });
+                    last = markers[markers.length-1];
+                }
+            }
         }
-        isGameRunning = false;
+
+        function gameLoop() {
+            if (!isGameRunning) return;
+            updateMarkers();
+            drawScene();
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function startGame() {
+            if (isGameRunning) return;
+            // Container anzeigen
+            gameContainer.style.display = "flex";
+            // Canvas-Größe fixieren (wichtig für korrekte Berechnung)
+            if (canvas.width !== 800) {
+                canvas.width = 800;
+                canvas.height = 300;
+            }
+            initMarkers();
+            drawScene(); // Sofort zeichnen
+            isGameRunning = true;
+            if (animationId) cancelAnimationFrame(animationId);
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function stopGame() {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            isGameRunning = false;
+            gameContainer.style.display = "none";
+        }
+
+        // Event-Listener mit Fehlervermeidung
+        if (startBtn) startBtn.addEventListener('click', startGame);
+        if (stopBtn) stopBtn.addEventListener('click', stopGame);
+
+        // Container zuerst verstecken
         gameContainer.style.display = "none";
-        // optional: Canvas leeren
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+        isGameRunning = false;
 
-    // Event-Listener
-    startBtn.addEventListener('click', startGame);
-    stopBtn.addEventListener('click', stopGame);
+        // Canvas initial leeren
+        if (ctx) {
+            ctx.fillStyle = "#1a2a1f";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
 
-    // Stelle sicher, dass das Spiel nicht startet, wenn die Seite lädt (Container versteckt)
-    gameContainer.style.display = "none";
-    isGameRunning = false;
-
-    // Canvas initial einmal leeren
-    ctx.fillStyle = "#1a2a1f";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // kleines Console-Log
-    console.log("🔥 Bereit! Klicke auf START GAME – das Auto kommt und fährt auf unendlicher Straße!");
+        console.log("✅ Seite geladen – START GAME öffnet das Auto-Spiel!");
+    })();
 </script>
 </body>
 </html>
