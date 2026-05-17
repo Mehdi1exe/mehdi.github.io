@@ -126,7 +126,7 @@
     const clickScoreSpan = document.getElementById('clickScore');
     const leaderboardList = document.getElementById('leaderboardList');
 
-    let clickCount = 0, timeLeft = 50, gameActive = false, countdownInterval = null;
+    let clickCount = 0, timeLeft = 20, gameActive = false, countdownInterval = null;
 
     // --- Name im localStorage speichern und laden ---
     function loadSavedName() {
@@ -199,7 +199,7 @@
         timeLeft = 50;
         gameActive = true;
         clickScoreSpan.innerText = `Klicks: 0`;
-        timerDisplay.innerText = `50.0 s`;
+        timerDisplay.innerText = `20.0 s`;
         clickButton.disabled = false;
 
         if (countdownInterval) clearInterval(countdownInterval);
