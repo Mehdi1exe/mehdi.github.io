@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Klick-Challenge | Solo + Lokal + Online + Bot (3D-Button)</title>
+    <title>Klick-Challenge | Solo + Lokal + Online + Bot (Pikachu)</title>
     <style>
         * {
             margin: 0;
@@ -125,29 +125,25 @@
             transform: translateY(5px);
             box-shadow: 0 4px 0 #8b3c00;
         }
-        /* 3D-Button für Bot-Modus (wie PDF "3D") */
-        .click-btn-3d {
-            background: linear-gradient(145deg, #ffaa33, #cc7700);
+        /* 3D-Pikachu-Button für Bot-Modus (Bild statt Text) */
+        .click-btn-pikachu {
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            font-size: 2.8rem;
-            font-weight: bold;
-            color: white;
-            text-shadow: 2px 2px 0 #8b3c00;
+            background: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png') center/cover no-repeat, linear-gradient(145deg, #ffcc00, #ddaa00);
+            background-size: cover;
             border: none;
             cursor: pointer;
-            box-shadow: 0 15px 0 #8b3c00, 0 8px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 15px 0 #aa7700, 0 8px 25px rgba(0,0,0,0.4);
             transition: all 0.08s linear;
             margin: 10px auto;
             display: block;
             touch-action: manipulation;
             transform: translateY(-5px);
-            letter-spacing: 2px;
         }
-        .click-btn-3d:active {
+        .click-btn-pikachu:active {
             transform: translateY(5px);
-            box-shadow: 0 5px 0 #8b3c00;
+            box-shadow: 0 5px 0 #aa7700;
         }
         .timer { font-size: 2rem; font-family: monospace; background: #000000aa; display: inline-block; padding: 8px 25px; border-radius: 40px; margin: 10px; }
         .score-board { font-size: 1.5rem; margin: 10px; }
@@ -163,7 +159,7 @@
         .hidden { display: none; }
         @media (max-width: 550px) {
             .click-btn { width: 140px; height: 140px; font-size: 1.5rem; }
-            .click-btn-3d { width: 150px; height: 150px; font-size: 2rem; }
+            .click-btn-pikachu { width: 150px; height: 150px; }
             .player-box { min-width: 150px; }
             .mode-btn { width: 160px; padding: 15px; }
         }
@@ -184,7 +180,7 @@
             <div class="mode-btn solo" data-mode="solo"><h2>👤 Einzelspieler</h2><p>Globaler Highscore</p></div>
             <div class="mode-btn local" data-mode="local"><h2>👥 Lokales Duell</h2><p>Zwei Spieler, ein Gerät</p></div>
             <div class="mode-btn online" data-mode="online"><h2>🌐 Online-Duell</h2><p>Per Link gegeneinander</p></div>
-            <div class="mode-btn bot" data-mode="bot"><h2>🤖 Gegen Bot</h2><p>Klick gegen die KI</p></div>
+            <div class="mode-btn bot" data-mode="bot"><h2>🤖 Gegen Bot</h2><p>Klick auf Pikachu!</p></div>
         </div>
     </div>
 
@@ -239,14 +235,14 @@
         <button class="btn back-btn" data-back="online">⬅ Zurück zur Startseite</button>
     </div>
 
-    <!-- Bot-Duell (3D-Button mit "3D"-Text) -->
+    <!-- Bot-Duell (Pikachu-Button) -->
     <div id="botMode" class="game-card bot-card hidden">
-        <h2>🤖 Gegen Bot · Wer klickt schneller?</h2>
+        <h2>🤖 Gegen Bot · Klick auf Pikachu!</h2>
         <div><input type="text" id="botName" class="name-input" placeholder="Dein Name"><button id="botStartBtn" class="btn">START (30 Sek.)</button></div>
         <div id="botGamePanel" style="display:none;">
             <div class="timer" id="botTimer">30.0 s</div>
             <div class="score-board" id="botScore">Klicks: 0</div>
-            <button id="botClickBtn" class="click-btn-3d">3D</button>
+            <button id="botClickBtn" class="click-btn-pikachu"></button>
             <button id="botGameBackBtn" class="btn back-btn">Abbrechen</button>
         </div>
         <div id="botResult" class="duel-result"></div>
@@ -375,7 +371,7 @@
     soloStartBtn.addEventListener('click', startSolo);
     soloBackBtn.addEventListener('click', cancelSolo);
 
-    // ========== LOKALES DUELL ==========
+    // ========== LOKALES DUELL (kein Anti-Cheat) ==========
     let p1Active = false, p2Active = false, p1Clicks = 0, p2Clicks = 0, p1TimerInt = null, p2TimerInt = null, p1Time = 30, p2Time = 30;
     const p1Start = document.getElementById('p1StartBtn'), p1Game = document.getElementById('p1GameArea'), p1Click = document.getElementById('p1ClickBtn'), p1Cancel = document.getElementById('p1CancelBtn'), p1TimerEl = document.getElementById('p1Timer'), p1ScoreEl = document.getElementById('p1Score');
     const p2Start = document.getElementById('p2StartBtn'), p2Game = document.getElementById('p2GameArea'), p2Click = document.getElementById('p2ClickBtn'), p2Cancel = document.getElementById('p2CancelBtn'), p2TimerEl = document.getElementById('p2Timer'), p2ScoreEl = document.getElementById('p2Score');
@@ -537,7 +533,7 @@
     startOnlineRoundBtn.addEventListener('click', startOnlineGame);
     if (onlineStatusDiv) onlineStatusDiv.parentElement.appendChild(startOnlineRoundBtn);
 
-    // ========== BOT-DUELL (mit 3D-Button "3D") ==========
+    // ========== BOT-DUELL (mit Pikachu-Button) ==========
     let botActive = false, botCount = 0, botCountdown = null, botTimeLeft = 30;
     const botNameInput = document.getElementById('botName');
     const botStartBtn = document.getElementById('botStartBtn');
