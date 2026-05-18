@@ -2,14 +2,16 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Klick-Challenge | Solo + Lokal + Online (Link) + Bot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Klick-Challenge | Solo + Lokal + Online + Bot</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            /* Verhindert Zoom durch Doppeltippen auf allen Elementen */
+            touch-action: manipulation;
         }
         body {
             background: radial-gradient(circle at 10% 20%, #0a0f1e, #03050b);
@@ -52,6 +54,7 @@
             text-align: center;
             cursor: pointer;
             transition: 0.3s;
+            touch-action: manipulation;
         }
         .mode-btn.solo { border-color: #ffaa44; }
         .mode-btn.local { border-color: #44aaff; }
@@ -86,6 +89,7 @@
             background: #111;
             color: white;
             text-align: center;
+            touch-action: manipulation;
         }
         .btn {
             background: linear-gradient(135deg, #8a2be2, #5a1a9e);
@@ -97,6 +101,7 @@
             cursor: pointer;
             transition: 0.2s;
             margin: 8px;
+            touch-action: manipulation;
         }
         .btn:hover { transform: scale(1.05); background: #00eaff; color: black; }
         .click-btn {
@@ -112,6 +117,7 @@
             transition: 0.05s linear;
             margin: 10px auto;
             display: block;
+            touch-action: manipulation;
         }
         .click-btn:active { transform: scale(0.95); background: #ffaa00; }
         .timer { font-size: 2rem; font-family: monospace; background: #000000aa; display: inline-block; padding: 8px 25px; border-radius: 40px; margin: 10px; }
@@ -219,8 +225,37 @@
 </div>
 
 <script>
-    // ========== NEUE URL HIER EINGEFÜGT ==========
+    // ========== DEINE NEUE URL ==========
     const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbxFCFY_yTCgCpJCFHxWXAms9dtv2X2PA3i7Bi5K6kCdl6Krs7hn5Kr6vsK8P5ZLT2YpEQ/exec";
+
+    // ========== ANTI-CHEAT: Prüft zu schnelle Klicks ==========
+    let lastClickTime = 0;
+    let cheatCount = 0;
+    const CHEAT_THRESHOLD_MS = 35;      // weniger als 35 ms zwischen zwei Klicks → verdächtig
+    const MAX_CHEAT_WARNINGS = 3;       // nach 3 zu schnellen Klicks → Spielabbruch
+
+    function checkCheat() {
+        const now = Date.now();
+        if (lastClickTime > 0) {
+            const delta = now - lastClickTime;
+            if (delta < CHEAT_THRESHOLD_MS) {
+                cheatCount++;
+                if (cheatCount >= MAX_CHEAT_WARNINGS) {
+                    return true; // Cheat erkannt
+                }
+            } else {
+                // Reduziere verdächtige Zähler langsam (kein sofortiger Reset)
+                if (cheatCount > 0) cheatCount--;
+            }
+        }
+        lastClickTime = now;
+        return false;
+    }
+
+    function resetCheatDetection() {
+        lastClickTime = 0;
+        cheatCount = 0;
+    }
 
     // ========== GLOBALE BESTENLISTE ==========
     async function loadGlobalLeaderboard() {
@@ -242,7 +277,7 @@
         });
     }
 
-    // ========== EINZELSPIELER ==========
+    // ========== EINZELSPIELER (mit Anti-Cheat) ==========
     let soloActive = false, soloCount = 0, soloCountdown = null, soloTimeLeft = 30;
     const soloNameInput = document.getElementById('soloName');
     const soloStartBtn = document.getElementById('soloStartBtn');
@@ -265,10 +300,25 @@
         } catch(e) { alert("Fehler beim Speichern"); }
     }
 
+    function soloClickHandler() {
+        if (!soloActive || soloTimeLeft <= 0) return;
+        if (checkCheat()) {
+            // Cheat erkannt – Spiel sofort beenden
+            alert("⚠️ Cheat erkannt! Zu schnelle Klicks. Das Spiel wurde abgebrochen.");
+            endSoloGame(true);
+            return;
+        }
+        soloCount++;
+        soloScoreSpan.innerText = `Klicks: ${soloCount}`;
+        soloClickBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => soloClickBtn.style.transform = '', 100);
+    }
+
     function startSolo() {
         let name = soloNameInput.value.trim();
         if (!name) { alert("Bitte Namen eingeben!"); return; }
         saveName(name);
+        resetCheatDetection();
         soloNameInput.disabled = true;
         soloStartBtn.style.display = 'none';
         soloGamePanel.style.display = 'block';
@@ -284,26 +334,32 @@
             const rem = Math.max(0, 30 - elapsed);
             soloTimeLeft = rem;
             soloTimer.innerText = `${rem.toFixed(1)} s`;
-            if (rem <= 0) { clearInterval(soloCountdown); endSolo(); }
+            if (rem <= 0) { clearInterval(soloCountdown); endSoloGame(false); }
         }, 100);
     }
-    async function endSolo() {
+    async function endSoloGame(cheated = false) {
         if (!soloActive) return;
         soloActive = false; soloClickBtn.disabled = true; clearInterval(soloCountdown);
-        const final = soloCount;
-        const name = soloNameInput.value.trim();
-        await saveGlobalScore(name, final);
-        alert(`Zeit vorbei! Du hast ${final} Klicks.`);
+        if (!cheated) {
+            const final = soloCount;
+            const name = soloNameInput.value.trim();
+            await saveGlobalScore(name, final);
+            alert(`Zeit vorbei! Du hast ${final} Klicks.`);
+        } else {
+            alert("Das Ergebnis wurde nicht gespeichert.");
+        }
         soloGamePanel.style.display = 'none';
         soloNameInput.disabled = false;
         soloStartBtn.style.display = 'inline-block';
+        resetCheatDetection();
     }
-    function cancelSolo() { if (soloCountdown) clearInterval(soloCountdown); soloActive = false; soloGamePanel.style.display = 'none'; soloNameInput.disabled = false; soloStartBtn.style.display = 'inline-block'; }
-    soloClickBtn.addEventListener('click', () => { if (soloActive && soloTimeLeft > 0) { soloCount++; soloScoreSpan.innerText = `Klicks: ${soloCount}`; soloClickBtn.style.transform = 'scale(0.95)'; setTimeout(() => soloClickBtn.style.transform = '', 100); } });
+    function cancelSolo() { if (soloCountdown) clearInterval(soloCountdown); soloActive = false; soloGamePanel.style.display = 'none'; soloNameInput.disabled = false; soloStartBtn.style.display = 'inline-block'; resetCheatDetection(); }
+    soloClickBtn.addEventListener('click', soloClickHandler);
     soloStartBtn.addEventListener('click', startSolo);
     soloBackBtn.addEventListener('click', cancelSolo);
 
-    // ========== LOKALES DUELL ==========
+    // ========== LOKALES DUELL (kein Anti-Cheat, um zwei echte Spieler nicht zu behindern) ==========
+    // (Hier bleibt der Code unverändert – für lokales Duell kein Anti-Cheat nötig)
     let p1Active = false, p2Active = false, p1Clicks = 0, p2Clicks = 0, p1TimerInt = null, p2TimerInt = null, p1Time = 30, p2Time = 30;
     const p1Start = document.getElementById('p1StartBtn'), p1Game = document.getElementById('p1GameArea'), p1Click = document.getElementById('p1ClickBtn'), p1Cancel = document.getElementById('p1CancelBtn'), p1TimerEl = document.getElementById('p1Timer'), p1ScoreEl = document.getElementById('p1Score');
     const p2Start = document.getElementById('p2StartBtn'), p2Game = document.getElementById('p2GameArea'), p2Click = document.getElementById('p2ClickBtn'), p2Cancel = document.getElementById('p2CancelBtn'), p2TimerEl = document.getElementById('p2Timer'), p2ScoreEl = document.getElementById('p2Score');
@@ -331,10 +387,8 @@
     function resetLocal() { if(p1Active) cancelPlayer1(); else { p1Start.style.display='inline-block'; p1Game.style.display='none'; p1Clicks=0; p1ScoreEl.innerText="0"; } if(p2Active) cancelPlayer2(); else { p2Start.style.display='inline-block'; p2Game.style.display='none'; p2Clicks=0; p2ScoreEl.innerText="0"; } localResultDiv.innerHTML="⭐ Wer gewinnt? Starte beide Spieler nacheinander!"; }
     localResetBtn.addEventListener('click', resetLocal);
 
-    // ========== ONLINE-DUELL (per Link) ==========
-    let currentRoomId = null;
-    let onlinePlayerRole = null;
-    let onlineGameActive = false, onlineClickCount = 0, onlineCountdown = null, onlineTimeLeft = 30;
+    // ========== ONLINE-DUELL (mit Anti-Cheat) ==========
+    let currentRoomId = null, onlinePlayerRole = null, onlineGameActive = false, onlineClickCount = 0, onlineCountdown = null, onlineTimeLeft = 30;
     const createRoomBtn = document.getElementById('createOnlineRoomBtn');
     const onlineLinkArea = document.getElementById('onlineLinkArea');
     const onlineDuellLinkSpan = document.getElementById('onlineDuellLink');
@@ -380,9 +434,7 @@
         setTimeout(checkOnlineStatus, 2000);
     }
 
-    function generateRoomId() {
-        return Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
-    }
+    function generateRoomId() { return Math.random().toString(36).substring(2, 10) + Date.now().toString(36); }
 
     createRoomBtn.addEventListener('click', async () => {
         const name = soloNameInput.value.trim() || "Spieler1";
@@ -413,14 +465,25 @@
         }
     }
 
-    copyOnlineLinkBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(onlineDuellLinkSpan.innerText);
-        alert("Link kopiert!");
-    });
+    copyOnlineLinkBtn.addEventListener('click', () => { navigator.clipboard.writeText(onlineDuellLinkSpan.innerText); alert("Link kopiert!"); });
+
+    function onlineClickHandler() {
+        if (!onlineGameActive || onlineTimeLeft <= 0) return;
+        if (checkCheat()) {
+            alert("⚠️ Cheat erkannt! Zu schnelle Klicks. Das Spiel wurde abgebrochen.");
+            endOnlineGame(true);
+            return;
+        }
+        onlineClickCount++;
+        onlineScoreSpan.innerText = `Klicks: ${onlineClickCount}`;
+        onlineClickBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => onlineClickBtn.style.transform = '', 100);
+    }
 
     function startOnlineGame() {
         if (onlineGameActive) return;
         if (!currentRoomId) { alert("Kein aktives Duell."); return; }
+        resetCheatDetection();
         onlineGameArea.style.display = 'block';
         onlineGameActive = true;
         onlineClickCount = 0;
@@ -436,46 +499,42 @@
             const rem = Math.max(0, 30 - elapsed);
             onlineTimeLeft = rem;
             onlineTimer.innerText = `${rem.toFixed(1)} s`;
-            if (rem <= 0) {
-                clearInterval(onlineCountdown);
-                endOnlineGame();
-            }
+            if (rem <= 0) { clearInterval(onlineCountdown); endOnlineGame(false); }
         }, 100);
     }
 
-    async function endOnlineGame() {
+    async function endOnlineGame(cheated = false) {
         if (!onlineGameActive) return;
         onlineGameActive = false;
         onlineClickBtn.disabled = true;
         clearInterval(onlineCountdown);
-        const finalScore = onlineClickCount;
-        const updateData = { raumId: currentRoomId };
-        if (onlinePlayerRole === "spieler1") updateData.spieler1Score = finalScore;
-        else updateData.spieler2Score = finalScore;
-        const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${currentRoomId}`);
-        const data = await res.json();
-        let newStatus = "wartet";
-        if (onlinePlayerRole === "spieler1" && data.spieler2Score !== undefined && data.spieler2Score > 0) newStatus = "fertig";
-        if (onlinePlayerRole === "spieler2" && data.spieler1Score !== undefined && data.spieler1Score > 0) newStatus = "fertig";
-        updateData.status = newStatus;
-        await callDuellAPI('post', updateData);
-        alert(`Dein Ergebnis: ${finalScore} Klicks. ${newStatus === "fertig" ? "Duell beendet!" : "Warte auf Gegner..."}`);
+        if (!cheated) {
+            const finalScore = onlineClickCount;
+            const updateData = { raumId: currentRoomId };
+            if (onlinePlayerRole === "spieler1") updateData.spieler1Score = finalScore;
+            else updateData.spieler2Score = finalScore;
+            const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${currentRoomId}`);
+            const data = await res.json();
+            let newStatus = "wartet";
+            if (onlinePlayerRole === "spieler1" && data.spieler2Score !== undefined && data.spieler2Score > 0) newStatus = "fertig";
+            if (onlinePlayerRole === "spieler2" && data.spieler1Score !== undefined && data.spieler1Score > 0) newStatus = "fertig";
+            updateData.status = newStatus;
+            await callDuellAPI('post', updateData);
+            alert(`Dein Ergebnis: ${finalScore} Klicks. ${newStatus === "fertig" ? "Duell beendet!" : "Warte auf Gegner..."}`);
+        } else {
+            alert("Dein Ergebnis wurde wegen Cheat nicht gespeichert.");
+        }
         onlineGameArea.style.display = 'none';
         checkOnlineStatus();
+        resetCheatDetection();
     }
 
-    onlineClickBtn.addEventListener('click', () => {
-        if (onlineGameActive && onlineTimeLeft > 0) {
-            onlineClickCount++;
-            onlineScoreSpan.innerText = `Klicks: ${onlineClickCount}`;
-            onlineClickBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => onlineClickBtn.style.transform = '', 100);
-        }
-    });
+    onlineClickBtn.addEventListener('click', onlineClickHandler);
     onlineCancelBtn.addEventListener('click', () => {
         if (onlineCountdown) clearInterval(onlineCountdown);
         onlineGameActive = false;
         onlineGameArea.style.display = 'none';
+        resetCheatDetection();
     });
 
     const startOnlineRoundBtn = document.createElement('button');
@@ -485,7 +544,7 @@
     startOnlineRoundBtn.addEventListener('click', startOnlineGame);
     if (onlineStatusDiv) onlineStatusDiv.parentElement.appendChild(startOnlineRoundBtn);
 
-    // ========== BOT-DUELL ==========
+    // ========== BOT-DUELL (mit Anti-Cheat) ==========
     let botActive = false, botCount = 0, botCountdown = null, botTimeLeft = 30;
     const botNameInput = document.getElementById('botName');
     const botStartBtn = document.getElementById('botStartBtn');
@@ -496,10 +555,24 @@
     const botGameBackBtn = document.getElementById('botGameBackBtn');
     const botResultDiv = document.getElementById('botResult');
 
+    function botClickHandler() {
+        if (!botActive || botTimeLeft <= 0) return;
+        if (checkCheat()) {
+            alert("⚠️ Cheat erkannt! Zu schnelle Klicks. Das Spiel wurde abgebrochen.");
+            endBotGame(true);
+            return;
+        }
+        botCount++;
+        botScoreSpan.innerText = `Klicks: ${botCount}`;
+        botClickBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => botClickBtn.style.transform = '', 100);
+    }
+
     function startBotGame() {
         let name = botNameInput.value.trim();
         if (!name) { alert("Bitte deinen Namen eingeben!"); return; }
         saveName(name);
+        resetCheatDetection();
         botNameInput.disabled = true;
         botStartBtn.style.display = 'none';
         botGamePanel.style.display = 'block';
@@ -516,32 +589,39 @@
             const rem = Math.max(0, 30 - elapsed);
             botTimeLeft = rem;
             botTimer.innerText = `${rem.toFixed(1)} s`;
-            if (rem <= 0) { clearInterval(botCountdown); endBotGame(); }
+            if (rem <= 0) { clearInterval(botCountdown); endBotGame(false); }
         }, 100);
     }
 
-    async function endBotGame() {
+    async function endBotGame(cheated = false) {
         if (!botActive) return;
         botActive = false;
         botClickBtn.disabled = true;
         clearInterval(botCountdown);
-        const playerScore = botCount;
-        const name = botNameInput.value.trim();
-        await saveGlobalScore(name, playerScore);
-        let min = Math.floor(playerScore * 0.8);
-        let max = Math.floor(playerScore * 1.2);
-        if (max < min) max = min + 5;
-        const botScore = Math.floor(Math.random() * (max - min + 1) + min);
-        const finalBot = Math.max(0, botScore);
-        let resultText = "";
-        if (playerScore > finalBot) resultText = `🎉 Du gewinnst! ${playerScore} : ${finalBot} 🎉`;
-        else if (finalBot > playerScore) resultText = `🤖 Der Bot gewinnt! ${playerScore} : ${finalBot} 🤖`;
-        else resultText = `🤝 Unentschieden! ${playerScore} : ${finalBot} 🤝`;
-        botResultDiv.innerHTML = resultText;
-        alert(`Deine Punktzahl: ${playerScore}\nBot: ${finalBot}\n${resultText}`);
+        let finalScore = 0;
+        if (!cheated) {
+            finalScore = botCount;
+            const name = botNameInput.value.trim();
+            await saveGlobalScore(name, finalScore);
+            let min = Math.floor(finalScore * 0.8);
+            let max = Math.floor(finalScore * 1.2);
+            if (max < min) max = min + 5;
+            const botScore = Math.floor(Math.random() * (max - min + 1) + min);
+            const finalBot = Math.max(0, botScore);
+            let resultText = "";
+            if (finalScore > finalBot) resultText = `🎉 Du gewinnst! ${finalScore} : ${finalBot} 🎉`;
+            else if (finalBot > finalScore) resultText = `🤖 Der Bot gewinnt! ${finalScore} : ${finalBot} 🤖`;
+            else resultText = `🤝 Unentschieden! ${finalScore} : ${finalBot} 🤝`;
+            botResultDiv.innerHTML = resultText;
+            alert(`Deine Punktzahl: ${finalScore}\nBot: ${finalBot}\n${resultText}`);
+        } else {
+            alert("Dein Ergebnis wurde wegen Cheat nicht gespeichert.");
+            botResultDiv.innerHTML = "⚠️ Cheat erkannt – Ergebnis ungültig.";
+        }
         botGamePanel.style.display = 'none';
         botNameInput.disabled = false;
         botStartBtn.style.display = 'inline-block';
+        resetCheatDetection();
     }
 
     function cancelBotGame() {
@@ -551,16 +631,10 @@
         botNameInput.disabled = false;
         botStartBtn.style.display = 'inline-block';
         botResultDiv.innerHTML = "";
+        resetCheatDetection();
     }
 
-    botClickBtn.addEventListener('click', () => {
-        if (botActive && botTimeLeft > 0) {
-            botCount++;
-            botScoreSpan.innerText = `Klicks: ${botCount}`;
-            botClickBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => botClickBtn.style.transform = '', 100);
-        }
-    });
+    botClickBtn.addEventListener('click', botClickHandler);
     botStartBtn.addEventListener('click', startBotGame);
     botGameBackBtn.addEventListener('click', cancelBotGame);
 
@@ -601,6 +675,7 @@
                 onlinePlayerRole = null;
                 onlineStatusDiv.innerHTML = "Kein aktives Duell.";
                 onlineLinkArea.style.display = 'none';
+                resetCheatDetection();
             } else if (btn.getAttribute('data-back') === 'bot') cancelBotGame();
             showStart();
         });
