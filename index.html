@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Klick-Challenge | Alle Modi + Gesamtklicks + Tägliches Zeitfahren</title>
+    <title>Klick-Challenge | Alle Modi + Rennspiel (täglich 1x)</title>
     <style>
         * {
             margin: 0;
@@ -150,7 +150,56 @@
         .link-box { background: #111; padding: 8px; border-radius: 30px; margin: 10px 0; word-break: break-all; font-size: 0.8rem; }
         .hidden { display: none; }
         .cooldown-info { margin-top: 10px; font-size: 0.9rem; color: #ffaa88; background: #000000aa; border-radius: 30px; padding: 5px; }
-        @media (max-width: 550px) {
+
+        /* Rennspiel-spezifische Styles (übernommen aus deinem Code) */
+        #racingGameContainer {
+            display: none;
+            margin: 40px auto;
+            width: 90%;
+            max-width: 1100px;
+            background: #000000aa;
+            border-radius: 32px;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            border: 1px solid #8a2be2;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        #racingCanvas {
+            width: 100%;
+            height: 550px;
+            border-radius: 24px;
+            display: block;
+            background: #0a1a2a;
+        }
+        .racing-info {
+            font-size: 1.2rem;
+            color: #00eaff;
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+        }
+        .racing-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: #000000aa;
+            padding: 5px 15px;
+            border-radius: 30px;
+        }
+        .racing-over {
+            font-size: 1.5rem;
+            color: #ff6666;
+            text-shadow: 0 0 10px red;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; transform: scale(1);}
+            100% { opacity: 1; transform: scale(1.05);}
+        }
+        @media (max-width: 600px) {
+            .left-bottom-card { width: 180px; padding: 10px 15px; bottom: 10px; left: 10px; }
+            #racingCanvas { height: 300px; }
             .click-btn { width: 140px; height: 140px; font-size: 1.5rem; }
             .player-box { min-width: 150px; }
             .mode-btn { width: 160px; padding: 15px; }
@@ -163,7 +212,7 @@
     <div style="text-align: center;">
         <div class="total-clicks" id="totalClicksDisplay">Gesamtklicks: 0</div>
     </div>
-    <p class="sub">Wähle deinen Modus – 30 Sekunden (Zeitfahren: 50 Sek., 1x pro Tag)</p>
+    <p class="sub">Wähle deinen Modus – 30 Sekunden (Rennspiel: 1x täglich)</p>
 
     <!-- Startseite -->
     <div id="startPage">
@@ -176,7 +225,7 @@
             <div class="mode-btn local" data-mode="local"><h2>👥 Lokales Duell</h2><p>Zwei Spieler, ein Gerät</p></div>
             <div class="mode-btn online" data-mode="online"><h2>🌐 Online-Duell</h2><p>Per Link gegeneinander</p></div>
             <div class="mode-btn bot" data-mode="bot"><h2>🤖 Gegen Bot</h2><p>Klick gegen die KI</p></div>
-            <div class="mode-btn time" data-mode="time"><h2>🚗 Zeitfahren</h2><p>50 Sek., 1x täglich</p></div>
+            <div class="mode-btn time" data-mode="time"><h2>🚗 Rennspiel</h2><p>Auto fahren, 1x täglich</p></div>
         </div>
     </div>
 
@@ -245,23 +294,36 @@
         <button class="btn back-btn" data-back="bot">⬅ Zurück zur Startseite</button>
     </div>
 
-    <!-- ========== ZEITFAHREN (täglich 1x, 50 Sekunden, automatisch 1 Punkt pro Sekunde) ========== -->
-    <div id="timeMode" class="game-card time-card hidden">
-        <h2>🚗 Zeitfahren (täglich 1x)</h2>
-        <div><input type="text" id="timeName" class="name-input" placeholder="Dein Name"><button id="timeStartBtn" class="btn">START (50 Sek.)</button></div>
-        <div id="timeGamePanel" style="display:none;">
-            <div class="timer" id="timeTimer">50.0 s</div>
-            <div class="score-board" id="timeScore">Punkte: 0</div>
-            <button id="timeClickBtn" class="click-btn">👆</button>
-            <button id="timeBackBtn" class="btn back-btn">Abbrechen</button>
+    <!-- ========== RENNSPIEL (Zeitfahren, täglich 1x) ========== -->
+    <div id="racingMode" class="game-card time-card hidden">
+        <h2>🚗 Rennspiel · 3D-Action (täglich 1x)</h2>
+        <div><input type="text" id="racingName" class="name-input" placeholder="Dein Name"><button id="racingStartBtn" class="btn">RENNEN STARTEN</button></div>
+        <div id="racingGameContainer">
+            <canvas id="racingCanvas"></canvas>
+            <div class="racing-info">
+                <span>🚗 Steuere mit ← →</span>
+                <span class="racing-score" id="racingScore">Score: 0</span>
+            </div>
+            <div id="racingGameOverMsg" class="racing-over" style="display: none;">💥 GAME OVER! 💥</div>
+            <button class="btn" id="racingRestartBtn" style="display: none;">🔄 Neustart</button>
+            <button class="btn btn-stop" id="racingStopBtn">⏹️ Beenden</button>
         </div>
-        <div id="timeResult" class="duel-result"></div>
-        <div id="timeCooldown" class="cooldown-info"></div>
-        <button class="btn back-btn" data-back="time">⬅ Zurück zur Startseite</button>
+        <div id="racingCooldown" class="cooldown-info"></div>
+        <button class="btn back-btn" data-back="racing">⬅ Zurück zur Startseite</button>
     </div>
 </div>
 
-<script>
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+        }
+    }
+</script>
+
+<script type="module">
+    import * as THREE from 'three';
+
     // ========== KONFIGURATION ==========
     const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbxFCFY_yTCgCpJCFHxWXAms9dtv2X2PA3i7Bi5K6kCdl6Krs7hn5Kr6vsK8P5ZLT2YpEQ/exec";
 
@@ -281,23 +343,23 @@
         }
     }
 
-    // ========== TÄGLICHES LIMIT (Zeitfahren) ==========
-    function getLastTimePlayDate() { return localStorage.getItem('lastTimePlayDate'); }
-    function setLastTimePlayDate() { localStorage.setItem('lastTimePlayDate', new Date().toDateString()); }
-    function canPlayTimeMode() {
-        const last = getLastTimePlayDate();
+    // ========== TÄGLICHES LIMIT (Rennspiel) ==========
+    function getLastRacingDate() { return localStorage.getItem('lastRacingDate'); }
+    function setLastRacingDate() { localStorage.setItem('lastRacingDate', new Date().toDateString()); }
+    function canPlayRacing() {
+        const last = getLastRacingDate();
         if (!last) return true;
         const today = new Date().toDateString();
         return last !== today;
     }
-    function updateTimeCooldownDisplay() {
-        const cooldownDiv = document.getElementById('timeCooldown');
+    function updateRacingCooldownDisplay() {
+        const cooldownDiv = document.getElementById('racingCooldown');
         if (!cooldownDiv) return;
-        if (canPlayTimeMode()) {
-            cooldownDiv.innerHTML = "✅ Du kannst heute einmal Zeitfahren spielen!";
+        if (canPlayRacing()) {
+            cooldownDiv.innerHTML = "✅ Du kannst heute einmal Rennspiel spielen!";
             cooldownDiv.style.color = "#aaffaa";
         } else {
-            cooldownDiv.innerHTML = "⏰ Du hast heute bereits Zeitfahren gespielt. Komm morgen wieder!";
+            cooldownDiv.innerHTML = "⏰ Du hast heute bereits Rennspiel gespielt. Komm morgen wieder!";
             cooldownDiv.style.color = "#ffaa88";
         }
     }
@@ -322,7 +384,7 @@
         });
     }
 
-    // ========== ANTI-CHEAT (für andere Modi) ==========
+    // ========== ANTI-CHEAT (für Klick-Modi) ==========
     let lastClickTime = 0, cheatCount = 0;
     const CHEAT_THRESHOLD_MS = 35, MAX_CHEAT_WARNINGS = 3;
     function checkCheat() {
@@ -339,7 +401,7 @@
     }
     function resetCheatDetection() { lastClickTime = 0; cheatCount = 0; }
 
-    // ========== EINZELSPIELER ==========
+    // ========== EINZELSPIELER (Klicks) ==========
     let soloActive = false, soloCount = 0, soloCountdown = null, soloTimeLeft = 30;
     const soloNameInput = document.getElementById('soloName');
     const soloStartBtn = document.getElementById('soloStartBtn');
@@ -352,7 +414,7 @@
         const saved = localStorage.getItem('clickChallengePlayerName');
         if (saved) soloNameInput.value = saved;
         if (document.getElementById('botName')) document.getElementById('botName').value = saved;
-        if (document.getElementById('timeName')) document.getElementById('timeName').value = saved;
+        if (document.getElementById('racingName')) document.getElementById('racingName').value = saved;
     }
     function saveName(name) { localStorage.setItem('clickChallengePlayerName', name); }
     async function saveGlobalScore(name, score) {
@@ -368,7 +430,6 @@
         soloScoreSpan.innerText = `Klicks: ${soloCount}`;
         soloClickBtn.style.transform = 'scale(0.95)';
         setTimeout(() => soloClickBtn.style.transform = '', 100);
-        // Gesamtklicks erfassen
         addTotalClicks(1);
     }
     function startSolo() {
@@ -413,7 +474,7 @@
     soloStartBtn.addEventListener('click', startSolo);
     soloBackBtn.addEventListener('click', cancelSolo);
 
-    // ========== LOKALES DUELL (Gesamtklicks für beide Spieler) ==========
+    // ========== LOKALES DUELL ==========
     let p1Active = false, p2Active = false, p1Clicks = 0, p2Clicks = 0, p1TimerInt = null, p2TimerInt = null, p1Time = 30, p2Time = 30;
     const p1Start = document.getElementById('p1StartBtn'), p1Game = document.getElementById('p1GameArea'), p1Click = document.getElementById('p1ClickBtn'), p1Cancel = document.getElementById('p1CancelBtn'), p1TimerEl = document.getElementById('p1Timer'), p1ScoreEl = document.getElementById('p1Score');
     const p2Start = document.getElementById('p2StartBtn'), p2Game = document.getElementById('p2GameArea'), p2Click = document.getElementById('p2ClickBtn'), p2Cancel = document.getElementById('p2CancelBtn'), p2TimerEl = document.getElementById('p2Timer'), p2ScoreEl = document.getElementById('p2Score');
@@ -658,112 +719,290 @@
     botStartBtn.addEventListener('click', startBotGame);
     botGameBackBtn.addEventListener('click', cancelBotGame);
 
-    // ========== ZEITFAHREN (täglich 1x, 50 Sekunden, automatisch +1 pro Sekunde) ==========
-    let timeActive = false, timeAutoPoints = 0, timeManualClicks = 0, timeCountdown = null, timeTimeLeft = 50;
-    const timeNameInput = document.getElementById('timeName');
-    const timeStartBtn = document.getElementById('timeStartBtn');
-    const timeGamePanel = document.getElementById('timeGamePanel');
-    const timeClickBtn = document.getElementById('timeClickBtn');
-    const timeTimer = document.getElementById('timeTimer');
-    const timeScoreSpan = document.getElementById('timeScore');
-    const timeBackBtn = document.getElementById('timeBackBtn');
-    const timeResultDiv = document.getElementById('timeResult');
+    // ========== RENNSPIEL (3D Auto, täglich 1x) ==========
+    // 1. DOM-Elemente für Rennspiel
+    const racingGameContainer = document.getElementById('racingGameContainer');
+    const racingStartBtn = document.getElementById('racingStartBtn');
+    const racingStopBtn = document.getElementById('racingStopBtn');
+    const racingRestartBtn = document.getElementById('racingRestartBtn');
+    const racingGameOverMsg = document.getElementById('racingGameOverMsg');
+    const racingScoreSpan = document.getElementById('racingScore');
+    const racingCanvas = document.getElementById('racingCanvas');
+    const racingNameInput = document.getElementById('racingName');
 
-    function timeClickHandler() {
-        if (!timeActive || timeTimeLeft <= 0) return;
-        timeManualClicks++;
-        timeScoreSpan.innerText = `Punkte: ${timeAutoPoints + timeManualClicks}`;
-        timeClickBtn.style.transform = 'scale(0.95)';
-        setTimeout(() => timeClickBtn.style.transform = '', 100);
-        addTotalClicks(1);
+    // Rennspiel-Variablen (wie in deinem Original)
+    let racingScene, racingCamera, racingRenderer, racingCar, racingObstacles = [], racingRoadSegments = [];
+    let racingIsRunning = false, racingGameOver = false, racingScore = 0, racingCurrentSpeed = 0.22, racingBaseSpeed = 0.22;
+    let racingAnimId = null;
+    let racingLeftPressed = false, racingRightPressed = false, racingCarX = 0;
+    const racingMinX = -2.8, racingMaxX = 2.8;
+    const racingRoadLength = 30, racingObstacleSpawnDist = 25;
+
+    function initRacing3D() {
+        racingScene = new THREE.Scene();
+        racingScene.background = new THREE.Color(0x0a2a2a);
+        racingScene.fog = new THREE.FogExp2(0x0a2a2a, 0.008);
+        racingCamera = new THREE.PerspectiveCamera(60, racingCanvas.clientWidth / racingCanvas.clientHeight, 0.1, 200);
+        racingCamera.position.set(0, 5, 12);
+        racingCamera.lookAt(0, 0, 0);
+        racingRenderer = new THREE.WebGLRenderer({ canvas: racingCanvas, antialias: true });
+        racingRenderer.setSize(racingCanvas.clientWidth, racingCanvas.clientHeight);
+        racingRenderer.shadowMap.enabled = true;
+
+        const ambient = new THREE.AmbientLight(0x404060);
+        racingScene.add(ambient);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(5, 12, 8);
+        dirLight.castShadow = true;
+        racingScene.add(dirLight);
+        const fillLight = new THREE.PointLight(0x4466cc, 0.5);
+        fillLight.position.set(0, 4, -5);
+        racingScene.add(fillLight);
+
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 200), new THREE.MeshStandardMaterial({ color: 0x2a5a2a, roughness: 0.9 }));
+        ground.rotation.x = -Math.PI/2;
+        ground.position.y = -0.2;
+        ground.receiveShadow = true;
+        racingScene.add(ground);
+
+        // Auto
+        racingCar = new THREE.Group();
+        const body = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.4, 2.0), new THREE.MeshStandardMaterial({ color: 0xe34234, metalness: 0.7 }));
+        body.castShadow = true; body.position.y = 0.2; racingCar.add(body);
+        const roof = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.3, 1.2), new THREE.MeshStandardMaterial({ color: 0xcc5533 }));
+        roof.position.y = 0.55; roof.castShadow = true; racingCar.add(roof);
+        const glassMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, emissive: 0x224466 });
+        const fw = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 0.1), glassMat); fw.position.set(0, 0.5, 0.85); racingCar.add(fw);
+        const rw = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 0.1), glassMat); rw.position.set(0, 0.5, -0.85); racingCar.add(rw);
+        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+        const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.3, 16);
+        [[-0.7, 0.12, 0.85], [0.7, 0.12, 0.85], [-0.7, 0.12, -0.85], [0.7, 0.12, -0.85]].forEach(pos => {
+            const w = new THREE.Mesh(wheelGeo, wheelMat);
+            w.rotation.z = Math.PI/2;
+            w.position.set(pos[0], pos[1], pos[2]);
+            w.castShadow = true;
+            racingCar.add(w);
+        });
+        racingCar.position.y = 0.1;
+        racingCar.castShadow = true;
+        racingScene.add(racingCar);
+
+        // Straße
+        function createRoadSegment(zPos) {
+            const group = new THREE.Group();
+            const roadMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.6 });
+            const roadPlane = new THREE.Mesh(new THREE.PlaneGeometry(6, racingRoadLength), roadMat);
+            roadPlane.rotation.x = -Math.PI/2;
+            roadPlane.position.y = -0.05;
+            roadPlane.receiveShadow = true;
+            group.add(roadPlane);
+            const stripeMat = new THREE.MeshStandardMaterial({ color: 0xffcc44 });
+            for (let i = -racingRoadLength/2 + 1; i < racingRoadLength/2; i+= 1.8) {
+                const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.05, 0.6), stripeMat);
+                stripe.position.set(0, 0.02, i);
+                stripe.castShadow = false;
+                group.add(stripe);
+            }
+            const edgeMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
+            const leftEdge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, racingRoadLength), edgeMat);
+            leftEdge.position.set(-2.95, 0.02, 0);
+            group.add(leftEdge);
+            const rightEdge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, racingRoadLength), edgeMat);
+            rightEdge.position.set(2.95, 0.02, 0);
+            group.add(rightEdge);
+            group.position.z = zPos;
+            return group;
+        }
+        for (let i = -2; i <= 2; i++) {
+            const seg = createRoadSegment(i * racingRoadLength);
+            racingScene.add(seg);
+            racingRoadSegments.push(seg);
+        }
+        function updateCamera() {
+            racingCamera.position.x += (racingCar.position.x - racingCamera.position.x) * 0.1;
+            racingCamera.lookAt(racingCar.position.x, 0.5, 0);
+        }
+        return { updateCamera };
     }
-    function startTimeGame() {
-        if (!canPlayTimeMode()) {
-            alert("Du hast heute bereits Zeitfahren gespielt. Komm morgen wieder!");
+
+    function createRacingTree(x, z) {
+        const group = new THREE.Group();
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 1.0, 6), new THREE.MeshStandardMaterial({ color: 0x8B5A2B }));
+        trunk.position.y = 0.5; trunk.castShadow = true; group.add(trunk);
+        const foliage1 = new THREE.Mesh(new THREE.ConeGeometry(0.6, 0.8, 8), new THREE.MeshStandardMaterial({ color: 0x3c9e3c }));
+        foliage1.position.y = 1.0; foliage1.castShadow = true; group.add(foliage1);
+        const foliage2 = new THREE.Mesh(new THREE.ConeGeometry(0.5, 0.7, 8), new THREE.MeshStandardMaterial({ color: 0x3c9e3c }));
+        foliage2.position.y = 1.5; foliage2.castShadow = true; group.add(foliage2);
+        group.position.set(x, 0, z);
+        return group;
+    }
+    function spawnRacingObstacle(zPos) {
+        const xPos = (Math.random() - 0.5) * 5.0;
+        const clampedX = Math.min(racingMaxX - 0.5, Math.max(racingMinX + 0.5, xPos));
+        const tree = createRacingTree(clampedX, zPos);
+        racingScene.add(tree);
+        racingObstacles.push({ mesh: tree, collisionRadius: 0.7, x: clampedX, z: zPos });
+    }
+    function updateRacingObstacles(speed) {
+        for (let obs of racingObstacles) {
+            obs.z -= speed;
+            obs.mesh.position.z = obs.z;
+        }
+        racingObstacles = racingObstacles.filter(obs => {
+            if (obs.z < -12) { racingScene.remove(obs.mesh); return false; }
+            return true;
+        });
+    }
+    function manageRacingObstacleSpawning() {
+        if (!racingIsRunning) return;
+        let maxZ = -30;
+        for (let obs of racingObstacles) if (obs.z > maxZ) maxZ = obs.z;
+        while (maxZ < 20) {
+            const newZ = maxZ + racingObstacleSpawnDist;
+            spawnRacingObstacle(newZ);
+            maxZ = newZ;
+        }
+    }
+    function updateRacingRoad(speed) {
+        for (let seg of racingRoadSegments) seg.position.z -= speed;
+        for (let i=0; i<racingRoadSegments.length; i++) {
+            if (racingRoadSegments[i].position.z < -racingRoadLength)
+                racingRoadSegments[i].position.z += racingRoadLength * racingRoadSegments.length;
+        }
+    }
+    function checkRacingCollision() {
+        const carR = 0.6;
+        for (let obs of racingObstacles) {
+            const dx = racingCar.position.x - obs.x;
+            const dz = 0 - obs.z;
+            if (Math.hypot(dx, dz) < carR + obs.collisionRadius) return true;
+        }
+        return false;
+    }
+    function updateRacingScore(speed) {
+        if (!racingIsRunning) return;
+        racingScore += speed * 2;
+        racingScoreSpan.innerText = `Score: ${Math.floor(racingScore)}`;
+        if (Math.floor(racingScore) > (lastRacingScoreUpdate + 200)) {
+            lastRacingScoreUpdate = Math.floor(racingScore);
+            racingCurrentSpeed = Math.min(0.55, racingCurrentSpeed + 0.02);
+        }
+    }
+    let lastRacingScoreUpdate = 0;
+    function racingGameOver() {
+        if (!racingIsRunning) return;
+        racingIsRunning = false;
+        racingGameOver = true;
+        racingGameOverMsg.style.display = 'block';
+        racingRestartBtn.style.display = 'inline-block';
+        if (racingAnimId) cancelAnimationFrame(racingAnimId);
+        racingAnimId = null;
+        // Score speichern und zu Gesamtklicks addieren
+        const finalScore = Math.floor(racingScore);
+        const playerName = racingNameInput.value.trim();
+        if (playerName && finalScore > 0) {
+            saveGlobalScore(playerName, finalScore);
+            addTotalClicks(finalScore); // Rennspiel-Punkte zählen als Klicks
+        }
+    }
+    function racingRestart() {
+        for (let obs of racingObstacles) racingScene.remove(obs.mesh);
+        racingObstacles = [];
+        racingScore = 0;
+        racingScoreSpan.innerText = `Score: 0`;
+        racingCurrentSpeed = racingBaseSpeed;
+        racingCarX = 0;
+        racingCar.position.x = 0;
+        racingGameOver = false;
+        racingGameOverMsg.style.display = 'none';
+        racingRestartBtn.style.display = 'none';
+        for (let i=0; i<racingRoadSegments.length; i++) racingRoadSegments[i].position.z = (i-2)*racingRoadLength;
+        for (let i=0; i<4; i++) spawnRacingObstacle(-10 + i * racingObstacleSpawnDist);
+        racingIsRunning = true;
+        racingGameLoop();
+    }
+    function handleRacingKeyDown(e) {
+        if (!racingIsRunning || racingGameOver) return;
+        if (e.key === 'ArrowLeft') { racingLeftPressed = true; e.preventDefault(); }
+        else if (e.key === 'ArrowRight') { racingRightPressed = true; e.preventDefault(); }
+    }
+    function handleRacingKeyUp(e) {
+        if (e.key === 'ArrowLeft') racingLeftPressed = false;
+        else if (e.key === 'ArrowRight') racingRightPressed = false;
+    }
+    function updateRacingCar() {
+        if (!racingIsRunning || racingGameOver) return;
+        let move = 0;
+        if (racingLeftPressed) move = -0.18;
+        if (racingRightPressed) move = 0.18;
+        racingCarX += move;
+        racingCarX = Math.min(racingMaxX, Math.max(racingMinX, racingCarX));
+        racingCar.position.x = racingCarX;
+    }
+    let racingCameraHelper;
+    function racingGameLoop() {
+        if (!racingIsRunning) return;
+        updateRacingCar();
+        const speed = racingCurrentSpeed;
+        updateRacingRoad(speed);
+        updateRacingObstacles(speed);
+        manageRacingObstacleSpawning();
+        updateRacingScore(speed);
+        if (checkRacingCollision()) { racingGameOver(); return; }
+        if (racingCameraHelper) racingCameraHelper.updateCamera();
+        racingRenderer.render(racingScene, racingCamera);
+        racingAnimId = requestAnimationFrame(racingGameLoop);
+    }
+    let racingThreeInit = false;
+    function startRacing() {
+        if (!canPlayRacing()) {
+            alert("Du hast heute bereits Rennspiel gespielt. Komm morgen wieder!");
             return;
         }
-        let name = timeNameInput.value.trim();
+        const name = racingNameInput.value.trim();
         if (!name) { alert("Bitte deinen Namen eingeben!"); return; }
         saveName(name);
-        resetCheatDetection();
-        timeNameInput.disabled = true;
-        timeStartBtn.style.display = 'none';
-        timeGamePanel.style.display = 'block';
-        timeActive = true;
-        timeAutoPoints = 0;
-        timeManualClicks = 0;
-        timeTimeLeft = 50;
-        timeScoreSpan.innerText = `Punkte: 0`;
-        timeTimer.innerText = `50.0 s`;
-        timeClickBtn.disabled = false;
-        if (timeCountdown) clearInterval(timeCountdown);
-        const startTime = Date.now();
-        // Automatische Punktvergabe pro Sekunde
-        const autoInterval = setInterval(() => {
-            if (!timeActive) { clearInterval(autoInterval); return; }
-            const elapsed = (Date.now() - startTime) / 1000;
-            const remaining = Math.max(0, 50 - elapsed);
-            if (remaining > 0 && timeActive) {
-                // Jede volle Sekunde einen Punkt
-                const newAutoPoints = Math.floor(50 - remaining);
-                if (newAutoPoints > timeAutoPoints) {
-                    timeAutoPoints = newAutoPoints;
-                    timeScoreSpan.innerText = `Punkte: ${timeAutoPoints + timeManualClicks}`;
-                    addTotalClicks(1); // automatischer Punkt zählt auch für Gesamtklicks
-                }
-            }
-        }, 100);
-        // Countdown für Timer
-        timeCountdown = setInterval(() => {
-            if (!timeActive) return;
-            const elapsed = (Date.now() - startTime) / 1000;
-            const remaining = Math.max(0, 50 - elapsed);
-            timeTimeLeft = remaining;
-            timeTimer.innerText = `${remaining.toFixed(1)} s`;
-            if (remaining <= 0) {
-                clearInterval(timeCountdown);
-                clearInterval(autoInterval);
-                endTimeGame(false);
-            }
-        }, 100);
-    }
-    async function endTimeGame(cheated = false) {
-        if (!timeActive) return;
-        timeActive = false;
-        timeClickBtn.disabled = true;
-        clearInterval(timeCountdown);
-        if (!cheated) {
-            const totalPoints = timeAutoPoints + timeManualClicks;
-            const name = timeNameInput.value.trim();
-            // optional: Punktzahl in globale Bestenliste speichern? Der Benutzer wollte nur Gesamtklicks.
-            // Hier speichern wir es zusätzlich in die globale Bestenliste (wie Einzelspieler)
-            await saveGlobalScore(name, totalPoints);
-            setLastTimePlayDate();
-            updateTimeCooldownDisplay();
-            timeResultDiv.innerHTML = `🎉 Du hast ${totalPoints} Punkte erreicht! (${timeAutoPoints} automatisch, ${timeManualClicks} geklickt)`;
-            alert(`Zeitfahren beendet! Du hast ${totalPoints} Punkte.`);
+        racingGameContainer.style.display = "flex";
+        if (!racingThreeInit) {
+            const init = initRacing3D();
+            racingCameraHelper = init.updateCamera;
+            racingThreeInit = true;
+            window.addEventListener('keydown', handleRacingKeyDown);
+            window.addEventListener('keyup', handleRacingKeyUp);
+            for (let i=0; i<5; i++) spawnRacingObstacle(-10 + i * racingObstacleSpawnDist);
         } else {
-            alert("Cheat erkannt – Ergebnis nicht gespeichert.");
-            timeResultDiv.innerHTML = "⚠️ Cheat erkannt – Ergebnis ungültig.";
+            racingRestart();
+            return;
         }
-        timeGamePanel.style.display = 'none';
-        timeNameInput.disabled = false;
-        timeStartBtn.style.display = 'inline-block';
-        resetCheatDetection();
+        racingIsRunning = true;
+        racingGameOver = false;
+        racingScore = 0;
+        racingCurrentSpeed = racingBaseSpeed;
+        racingScoreSpan.innerText = "Score: 0";
+        racingGameOverMsg.style.display = 'none';
+        racingRestartBtn.style.display = 'none';
+        racingGameLoop();
+        setLastRacingDate();
+        updateRacingCooldownDisplay();
+        function handleResize() {
+            const w = racingCanvas.clientWidth, h = racingCanvas.clientHeight;
+            racingRenderer.setSize(w, h);
+            racingCamera.aspect = w / h;
+            racingCamera.updateProjectionMatrix();
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
     }
-    function cancelTimeGame() {
-        if (timeCountdown) clearInterval(timeCountdown);
-        timeActive = false;
-        timeGamePanel.style.display = 'none';
-        timeNameInput.disabled = false;
-        timeStartBtn.style.display = 'inline-block';
-        timeResultDiv.innerHTML = "";
-        resetCheatDetection();
+    function stopRacing() {
+        if (racingAnimId) cancelAnimationFrame(racingAnimId);
+        racingIsRunning = false;
+        racingGameContainer.style.display = "none";
+        racingLeftPressed = false; racingRightPressed = false;
     }
-    timeClickBtn.addEventListener('click', timeClickHandler);
-    timeStartBtn.addEventListener('click', startTimeGame);
-    timeBackBtn.addEventListener('click', cancelTimeGame);
-    updateTimeCooldownDisplay();
+    racingStartBtn.addEventListener('click', startRacing);
+    racingStopBtn.addEventListener('click', stopRacing);
+    racingRestartBtn.addEventListener('click', racingRestart);
+    racingGameContainer.style.display = "none";
 
     // ========== NAVIGATION ==========
     const startPage = document.getElementById('startPage');
@@ -771,7 +1010,7 @@
     const localDiv = document.getElementById('localMode');
     const onlineDiv = document.getElementById('onlineMode');
     const botDiv = document.getElementById('botMode');
-    const timeDiv = document.getElementById('timeMode');
+    const racingDiv = document.getElementById('racingMode');
 
     function showStart() {
         startPage.classList.remove('hidden');
@@ -779,9 +1018,9 @@
         localDiv.classList.add('hidden');
         onlineDiv.classList.add('hidden');
         botDiv.classList.add('hidden');
-        timeDiv.classList.add('hidden');
+        racingDiv.classList.add('hidden');
         loadGlobalLeaderboard();
-        updateTimeCooldownDisplay();
+        updateRacingCooldownDisplay();
     }
     document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -791,7 +1030,7 @@
             else if (mode === 'local') localDiv.classList.remove('hidden');
             else if (mode === 'online') onlineDiv.classList.remove('hidden');
             else if (mode === 'bot') botDiv.classList.remove('hidden');
-            else if (mode === 'time') timeDiv.classList.remove('hidden');
+            else if (mode === 'time') racingDiv.classList.remove('hidden');
         });
     });
     document.querySelectorAll('[data-back]').forEach(btn => {
@@ -803,7 +1042,7 @@
                 onlineGameActive = false; onlineGameArea.style.display = 'none'; currentRoomId = null; onlinePlayerRole = null;
                 onlineStatusDiv.innerHTML = "Kein aktives Duell."; onlineLinkArea.style.display = 'none'; resetCheatDetection();
             } else if (btn.getAttribute('data-back') === 'bot') cancelBotGame();
-            else if (btn.getAttribute('data-back') === 'time') cancelTimeGame();
+            else if (btn.getAttribute('data-back') === 'racing') stopRacing();
             showStart();
         });
     });
