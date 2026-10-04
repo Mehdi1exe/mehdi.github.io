@@ -366,7 +366,7 @@
     const soloGamePanel = document.getElementById('soloGamePanel');
     const soloClickBtn = document.getElementById('soloClickBtn');
     const soloTimer = document.getElementById('soloTimer');
-    const.getElementById soloScoreSpan = document.getElementById('soloScore');
+    const soloScoreSpan = document.getElementById('soloScore');
     const soloBackBtn = document.getElementById('soloBackBtn');
     function loadSavedName() {
         const saved = localStorage.getItem('clickChallengePlayerName');
@@ -435,13 +435,13 @@
     // ========== LOKALES DUELL ==========
     let p1Active = false, p2Active = false, p1Clicks = 0, p2Clicks = 0, p1TimerInt = null, p2TimerInt = null, p1Time = 30, p2Time = 30;
     const p1Start = document.getElementById('p1StartBtn'), p1Game = document.getElementById('p1GameArea'), p1Click = document.getElementById('p1ClickBtn'), p1Cancel = document.getElementById('p1CancelBtn'), p1TimerEl = document.getElementById('p1Timer'), p1ScoreEl = document.getElementById('p1Score');
-    const p2Start = document.getElementById('p2StartBtn'), p2Game = document.getElementById('p2GameArea'), p2Click = document.getElementById('p2ClickBtn'), p2Cancel = document.getElementById('p2CancelBtn'), p2TimerEl = document('p2Timer'), p2ScoreEl = document.getElementById('p2Score');
+    const p2Start = document.getElementById('p2StartBtn'), p2Game = document.getElementById('p2GameArea'), p2Click = document.getElementById('p2ClickBtn'), p2Cancel = document.getElementById('p2CancelBtn'), p2TimerEl = document.getElementById('p2Timer'), p2ScoreEl = document.getElementById('p2Score');
     const localResultDiv = document.getElementById('localResult'), localResetBtn = document.getElementById('localResetBtn');
     function updateLocalResult() {
         if (!p1Active && !p2Active && (p1Clicks > 0 || p2Clicks > 0)) {
             if (p1Clicks > p2Clicks) localResultDiv.innerHTML = `🏆 Spieler 1 gewinnt! ${p1Clicks} : ${p2Clicks}`;
-            else if (p2Clicks > p1Clicks) localResultDiv.innerHTML = `🏆 Spieler 2 gewinnt! ${p1Clicks} :string ${p2C(licks}`;
-            else if (p12Clicks === p2Clicks, && p1Clicks > 0 ) localResultDiv.innerHTML = `🤝 Unentschieden! ${p1Clicks} : ${p2Clicks}`;
+            else if (p2Clicks > p1Clicks) localResultDiv.innerHTML = `🏆 Spieler 2 gewinnt! ${p1Clicks} : ${p2Clicks}`;
+            else if (p1Clicks === p2Clicks && p1Clicks > 0) localResultDiv.innerHTML = `🤝 Unentschieden! ${p1Clicks} : ${p2Clicks}`;
             else localResultDiv.innerHTML = `⭐ Wer gewinnt? Starte beide Spieler nacheinander!`;
         } else if (!p1Active && !p2Active && p1Clicks === 0 && p2Clicks === 0) localResultDiv.innerHTML = `⭐ Wer gewinnt? Starte beide Spieler nacheinander!`;
     }
@@ -501,7 +501,7 @@
         } catch(e) { console.log(e); }
         setTimeout(checkOnlineStatus, 2000);
     }
-    function generateRoomId() { return Math.random().toString(36).sub10) + Date.now().toString(36); }
+    function generateRoomId() { return Math.random().toString(36).substring(2, 10) + Date.now().toString(36); }
     createRoomBtn.addEventListener('click', async () => {
         const name = soloNameInput.value.trim() || "Spieler1";
         if (!name) { alert("Bitte im Einzelspieler-Feld deinen Namen eingeben."); return; }
@@ -517,4 +517,321 @@
     });
     function joinDuellByUrl() {
         const urlParams = new URLSearchParams(window.location.search);
-        const room
+        const roomId = urlParams.get('duell');
+        if (roomId && !currentRoomId) {
+            currentRoomId = roomId;
+            onlineLinkArea.style.display = 'block';
+            onlineDuellLinkSpan.innerText = window.location.href;
+            onlinePlayerRole = "spieler2";
+            onlineStatusDiv.innerHTML = `Du trittst dem Duell bei. Warte auf Spieler 1 oder starte deine Runde, falls er schon gespielt hat.`;
+            checkOnlineStatus();
+            const name = soloNameInput.value.trim();
+            if (name) callDuellAPI('post', { raumId: currentRoomId, spieler2Name: name, status: "wartet" });
+        }
+    }
+    copyOnlineLinkBtn.addEventListener('click', () => { navigator.clipboard.writeText(onlineDuellLinkSpan.innerText); alert("Link kopiert!"); });
+    function onlineClickHandler() {
+        if (!onlineGameActive || onlineTimeLeft <= 0) return;
+        if (checkCheat()) { alert("⚠️ Cheat erkannt! Spielabbruch."); endOnlineGame(true); return; }
+        onlineClickCount++;
+        onlineScoreSpan.innerText = `Klicks: ${onlineClickCount}`;
+        onlineClickBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => onlineClickBtn.style.transform = '', 100);
+        addTotalClicks(1);
+    }
+    function startOnlineGame() {
+        if (onlineGameActive) return;
+        if (!currentRoomId) { alert("Kein aktives Duell."); return; }
+        resetCheatDetection();
+        onlineGameArea.style.display = 'block';
+        onlineGameActive = true;
+        onlineClickCount = 0;
+        onlineTimeLeft = 30;
+        onlineScoreSpan.innerText = `Klicks: 0`;
+        onlineTimer.innerText = `30.0 s`;
+        onlineClickBtn.disabled = false;
+        if (onlineCountdown) clearInterval(onlineCountdown);
+        const start = Date.now();
+        onlineCountdown = setInterval(() => {
+            if (!onlineGameActive) return;
+            const elapsed = (Date.now() - start) / 1000;
+            const rem = Math.max(0, 30 - elapsed);
+            onlineTimeLeft = rem;
+            onlineTimer.innerText = `${rem.toFixed(1)} s`;
+            if (rem <= 0) { clearInterval(onlineCountdown); endOnlineGame(false); }
+        }, 100);
+    }
+    async function endOnlineGame(cheated = false) {
+        if (!onlineGameActive) return;
+        onlineGameActive = false; onlineClickBtn.disabled = true; clearInterval(onlineCountdown);
+        if (!cheated) {
+            const finalScore = onlineClickCount;
+            const updateData = { raumId: currentRoomId };
+            if (onlinePlayerRole === "spieler1") updateData.spieler1Score = finalScore;
+            else updateData.spieler2Score = finalScore;
+            const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${currentRoomId}`);
+            const data = await res.json();
+            let newStatus = "wartet";
+            if (onlinePlayerRole === "spieler1" && data.spieler2Score !== undefined && data.spieler2Score > 0) newStatus = "fertig";
+            if (onlinePlayerRole === "spieler2" && data.spieler1Score !== undefined && data.spieler1Score > 0) newStatus = "fertig";
+            updateData.status = newStatus;
+            await callDuellAPI('post', updateData);
+            alert(`Dein Ergebnis: ${finalScore} Klicks. ${newStatus === "fertig" ? "Duell beendet!" : "Warte auf Gegner..."}`);
+        } else alert("Ergebnis wegen Cheat nicht gespeichert.");
+        onlineGameArea.style.display = 'none';
+        checkOnlineStatus();
+        resetCheatDetection();
+    }
+    onlineClickBtn.addEventListener('click', onlineClickHandler);
+    onlineCancelBtn.addEventListener('click', () => {
+        if (onlineCountdown) clearInterval(onlineCountdown);
+        onlineGameActive = false; onlineGameArea.style.display = 'none'; resetCheatDetection();
+    });
+    const startOnlineRoundBtn = document.createElement('button');
+    startOnlineRoundBtn.innerText = "🎮 Runde spielen (30s)";
+    startOnlineRoundBtn.className = "btn";
+    startOnlineRoundBtn.style.margin = "10px";
+    startOnlineRoundBtn.addEventListener('click', startOnlineGame);
+    if (onlineStatusDiv) onlineStatusDiv.parentElement.appendChild(startOnlineRoundBtn);
+
+    // ========== BOT-DUELL (ohne Sound, mit Pikachu-Bild) ==========
+    let botActive = false, botCount = 0, botCountdown = null, botTimeLeft = 30;
+    const botNameInput = document.getElementById('botName');
+    const botStartBtn = document.getElementById('botStartBtn');
+    const botGamePanel = document.getElementById('botGamePanel');
+    const botClickBtn = document.getElementById('botClickBtn');
+    const botTimer = document.getElementById('botTimer');
+    const botScoreSpan = document.getElementById('botScore');
+    const botGameBackBtn = document.getElementById('botGameBackBtn');
+    const botResultDiv = document.getElementById('botResult');
+    function botClickHandler() {
+        if (!botActive || botTimeLeft <= 0) return;
+        if (checkCheat()) { alert("⚠️ Cheat erkannt! Spielabbruch."); endBotGame(true); return; }
+        botCount++;
+        botScoreSpan.innerText = `Klicks: ${botCount}`;
+        botClickBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => botClickBtn.style.transform = '', 100);
+        addTotalClicks(1);
+    }
+    function startBotGame() {
+        let name = botNameInput.value.trim();
+        if (!name) { alert("Bitte deinen Namen eingeben!"); return; }
+        saveName(name);
+        resetCheatDetection();
+        botNameInput.disabled = true;
+        botStartBtn.style.display = 'none';
+        botGamePanel.style.display = 'block';
+        botResultDiv.innerHTML = "";
+        botActive = true; botCount = 0; botTimeLeft = 30;
+        botScoreSpan.innerText = `Klicks: 0`;
+        botTimer.innerText = `30.0 s`;
+        botClickBtn.disabled = false;
+        if (botCountdown) clearInterval(botCountdown);
+        const start = Date.now();
+        botCountdown = setInterval(() => {
+            if (!botActive) return;
+            const elapsed = (Date.now() - start) / 1000;
+            const rem = Math.max(0, 30 - elapsed);
+            botTimeLeft = rem;
+            botTimer.innerText = `${rem.toFixed(1)} s`;
+            if (rem <= 0) { clearInterval(botCountdown); endBotGame(false); }
+        }, 100);
+    }
+    async function endBotGame(cheated = false) {
+        if (!botActive) return;
+        botActive = false; botClickBtn.disabled = true; clearInterval(botCountdown);
+        if (!cheated) {
+            const playerScore = botCount;
+            const name = botNameInput.value.trim();
+            await saveGlobalScore(name, playerScore);
+            let min = Math.floor(playerScore * 0.8);
+            let max = Math.floor(playerScore * 1.2);
+            if (max < min) max = min + 5;
+            const botScore = Math.floor(Math.random() * (max - min + 1) + min);
+            const finalBot = Math.max(0, botScore);
+            let resultText = "";
+            if (playerScore > finalBot) resultText = `🎉 Du gewinnst! ${playerScore} : ${finalBot} 🎉`;
+            else if (finalBot > playerScore) resultText = `🤖 Der Bot gewinnt! ${playerScore} : ${finalBot} 🤖`;
+            else resultText = `🤝 Unentschieden! ${playerScore} : ${finalBot} 🤝`;
+            botResultDiv.innerHTML = resultText;
+            alert(`Deine Punktzahl: ${playerScore}\nBot: ${finalBot}\n${resultText}`);
+        } else {
+            alert("Ergebnis wegen Cheat nicht gespeichert.");
+            botResultDiv.innerHTML = "⚠️ Cheat erkannt – Ergebnis ungültig.";
+        }
+        botGamePanel.style.display = 'none';
+        botNameInput.disabled = false;
+        botStartBtn.style.display = 'inline-block';
+        resetCheatDetection();
+    }
+    function cancelBotGame() {
+        if (botCountdown) clearInterval(botCountdown);
+        botActive = false;
+        botGamePanel.style.display = 'none';
+        botNameInput.disabled = false;
+        botStartBtn.style.display = 'inline-block';
+        botResultDiv.innerHTML = "";
+        resetCheatDetection();
+    }
+    botClickBtn.addEventListener('click', botClickHandler);
+    botStartBtn.addEventListener('click', startBotGame);
+    botGameBackBtn.addEventListener('click', cancelBotGame);
+
+    // ========== ZEITFAHREN ==========
+    let timeActive = false, timeAutoPoints = 0, timeManualClicks = 0, timeCountdown = null, timeTimeLeft = 50;
+    const timeNameInput = document.getElementById('timeName');
+    const timeStartBtn = document.getElementById('timeStartBtn');
+    const timeGamePanel = document.getElementById('timeGamePanel');
+    const timeClickBtn = document.getElementById('timeClickBtn');
+    const timeTimer = document.getElementById('timeTimer');
+    const timeScoreSpan = document.getElementById('timeScore');
+    const timeBackBtn = document.getElementById('timeBackBtn');
+    const timeResultDiv = document.getElementById('timeResult');
+
+    function timeClickHandler() {
+        if (!timeActive || timeTimeLeft <= 0) return;
+        timeManualClicks++;
+        timeScoreSpan.innerText = `Punkte: ${timeAutoPoints + timeManualClicks}`;
+        timeClickBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => timeClickBtn.style.transform = '', 100);
+        addTotalClicks(1);
+    }
+    function startTimeGame() {
+        if (!canPlayTimeMode()) {
+            alert("Du hast heute bereits Zeitfahren gespielt. Komm morgen wieder!");
+            return;
+        }
+        let name = timeNameInput.value.trim();
+        if (!name) { alert("Bitte deinen Namen eingeben!"); return; }
+        saveName(name);
+        resetCheatDetection();
+        timeNameInput.disabled = true;
+        timeStartBtn.style.display = 'none';
+        timeGamePanel.style.display = 'block';
+        timeActive = true;
+        timeAutoPoints = 0;
+        timeManualClicks = 0;
+        timeTimeLeft = 50;
+        timeScoreSpan.innerText = `Punkte: 0`;
+        timeTimer.innerText = `50.0 s`;
+        timeClickBtn.disabled = false;
+        if (timeCountdown) clearInterval(timeCountdown);
+        const startTime = Date.now();
+        const autoInterval = setInterval(() => {
+            if (!timeActive) { clearInterval(autoInterval); return; }
+            const elapsed = (Date.now() - startTime) / 1000;
+            const remaining = Math.max(0, 50 - elapsed);
+            if (remaining > 0 && timeActive) {
+                const newAutoPoints = Math.floor(50 - remaining);
+                if (newAutoPoints > timeAutoPoints) {
+                    timeAutoPoints = newAutoPoints;
+                    timeScoreSpan.innerText = `Punkte: ${timeAutoPoints + timeManualClicks}`;
+                    addTotalClicks(1);
+                }
+            }
+        }, 100);
+        timeCountdown = setInterval(() => {
+            if (!timeActive) return;
+            const elapsed = (Date.now() - startTime) / 1000;
+            const remaining = Math.max(0, 50 - elapsed);
+            timeTimeLeft = remaining;
+            timeTimer.innerText = `${remaining.toFixed(1)} s`;
+            if (remaining <= 0) {
+                clearInterval(timeCountdown);
+                clearInterval(autoInterval);
+                endTimeGame(false);
+            }
+        }, 100);
+    }
+    async function endTimeGame(cheated = false) {
+        if (!timeActive) return;
+        timeActive = false;
+        timeClickBtn.disabled = true;
+        clearInterval(timeCountdown);
+        if (!cheated) {
+            const totalPoints = timeAutoPoints + timeManualClicks;
+            const name = timeNameInput.value.trim();
+            await saveGlobalScore(name, totalPoints);
+            setLastTimePlayDate();
+            updateTimeCooldownDisplay();
+            timeResultDiv.innerHTML = `🎉 Du hast ${totalPoints} Punkte erreicht! (${timeAutoPoints} automatisch, ${timeManualClicks} geklickt)`;
+            alert(`Zeitfahren beendet! Du hast ${totalPoints} Punkte.`);
+        } else {
+            alert("Cheat erkannt – Ergebnis nicht gespeichert.");
+            timeResultDiv.innerHTML = "⚠️ Cheat erkannt – Ergebnis ungültig.";
+        }
+        timeGamePanel.style.display = 'none';
+        timeNameInput.disabled = false;
+        timeStartBtn.style.display = 'inline-block';
+        resetCheatDetection();
+    }
+    function cancelTimeGame() {
+        if (timeCountdown) clearInterval(timeCountdown);
+        timeActive = false;
+        timeGamePanel.style.display = 'none';
+        timeNameInput.disabled = false;
+        timeStartBtn.style.display = 'inline-block';
+        timeResultDiv.innerHTML = "";
+        resetCheatDetection();
+    }
+    timeClickBtn.addEventListener('click', timeClickHandler);
+    timeStartBtn.addEventListener('click', startTimeGame);
+    timeBackBtn.addEventListener('click', cancelTimeGame);
+    updateTimeCooldownDisplay();
+
+    // ========== NAVIGATION ==========
+    const startPage = document.getElementById('startPage');
+    const soloDiv = document.getElementById('soloMode');
+    const localDiv = document.getElementById('localMode');
+    const onlineDiv = document.getElementById('onlineMode');
+    const botDiv = document.getElementById('botMode');
+    const timeDiv = document.getElementById('timeMode');
+
+    function showStart() {
+        startPage.classList.remove('hidden');
+        soloDiv.classList.add('hidden');
+        localDiv.classList.add('hidden');
+        onlineDiv.classList.add('hidden');
+        botDiv.classList.add('hidden');
+        timeDiv.classList.add('hidden');
+        loadGlobalLeaderboard();
+        updateTimeCooldownDisplay();
+    }
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const mode = btn.getAttribute('data-mode');
+            startPage.classList.add('hidden');
+            if (mode === 'solo') soloDiv.classList.remove('hidden');
+            else if (mode === 'local') localDiv.classList.remove('hidden');
+            else if (mode === 'online') onlineDiv.classList.remove('hidden');
+            else if (mode === 'bot') botDiv.classList.remove('hidden');
+            else if (mode === 'time') timeDiv.classList.remove('hidden');
+        });
+    });
+    document.querySelectorAll('[data-back]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.getAttribute('data-back') === 'solo') cancelSolo();
+            else if (btn.getAttribute('data-back') === 'local') resetLocal();
+            else if (btn.getAttribute('data-back') === 'online') {
+                if (onlineCountdown) clearInterval(onlineCountdown);
+                onlineGameActive = false; onlineGameArea.style.display = 'none'; currentRoomId = null; onlinePlayerRole = null;
+                onlineStatusDiv.innerHTML = "Kein aktives Duell."; onlineLinkArea.style.display = 'none'; resetCheatDetection();
+            } else if (btn.getAttribute('data-back') === 'bot') cancelBotGame();
+            else if (btn.getAttribute('data-back') === 'time') cancelTimeGame();
+            showStart();
+        });
+    });
+    if (soloBackBtn) soloBackBtn.addEventListener('click', () => { cancelSolo(); showStart(); });
+
+    loadSavedName();
+    loadGlobalLeaderboard();
+    loadTotalClicks();
+    setInterval(loadGlobalLeaderboard, 5000);
+    joinDuellByUrl();
+    if (window.location.search.includes('duell=')) {
+        startPage.classList.add('hidden');
+        onlineDiv.classList.remove('hidden');
+    } else { showStart(); }
+</script>
+</body>
+</html
