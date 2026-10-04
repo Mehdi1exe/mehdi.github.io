@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Klick-Challenge | Alle Modi + Gesamtklicks + Tägliches Zeitfahren</title>
+    <title>Klick-Challenge | Alle Modi + Admin</title>
     <style>
         * {
             margin: 0;
@@ -137,7 +137,6 @@
             transform: translateY(5px);
             box-shadow: 0 4px 0 #8b3c00;
         }
-        /* Bot-Button mit Pikachu-Bild */
         .click-btn-bot {
             width: 200px;
             height: 200px;
@@ -183,9 +182,8 @@
     <div style="text-align: center;">
         <div class="total-clicks" id="totalClicksDisplay">Gesamtklicks: 0</div>
     </div>
-    <p class="sub">Wähle deinen Modus – 30 Sekunden (Zeitfahren: 50 Sek., 1x pro Tag)</p>
+    <p class="sub">Wähle deinen Modus</p>
 
-    <!-- Startseite -->
     <div id="startPage">
         <div class="leaderboard">
             <h3>🏆 GLOBALE BESTENLISTE (Top 10)</h3>
@@ -200,10 +198,10 @@
         </div>
     </div>
 
-    <!-- ========== EINZELSPIELER ========== -->
+    <!-- EINZELSPIELER -->
     <div id="soloMode" class="game-card solo-card hidden">
         <h2>👤 Einzelspieler · Globale Bestenliste</h2>
-        <div><input type="text" id="soloName" class="name-input" placeholder="Dein Name"><button id="soloStartBtn" class="btn">START (30 Sek.)</button></div>
+        <div><input type="text" id="soloName" class="name-input" placeholder="Dein Name"><button id="soloStartBtn" class="btn">START</button></div>
         <div id="soloGamePanel" style="display:none;">
             <div class="timer" id="soloTimer">30.0 s</div>
             <div class="score-board" id="soloScore">Klicks: 0</div>
@@ -214,23 +212,23 @@
         <button class="btn back-btn" data-back="solo">⬅ Zurück zur Startseite</button>
     </div>
 
-    <!-- ========== LOKALES DUELL ========== -->
+    <!-- LOKALES DUELL -->
     <div id="localMode" class="game-card duel-card hidden">
         <h2>👥 Lokales Duell · Ein Gerät</h2>
         <div class="duel-players">
-            <div class="player-box"><h3>⚡ Spieler 1</h3><div id="p1Score" class="player-score">0</div><button id="p1StartBtn" class="btn">Start (30s)</button>
+            <div class="player-box"><h3>⚡ Spieler 1</h3><div id="p1Score" class="player-score">0</div><button id="p1StartBtn" class="btn">Start</button>
                 <div id="p1GameArea" style="display:none;"><div class="timer" id="p1Timer">30.0 s</div><button id="p1ClickBtn" class="click-btn" style="width:120px;height:120px;">👆</button><button id="p1CancelBtn" class="btn">Abbrechen</button></div>
             </div>
-            <div class="player-box"><h3>⚡ Spieler 2</h3><div id="p2Score" class="player-score">0</div><button id="p2StartBtn" class="btn">Start (30s)</button>
+            <div class="player-box"><h3>⚡ Spieler 2</h3><div id="p2Score" class="player-score">0</div><button id="p2StartBtn" class="btn">Start</button>
                 <div id="p2GameArea" style="display:none;"><div class="timer" id="p2Timer">30.0 s</div><button id="p2ClickBtn" class="click-btn" style="width:120px;height:120px;">👆</button><button id="p2CancelBtn" class="btn">Abbrechen</button></div>
             </div>
         </div>
-        <div id="localResult" class="duel-result">⭐ Wer gewinnt? Starte beide Spieler nacheinander!</div>
+        <div id="localResult" class="duel-result">⭐ Wer gewinnt?</div>
         <button id="localResetBtn" class="btn back-btn">🔄 Zurücksetzen</button>
         <button class="btn back-btn" data-back="local">⬅ Zurück zur Startseite</button>
     </div>
 
-    <!-- ========== ONLINE-DUELL (Link) ========== -->
+    <!-- ONLINE-DUELL -->
     <div id="onlineMode" class="game-card online-card hidden">
         <h2>🌐 Online-Duell · Per Link einladen</h2>
         <div id="onlineMain">
@@ -251,10 +249,10 @@
         <button class="btn back-btn" data-back="online">⬅ Zurück zur Startseite</button>
     </div>
 
-    <!-- ========== BOT-DUELL (mit Pikachu-Bild) ========== -->
+    <!-- BOT-DUELL -->
     <div id="botMode" class="game-card bot-card hidden">
         <h2>🤖 Gegen Bot · Klick auf Pikachu!</h2>
-        <div><input type="text" id="botName" class="name-input" placeholder="Dein Name"><button id="botStartBtn" class="btn">START (30 Sek.)</button></div>
+        <div><input type="text" id="botName" class="name-input" placeholder="Dein Name"><button id="botStartBtn" class="btn">START</button></div>
         <div id="botGamePanel" style="display:none;">
             <div class="timer" id="botTimer">30.0 s</div>
             <div class="score-board" id="botScore">Klicks: 0</div>
@@ -265,10 +263,10 @@
         <button class="btn back-btn" data-back="bot">⬅ Zurück zur Startseite</button>
     </div>
 
-    <!-- ========== ZEITFAHREN ========== -->
+    <!-- ZEITFAHREN -->
     <div id="timeMode" class="game-card time-card hidden">
         <h2>🚗 Zeitfahren (täglich 1x)</h2>
-        <div><input type="text" id="timeName" class="name-input" placeholder="Dein Name"><button id="timeStartBtn" class="btn">START (50 Sek.)</button></div>
+        <div><input type="text" id="timeName" class="name-input" placeholder="Dein Name"><button id="timeStartBtn" class="btn">START</button></div>
         <div id="timeGamePanel" style="display:none;">
             <div class="timer" id="timeTimer">50.0 s</div>
             <div class="score-board" id="timeScore">Punkte: 0</div>
@@ -281,9 +279,31 @@
     </div>
 </div>
 
+<!-- ADMIN-BUTTON -->
+<div id="adminLoginArea" style="position: fixed; bottom: 10px; right: 10px; z-index: 999;">
+    <button id="adminLoginBtn" style="background:#222; color:#fff; border:1px solid #444; border-radius:20px; padding:8px 15px; font-size:0.8rem; cursor:pointer; touch-action:manipulation;">🔒 Admin</button>
+</div>
+
+<!-- ADMIN-PANEL -->
+<div id="adminPanel" style="display:none; position: fixed; inset:0; background:rgba(0,0,0,0.96); z-index:1000; padding:25px; color:white; overflow:auto;">
+    <h2 style="color:#00eaff; text-align:center;">👑 Admin-Bereich</h2>
+    <p style="text-align:center; color:#ccc; font-size:0.9rem;">Volle Kontrolle über die Tabelle</p>
+    <div id="adminStats" style="margin-top:20px;"></div>
+    <div style="text-align:center; margin-top:25px;">
+        <button id="adminClearBtn" class="btn" style="background:#aa2222;">🗑️ Bestenliste komplett löschen</button>
+        <button id="adminCloseBtn" class="btn" style="background:#444;">Schließen</button>
+    </div>
+</div>
+
 <script>
     // ========== KONFIGURATION ==========
     const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbxFCFY_yTCgCpJCFHxWXAms9dtv2X2PA3i7Bi5K6kCdl6Krs7hn5Kr6vsK8P5ZLT2YpEQ/exec";
+    const ADMIN_PASSWORD = "Mehdi67exe";
+
+    // ========== SPIELZEIT (nur für Admin änderbar) ==========
+    function getGameTime() {
+        return parseInt(localStorage.getItem('adminTime')) || 30;
+    }
 
     // ========== GESAMTKLICK-ZÄHLER ==========
     let totalClicks = 0;
@@ -301,28 +321,22 @@
         }
     }
 
-    // ========== TÄGLICHES LIMIT (Zeitfahren) ==========
+    // ========== TÄGLICHES LIMIT ==========
     function getLastTimePlayDate() { return localStorage.getItem('lastTimePlayDate'); }
     function setLastTimePlayDate() { localStorage.setItem('lastTimePlayDate', new Date().toDateString()); }
     function canPlayTimeMode() {
         const last = getLastTimePlayDate();
         if (!last) return true;
-        const today = new Date().toDateString();
-        return last !== today;
+        return last !== new Date().toDateString();
     }
     function updateTimeCooldownDisplay() {
-        const cooldownDiv = document.getElementById('timeCooldown');
-        if (!cooldownDiv) return;
-        if (canPlayTimeMode()) {
-            cooldownDiv.innerHTML = "✅ Du kannst heute einmal Zeitfahren spielen!";
-            cooldownDiv.style.color = "#aaffaa";
-        } else {
-            cooldownDiv.innerHTML = "⏰ Du hast heute bereits Zeitfahren gespielt. Komm morgen wieder!";
-            cooldownDiv.style.color = "#ffaa88";
-        }
+        const c = document.getElementById('timeCooldown');
+        if (!c) return;
+        if (canPlayTimeMode()) { c.innerHTML = "✅ Du kannst heute einmal Zeitfahren spielen!"; c.style.color = "#aaffaa"; }
+        else { c.innerHTML = "⏰ Heute schon gespielt. Komm morgen wieder!"; c.style.color = "#ffaa88"; }
     }
 
-    // ========== GLOBALE BESTENLISTE ==========
+    // ========== BESTENLISTE ==========
     async function loadGlobalLeaderboard() {
         try {
             const res = await fetch(SHEETS_API_URL);
@@ -341,6 +355,12 @@
             element.appendChild(li);
         });
     }
+    async function saveGlobalScore(name, score) {
+        try {
+            await fetch(SHEETS_API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, score }) });
+            setTimeout(loadGlobalLeaderboard, 500);
+        } catch(e) { console.error(e); }
+    }
 
     // ========== ANTI-CHEAT ==========
     let lastClickTime = 0, cheatCount = 0;
@@ -349,15 +369,24 @@
         const now = Date.now();
         if (lastClickTime > 0) {
             const delta = now - lastClickTime;
-            if (delta < CHEAT_THRESHOLD_MS) {
-                cheatCount++;
-                if (cheatCount >= MAX_CHEAT_WARNINGS) return true;
-            } else if (cheatCount > 0) cheatCount--;
+            if (delta < CHEAT_THRESHOLD_MS) { cheatCount++; if (cheatCount >= MAX_CHEAT_WARNINGS) return true; }
+            else if (cheatCount > 0) cheatCount--;
         }
         lastClickTime = now;
         return false;
     }
     function resetCheatDetection() { lastClickTime = 0; cheatCount = 0; }
+
+    // ========== NAME SPEICHERN ==========
+    function loadSavedName() {
+        const saved = localStorage.getItem('clickChallengePlayerName');
+        if (saved) {
+            document.getElementById('soloName').value = saved;
+            document.getElementById('botName').value = saved;
+            document.getElementById('timeName').value = saved;
+        }
+    }
+    function saveName(name) { localStorage.setItem('clickChallengePlayerName', name); }
 
     // ========== EINZELSPIELER ==========
     let soloActive = false, soloCount = 0, soloCountdown = null, soloTimeLeft = 30;
@@ -367,23 +396,9 @@
     const soloClickBtn = document.getElementById('soloClickBtn');
     const soloTimer = document.getElementById('soloTimer');
     const soloScoreSpan = document.getElementById('soloScore');
-    const soloBackBtn = document.getElementById('soloBackBtn');
-    function loadSavedName() {
-        const saved = localStorage.getItem('clickChallengePlayerName');
-        if (saved) soloNameInput.value = saved;
-        if (document.getElementById('botName')) document.getElementById('botName').value = saved;
-        if (document.getElementById('timeName')) document.getElementById('timeName').value = saved;
-    }
-    function saveName(name) { localStorage.setItem('clickChallengePlayerName', name); }
-    async function saveGlobalScore(name, score) {
-        try {
-            await fetch(SHEETS_API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, score }) });
-            setTimeout(loadGlobalLeaderboard, 500);
-        } catch(e) { console.error(e); }
-    }
     function soloClickHandler() {
         if (!soloActive || soloTimeLeft <= 0) return;
-        if (checkCheat()) { alert("⚠️ Cheat erkannt! Spielabbruch."); endSoloGame(true); return; }
+        if (checkCheat()) { alert("⚠️ Cheat erkannt!"); endSoloGame(true); return; }
         soloCount++;
         soloScoreSpan.innerText = `Klicks: ${soloCount}`;
         soloClickBtn.style.transform = 'scale(0.95)';
@@ -391,23 +406,24 @@
         addTotalClicks(1);
     }
     function startSolo() {
-        let name = soloNameInput.value.trim();
+        const name = soloNameInput.value.trim();
         if (!name) { alert("Bitte Namen eingeben!"); return; }
         saveName(name);
         resetCheatDetection();
         soloNameInput.disabled = true;
         soloStartBtn.style.display = 'none';
         soloGamePanel.style.display = 'block';
-        soloActive = true; soloCount = 0; soloTimeLeft = 30;
+        const t = getGameTime();
+        soloActive = true; soloCount = 0; soloTimeLeft = t;
         soloScoreSpan.innerText = `Klicks: 0`;
-        soloTimer.innerText = `30.0 s`;
+        soloTimer.innerText = `${t.toFixed(1)} s`;
         soloClickBtn.disabled = false;
         if (soloCountdown) clearInterval(soloCountdown);
         const start = Date.now();
         soloCountdown = setInterval(() => {
             if (!soloActive) return;
             const elapsed = (Date.now() - start) / 1000;
-            const rem = Math.max(0, 30 - elapsed);
+            const rem = Math.max(0, t - elapsed);
             soloTimeLeft = rem;
             soloTimer.innerText = `${rem.toFixed(1)} s`;
             if (rem <= 0) { clearInterval(soloCountdown); endSoloGame(false); }
@@ -417,10 +433,8 @@
         if (!soloActive) return;
         soloActive = false; soloClickBtn.disabled = true; clearInterval(soloCountdown);
         if (!cheated) {
-            const final = soloCount;
-            const name = soloNameInput.value.trim();
-            await saveGlobalScore(name, final);
-            alert(`Zeit vorbei! Du hast ${final} Klicks.`);
+            await saveGlobalScore(soloNameInput.value.trim(), soloCount);
+            alert(`Zeit vorbei! Du hast ${soloCount} Klicks.`);
         } else alert("Ergebnis wegen Cheat nicht gespeichert.");
         soloGamePanel.style.display = 'none';
         soloNameInput.disabled = false;
@@ -430,7 +444,7 @@
     function cancelSolo() { if (soloCountdown) clearInterval(soloCountdown); soloActive = false; soloGamePanel.style.display = 'none'; soloNameInput.disabled = false; soloStartBtn.style.display = 'inline-block'; resetCheatDetection(); }
     soloClickBtn.addEventListener('click', soloClickHandler);
     soloStartBtn.addEventListener('click', startSolo);
-    soloBackBtn.addEventListener('click', cancelSolo);
+    document.getElementById('soloBackBtn').addEventListener('click', cancelSolo);
 
     // ========== LOKALES DUELL ==========
     let p1Active = false, p2Active = false, p1Clicks = 0, p2Clicks = 0, p1TimerInt = null, p2TimerInt = null, p1Time = 30, p2Time = 30;
@@ -441,23 +455,42 @@
         if (!p1Active && !p2Active && (p1Clicks > 0 || p2Clicks > 0)) {
             if (p1Clicks > p2Clicks) localResultDiv.innerHTML = `🏆 Spieler 1 gewinnt! ${p1Clicks} : ${p2Clicks}`;
             else if (p2Clicks > p1Clicks) localResultDiv.innerHTML = `🏆 Spieler 2 gewinnt! ${p1Clicks} : ${p2Clicks}`;
-            else if (p1Clicks === p2Clicks && p1Clicks > 0) localResultDiv.innerHTML = `🤝 Unentschieden! ${p1Clicks} : ${p2Clicks}`;
-            else localResultDiv.innerHTML = `⭐ Wer gewinnt? Starte beide Spieler nacheinander!`;
-        } else if (!p1Active && !p2Active && p1Clicks === 0 && p2Clicks === 0) localResultDiv.innerHTML = `⭐ Wer gewinnt? Starte beide Spieler nacheinander!`;
+            else localResultDiv.innerHTML = `🤝 Unentschieden! ${p1Clicks} : ${p2Clicks}`;
+        } else localResultDiv.innerHTML = `⭐ Wer gewinnt?`;
     }
-    function startPlayer1() { if (p1Active) return; p1Start.style.display='none'; p1Game.style.display='block'; p1Active=true; p1Clicks=0; p1Time=30; p1ScoreEl.innerText="0"; p1TimerEl.innerText="30.0 s"; p1Click.disabled=false; if(p1TimerInt) clearInterval(p1TimerInt); const start=Date.now(); p1TimerInt=setInterval(()=>{ if(!p1Active) return; const elapsed=(Date.now()-start)/1000; const rem=Math.max(0,30-elapsed); p1Time=rem; p1TimerEl.innerText=`${rem.toFixed(1)} s`; if(rem<=0){ clearInterval(p1TimerInt); endPlayer1(); } },100); }
+    function startPlayer1() {
+        if (p1Active) return;
+        const t = getGameTime();
+        p1Start.style.display='none'; p1Game.style.display='block'; p1Active=true; p1Clicks=0; p1Time=t;
+        p1ScoreEl.innerText="0"; p1TimerEl.innerText=`${t}.0 s`; p1Click.disabled=false;
+        if(p1TimerInt) clearInterval(p1TimerInt);
+        const start=Date.now();
+        p1TimerInt=setInterval(()=>{ if(!p1Active) return; const e=(Date.now()-start)/1000; const r=Math.max(0,t-e); p1Time=r; p1TimerEl.innerText=`${r.toFixed(1)} s`; if(r<=0){ clearInterval(p1TimerInt); endPlayer1(); } },100);
+    }
     function endPlayer1() { if(!p1Active) return; p1Active=false; p1Click.disabled=true; clearInterval(p1TimerInt); p1ScoreEl.innerText=p1Clicks; p1Game.style.display='none'; p1Start.style.display='inline-block'; updateLocalResult(); }
     function cancelPlayer1() { if(p1TimerInt) clearInterval(p1TimerInt); p1Active=false; p1Game.style.display='none'; p1Start.style.display='inline-block'; p1Clicks=0; p1ScoreEl.innerText="0"; updateLocalResult(); }
     p1Click.addEventListener('click',()=>{ if(p1Active && p1Time>0){ p1Clicks++; p1ScoreEl.innerText=p1Clicks; p1Click.style.transform='scale(0.95)'; setTimeout(()=>p1Click.style.transform='',100); addTotalClicks(1); } });
     p1Start.addEventListener('click', startPlayer1);
     p1Cancel.addEventListener('click', cancelPlayer1);
-    function startPlayer2() { if (p2Active) return; p2Start.style.display='none'; p2Game.style.display='block'; p2Active=true; p2Clicks=0; p2Time=30; p2ScoreEl.innerText="0"; p2TimerEl.innerText="30.0 s"; p2Click.disabled=false; if(p2TimerInt) clearInterval(p2TimerInt); const start=Date.now(); p2TimerInt=setInterval(()=>{ if(!p2Active) return; const elapsed=(Date.now()-start)/1000; const rem=Math.max(0,30-elapsed); p2Time=rem; p2TimerEl.innerText=`${rem.toFixed(1)} s`; if(rem<=0){ clearInterval(p2TimerInt); endPlayer2(); } },100); }
+    function startPlayer2() {
+        if (p2Active) return;
+        const t = getGameTime();
+        p2Start.style.display='none'; p2Game.style.display='block'; p2Active=true; p2Clicks=0; p2Time=t;
+        p2ScoreEl.innerText="0"; p2TimerEl.innerText=`${t}.0 s`; p2Click.disabled=false;
+        if(p2TimerInt) clearInterval(p2TimerInt);
+        const start=Date.now();
+        p2TimerInt=setInterval(()=>{ if(!p2Active) return; const e=(Date.now()-start)/1000; const r=Math.max(0,t-e); p2Time=r; p2TimerEl.innerText=`${r.toFixed(1)} s`; if(r<=0){ clearInterval(p2TimerInt); endPlayer2(); } },100);
+    }
     function endPlayer2() { if(!p2Active) return; p2Active=false; p2Click.disabled=true; clearInterval(p2TimerInt); p2ScoreEl.innerText=p2Clicks; p2Game.style.display='none'; p2Start.style.display='inline-block'; updateLocalResult(); }
     function cancelPlayer2() { if(p2TimerInt) clearInterval(p2TimerInt); p2Active=false; p2Game.style.display='none'; p2Start.style.display='inline-block'; p2Clicks=0; p2ScoreEl.innerText="0"; updateLocalResult(); }
     p2Click.addEventListener('click',()=>{ if(p2Active && p2Time>0){ p2Clicks++; p2ScoreEl.innerText=p2Clicks; p2Click.style.transform='scale(0.95)'; setTimeout(()=>p2Click.style.transform='',100); addTotalClicks(1); } });
     p2Start.addEventListener('click', startPlayer2);
     p2Cancel.addEventListener('click', cancelPlayer2);
-    function resetLocal() { if(p1Active) cancelPlayer1(); else { p1Start.style.display='inline-block'; p1Game.style.display='none'; p1Clicks=0; p1ScoreEl.innerText="0"; } if(p2Active) cancelPlayer2(); else { p2Start.style.display='inline-block'; p2Game.style.display='none'; p2Clicks=0; p2ScoreEl.innerText="0"; } localResultDiv.innerHTML="⭐ Wer gewinnt? Starte beide Spieler nacheinander!"; }
+    function resetLocal() {
+        if(p1Active) cancelPlayer1(); else { p1Start.style.display='inline-block'; p1Game.style.display='none'; p1Clicks=0; p1ScoreEl.innerText="0"; }
+        if(p2Active) cancelPlayer2(); else { p2Start.style.display='inline-block'; p2Game.style.display='none'; p2Clicks=0; p2ScoreEl.innerText="0"; }
+        localResultDiv.innerHTML="⭐ Wer gewinnt?";
+    }
     localResetBtn.addEventListener('click', resetLocal);
 
     // ========== ONLINE-DUELL ==========
@@ -474,10 +507,8 @@
     const onlineCancelBtn = document.getElementById('onlineCancelBtn');
     async function callDuellAPI(action, data) {
         const url = SHEETS_API_URL;
-        if (action === 'get') {
-            const res = await fetch(`${url}?action=duell&id=${data.raumId}`);
-            return await res.json();
-        } else if (action === 'post') {
+        if (action === 'get') { const res = await fetch(`${url}?action=duell&id=${data.raumId}`); return await res.json(); }
+        else if (action === 'post') {
             await fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'duell', ...data }) });
             return { success: true };
         }
@@ -489,14 +520,14 @@
             const data = await res.json();
             if (data.error) { onlineStatusDiv.innerHTML = "Fehler: Raum nicht gefunden."; return; }
             if (data.status === "fertig") {
-                onlineStatusDiv.innerHTML = `Duell beendet!<br>${data.spieler1Name}: ${data.spieler1Score} – ${data.spieler2Name}: ${data.spieler2Score}<br>Sieger: ${data.spieler1Score > data.spieler2Score ? data.spieler1Name : (data.spieler2Score > data.spieler1Score ? data.spieler2Name : "Unentschieden")}`;
+                onlineStatusDiv.innerHTML = `Duell beendet!<br>${data.spieler1Name}: ${data.spieler1Score} – ${data.spieler2Name}: ${data.spieler2Score}`;
                 onlineGameArea.style.display = 'none';
                 return;
             }
             if (onlinePlayerRole === "spieler1" && data.spieler2Name && data.spieler2Name !== "") {
-                onlineStatusDiv.innerHTML = `Gegner (${data.spieler2Name}) ist beigetreten! Du kannst jetzt deine Runde spielen.`;
+                onlineStatusDiv.innerHTML = `Gegner (${data.spieler2Name}) ist da! Du kannst deine Runde spielen.`;
             } else if (onlinePlayerRole === "spieler2" && data.spieler1Name && data.spieler1Score === 0) {
-                onlineStatusDiv.innerHTML = `Gegner ${data.spieler1Name} wartet auf deinen Zug. Klicke auf "Runde spielen".`;
+                onlineStatusDiv.innerHTML = `Gegner ${data.spieler1Name} wartet auf dich.`;
             }
         } catch(e) { console.log(e); }
         setTimeout(checkOnlineStatus, 2000);
@@ -504,14 +535,13 @@
     function generateRoomId() { return Math.random().toString(36).substring(2, 10) + Date.now().toString(36); }
     createRoomBtn.addEventListener('click', async () => {
         const name = soloNameInput.value.trim() || "Spieler1";
-        if (!name) { alert("Bitte im Einzelspieler-Feld deinen Namen eingeben."); return; }
         const roomId = generateRoomId();
         await callDuellAPI('post', { raumId: roomId, spieler1Name: name, spieler1Score: 0, status: "wartet" });
         currentRoomId = roomId;
         const fullLink = window.location.href.split('?')[0] + `?duell=${roomId}`;
         onlineDuellLinkSpan.innerText = fullLink;
         onlineLinkArea.style.display = 'block';
-        onlineStatusDiv.innerHTML = `Raum erstellt! Teile den Link. Warte auf Gegner...<br>Du bist Spieler 1.`;
+        onlineStatusDiv.innerHTML = `Raum erstellt! Teile den Link.`;
         onlinePlayerRole = "spieler1";
         checkOnlineStatus();
     });
@@ -523,7 +553,7 @@
             onlineLinkArea.style.display = 'block';
             onlineDuellLinkSpan.innerText = window.location.href;
             onlinePlayerRole = "spieler2";
-            onlineStatusDiv.innerHTML = `Du trittst dem Duell bei. Warte auf Spieler 1 oder starte deine Runde, falls er schon gespielt hat.`;
+            onlineStatusDiv.innerHTML = `Du trittst dem Duell bei.`;
             checkOnlineStatus();
             const name = soloNameInput.value.trim();
             if (name) callDuellAPI('post', { raumId: currentRoomId, spieler2Name: name, status: "wartet" });
@@ -532,7 +562,7 @@
     copyOnlineLinkBtn.addEventListener('click', () => { navigator.clipboard.writeText(onlineDuellLinkSpan.innerText); alert("Link kopiert!"); });
     function onlineClickHandler() {
         if (!onlineGameActive || onlineTimeLeft <= 0) return;
-        if (checkCheat()) { alert("⚠️ Cheat erkannt! Spielabbruch."); endOnlineGame(true); return; }
+        if (checkCheat()) { alert("⚠️ Cheat!"); endOnlineGame(true); return; }
         onlineClickCount++;
         onlineScoreSpan.innerText = `Klicks: ${onlineClickCount}`;
         onlineClickBtn.style.transform = 'scale(0.95)';
@@ -546,16 +576,17 @@
         onlineGameArea.style.display = 'block';
         onlineGameActive = true;
         onlineClickCount = 0;
-        onlineTimeLeft = 30;
+        const t = getGameTime();
+        onlineTimeLeft = t;
         onlineScoreSpan.innerText = `Klicks: 0`;
-        onlineTimer.innerText = `30.0 s`;
+        onlineTimer.innerText = `${t}.0 s`;
         onlineClickBtn.disabled = false;
         if (onlineCountdown) clearInterval(onlineCountdown);
         const start = Date.now();
         onlineCountdown = setInterval(() => {
             if (!onlineGameActive) return;
             const elapsed = (Date.now() - start) / 1000;
-            const rem = Math.max(0, 30 - elapsed);
+            const rem = Math.max(0, t - elapsed);
             onlineTimeLeft = rem;
             onlineTimer.innerText = `${rem.toFixed(1)} s`;
             if (rem <= 0) { clearInterval(onlineCountdown); endOnlineGame(false); }
@@ -565,10 +596,9 @@
         if (!onlineGameActive) return;
         onlineGameActive = false; onlineClickBtn.disabled = true; clearInterval(onlineCountdown);
         if (!cheated) {
-            const finalScore = onlineClickCount;
             const updateData = { raumId: currentRoomId };
-            if (onlinePlayerRole === "spieler1") updateData.spieler1Score = finalScore;
-            else updateData.spieler2Score = finalScore;
+            if (onlinePlayerRole === "spieler1") updateData.spieler1Score = onlineClickCount;
+            else updateData.spieler2Score = onlineClickCount;
             const res = await fetch(`${SHEETS_API_URL}?action=duell&id=${currentRoomId}`);
             const data = await res.json();
             let newStatus = "wartet";
@@ -576,8 +606,8 @@
             if (onlinePlayerRole === "spieler2" && data.spieler1Score !== undefined && data.spieler1Score > 0) newStatus = "fertig";
             updateData.status = newStatus;
             await callDuellAPI('post', updateData);
-            alert(`Dein Ergebnis: ${finalScore} Klicks. ${newStatus === "fertig" ? "Duell beendet!" : "Warte auf Gegner..."}`);
-        } else alert("Ergebnis wegen Cheat nicht gespeichert.");
+            alert(`Dein Ergebnis: ${onlineClickCount} Klicks.`);
+        }
         onlineGameArea.style.display = 'none';
         checkOnlineStatus();
         resetCheatDetection();
@@ -588,13 +618,13 @@
         onlineGameActive = false; onlineGameArea.style.display = 'none'; resetCheatDetection();
     });
     const startOnlineRoundBtn = document.createElement('button');
-    startOnlineRoundBtn.innerText = "🎮 Runde spielen (30s)";
+    startOnlineRoundBtn.innerText = "🎮 Runde spielen";
     startOnlineRoundBtn.className = "btn";
     startOnlineRoundBtn.style.margin = "10px";
     startOnlineRoundBtn.addEventListener('click', startOnlineGame);
     if (onlineStatusDiv) onlineStatusDiv.parentElement.appendChild(startOnlineRoundBtn);
 
-    // ========== BOT-DUELL (ohne Sound, mit Pikachu-Bild) ==========
+    // ========== BOT-DUELL ==========
     let botActive = false, botCount = 0, botCountdown = null, botTimeLeft = 30;
     const botNameInput = document.getElementById('botName');
     const botStartBtn = document.getElementById('botStartBtn');
@@ -606,7 +636,7 @@
     const botResultDiv = document.getElementById('botResult');
     function botClickHandler() {
         if (!botActive || botTimeLeft <= 0) return;
-        if (checkCheat()) { alert("⚠️ Cheat erkannt! Spielabbruch."); endBotGame(true); return; }
+        if (checkCheat()) { alert("⚠️ Cheat!"); endBotGame(true); return; }
         botCount++;
         botScoreSpan.innerText = `Klicks: ${botCount}`;
         botClickBtn.style.transform = 'scale(0.95)';
@@ -614,24 +644,25 @@
         addTotalClicks(1);
     }
     function startBotGame() {
-        let name = botNameInput.value.trim();
-        if (!name) { alert("Bitte deinen Namen eingeben!"); return; }
+        const name = botNameInput.value.trim();
+        if (!name) { alert("Bitte Namen eingeben!"); return; }
         saveName(name);
         resetCheatDetection();
         botNameInput.disabled = true;
         botStartBtn.style.display = 'none';
         botGamePanel.style.display = 'block';
         botResultDiv.innerHTML = "";
-        botActive = true; botCount = 0; botTimeLeft = 30;
+        const t = getGameTime();
+        botActive = true; botCount = 0; botTimeLeft = t;
         botScoreSpan.innerText = `Klicks: 0`;
-        botTimer.innerText = `30.0 s`;
+        botTimer.innerText = `${t}.0 s`;
         botClickBtn.disabled = false;
         if (botCountdown) clearInterval(botCountdown);
         const start = Date.now();
         botCountdown = setInterval(() => {
             if (!botActive) return;
             const elapsed = (Date.now() - start) / 1000;
-            const rem = Math.max(0, 30 - elapsed);
+            const rem = Math.max(0, t - elapsed);
             botTimeLeft = rem;
             botTimer.innerText = `${rem.toFixed(1)} s`;
             if (rem <= 0) { clearInterval(botCountdown); endBotGame(false); }
@@ -650,14 +681,11 @@
             const botScore = Math.floor(Math.random() * (max - min + 1) + min);
             const finalBot = Math.max(0, botScore);
             let resultText = "";
-            if (playerScore > finalBot) resultText = `🎉 Du gewinnst! ${playerScore} : ${finalBot} 🎉`;
-            else if (finalBot > playerScore) resultText = `🤖 Der Bot gewinnt! ${playerScore} : ${finalBot} 🤖`;
-            else resultText = `🤝 Unentschieden! ${playerScore} : ${finalBot} 🤝`;
+            if (playerScore > finalBot) resultText = `🎉 Du gewinnst! ${playerScore} : ${finalBot}`;
+            else if (finalBot > playerScore) resultText = `🤖 Der Bot gewinnt! ${playerScore} : ${finalBot}`;
+            else resultText = `🤝 Unentschieden! ${playerScore} : ${finalBot}`;
             botResultDiv.innerHTML = resultText;
             alert(`Deine Punktzahl: ${playerScore}\nBot: ${finalBot}\n${resultText}`);
-        } else {
-            alert("Ergebnis wegen Cheat nicht gespeichert.");
-            botResultDiv.innerHTML = "⚠️ Cheat erkannt – Ergebnis ungültig.";
         }
         botGamePanel.style.display = 'none';
         botNameInput.disabled = false;
@@ -687,7 +715,6 @@
     const timeScoreSpan = document.getElementById('timeScore');
     const timeBackBtn = document.getElementById('timeBackBtn');
     const timeResultDiv = document.getElementById('timeResult');
-
     function timeClickHandler() {
         if (!timeActive || timeTimeLeft <= 0) return;
         timeManualClicks++;
@@ -697,12 +724,9 @@
         addTotalClicks(1);
     }
     function startTimeGame() {
-        if (!canPlayTimeMode()) {
-            alert("Du hast heute bereits Zeitfahren gespielt. Komm morgen wieder!");
-            return;
-        }
-        let name = timeNameInput.value.trim();
-        if (!name) { alert("Bitte deinen Namen eingeben!"); return; }
+        if (!canPlayTimeMode()) { alert("Heute schon gespielt!"); return; }
+        const name = timeNameInput.value.trim();
+        if (!name) { alert("Bitte Namen eingeben!"); return; }
         saveName(name);
         resetCheatDetection();
         timeNameInput.disabled = true;
@@ -721,10 +745,10 @@
             if (!timeActive) { clearInterval(autoInterval); return; }
             const elapsed = (Date.now() - startTime) / 1000;
             const remaining = Math.max(0, 50 - elapsed);
-            if (remaining > 0 && timeActive) {
-                const newAutoPoints = Math.floor(50 - remaining);
-                if (newAutoPoints > timeAutoPoints) {
-                    timeAutoPoints = newAutoPoints;
+            if (remaining > 0) {
+                const newAuto = Math.floor(50 - remaining);
+                if (newAuto > timeAutoPoints) {
+                    timeAutoPoints = newAuto;
                     timeScoreSpan.innerText = `Punkte: ${timeAutoPoints + timeManualClicks}`;
                     addTotalClicks(1);
                 }
@@ -736,11 +760,7 @@
             const remaining = Math.max(0, 50 - elapsed);
             timeTimeLeft = remaining;
             timeTimer.innerText = `${remaining.toFixed(1)} s`;
-            if (remaining <= 0) {
-                clearInterval(timeCountdown);
-                clearInterval(autoInterval);
-                endTimeGame(false);
-            }
+            if (remaining <= 0) { clearInterval(timeCountdown); clearInterval(autoInterval); endTimeGame(false); }
         }, 100);
     }
     async function endTimeGame(cheated = false) {
@@ -750,15 +770,11 @@
         clearInterval(timeCountdown);
         if (!cheated) {
             const totalPoints = timeAutoPoints + timeManualClicks;
-            const name = timeNameInput.value.trim();
-            await saveGlobalScore(name, totalPoints);
+            await saveGlobalScore(timeNameInput.value.trim(), totalPoints);
             setLastTimePlayDate();
             updateTimeCooldownDisplay();
-            timeResultDiv.innerHTML = `🎉 Du hast ${totalPoints} Punkte erreicht! (${timeAutoPoints} automatisch, ${timeManualClicks} geklickt)`;
-            alert(`Zeitfahren beendet! Du hast ${totalPoints} Punkte.`);
-        } else {
-            alert("Cheat erkannt – Ergebnis nicht gespeichert.");
-            timeResultDiv.innerHTML = "⚠️ Cheat erkannt – Ergebnis ungültig.";
+            timeResultDiv.innerHTML = `🎉 ${totalPoints} Punkte! (${timeAutoPoints} auto + ${timeManualClicks} geklickt)`;
+            alert(`Zeitfahren beendet! ${totalPoints} Punkte.`);
         }
         timeGamePanel.style.display = 'none';
         timeNameInput.disabled = false;
@@ -810,19 +826,118 @@
     });
     document.querySelectorAll('[data-back]').forEach(btn => {
         btn.addEventListener('click', () => {
-            if (btn.getAttribute('data-back') === 'solo') cancelSolo();
-            else if (btn.getAttribute('data-back') === 'local') resetLocal();
-            else if (btn.getAttribute('data-back') === 'online') {
+            const b = btn.getAttribute('data-back');
+            if (b === 'solo') cancelSolo();
+            else if (b === 'local') resetLocal();
+            else if (b === 'online') {
                 if (onlineCountdown) clearInterval(onlineCountdown);
                 onlineGameActive = false; onlineGameArea.style.display = 'none'; currentRoomId = null; onlinePlayerRole = null;
                 onlineStatusDiv.innerHTML = "Kein aktives Duell."; onlineLinkArea.style.display = 'none'; resetCheatDetection();
-            } else if (btn.getAttribute('data-back') === 'bot') cancelBotGame();
-            else if (btn.getAttribute('data-back') === 'time') cancelTimeGame();
+            } else if (b === 'bot') cancelBotGame();
+            else if (b === 'time') cancelTimeGame();
             showStart();
         });
     });
-    if (soloBackBtn) soloBackBtn.addEventListener('click', () => { cancelSolo(); showStart(); });
 
+    // ========== ADMIN ==========
+    const adminLoginBtn = document.getElementById('adminLoginBtn');
+    const adminPanel = document.getElementById('adminPanel');
+    const adminCloseBtn = document.getElementById('adminCloseBtn');
+    const adminStats = document.getElementById('adminStats');
+    const adminClearBtn = document.getElementById('adminClearBtn');
+
+    adminLoginBtn.addEventListener('click', () => {
+        const input = prompt("Admin-Passwort:");
+        if (input === ADMIN_PASSWORD) { adminPanel.style.display = 'block'; loadAdminStats(); }
+        else if (input !== null) alert("❌ Falsches Passwort!");
+    });
+    adminCloseBtn.addEventListener('click', () => { adminPanel.style.display = 'none'; });
+
+    async function loadAdminStats() {
+        adminStats.innerHTML = "<p>Lade Daten...</p>";
+        try {
+            const res = await fetch(`${SHEETS_API_URL}?action=admin&key=${ADMIN_PASSWORD}`);
+            const data = await res.json();
+            if (data.error) { adminStats.innerHTML = "<p>Nicht autorisiert.</p>"; return; }
+            let html = `<h3>📋 Google-Tabelle (${data.length} Zeilen)</h3>`;
+            html += `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:0.85rem;">`;
+            html += `<tr style="background:#222;"><th>Zeile</th><th>Name</th><th>Punkte</th><th>Aktionen</th></tr>`;
+            data.forEach(row => {
+                html += `<tr style="border-bottom:1px solid #333;">
+                    <td style="padding:5px;">${row.row}</td>
+                    <td style="padding:5px;"><input type="text" id="name_${row.row}" value="${row.name || ''}" style="background:#111; color:#fff; border:1px solid #444; border-radius:8px; padding:4px; width:110px;"></td>
+                    <td style="padding:5px;"><input type="number" id="score_${row.row}" value="${row.score || 0}" style="background:#111; color:#fff; border:1px solid #444; border-radius:8px; padding:4px; width:70px;"></td>
+                    <td style="padding:5px;">
+                        <button onclick="adminUpdate(${row.row})" style="background:#0a7; color:#fff; border:none; border-radius:8px; padding:5px 10px; cursor:pointer;">💾</button>
+                        <button onclick="adminDelete(${row.row})" style="background:#a22; color:#fff; border:none; border-radius:8px; padding:5px 10px; cursor:pointer;">🗑️</button>
+                    </td></tr>`;
+            });
+            html += `</table></div>`;
+
+            html += `<div style="margin-top:20px; padding:15px; background:#111; border-radius:15px;">
+                <h3>➕ Neuen Spieler hinzufügen</h3>
+                <input type="text" id="adminNewName" placeholder="Name" style="background:#222; color:#fff; border:1px solid #444; border-radius:10px; padding:8px; margin:5px;">
+                <input type="number" id="adminNewScore" placeholder="Punkte" style="background:#222; color:#fff; border:1px solid #444; border-radius:10px; padding:8px; margin:5px;">
+                <button onclick="adminAdd()" style="background:#0a7; color:#fff; border:none; border-radius:10px; padding:8px 15px; cursor:pointer;">Hinzufügen</button>
+            </div>`;
+
+            html += `<div style="margin-top:20px; padding:15px; background:#111; border-radius:15px;">
+                <h3>⏱️ Deine Spielzeit</h3>
+                <p>Aktuell: <span id="adminTimeDisplay" style="color:#0eaff;">${getGameTime()}</span> Sekunden</p>
+                <input type="number" id="adminTimeInput" placeholder="z.B. 5" style="background:#222; color:#fff; border:1px solid #444; border-radius:10px; padding:8px; margin:5px;">
+                <button onclick="adminSetTime()" style="background:#0a7; color:#fff; border:none; border-radius:10px; padding:8px 15px; cursor:pointer;">Setzen</button>
+                <button onclick="adminResetTime()" style="background:#555; color:#fff; border:none; border-radius:10px; padding:8px 15px; cursor:pointer;">Reset (30s)</button>
+            </div>`;
+            adminStats.innerHTML = html;
+        } catch(e) { adminStats.innerHTML = "<p>Fehler beim Laden.</p>"; }
+    }
+
+    async function adminUpdate(row) {
+        const name = document.getElementById(`name_${row}`).value;
+        const score = document.getElementById(`score_${row}`).value;
+        await fetch(SHEETS_API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'admin', key: ADMIN_PASSWORD, cmd: 'update', row, name, score }) });
+        setTimeout(loadAdminStats, 500);
+        loadGlobalLeaderboard();
+    }
+    async function adminDelete(row) {
+        if (!confirm(`Zeile ${row} löschen?`)) return;
+        await fetch(SHEETS_API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'admin', key: ADMIN_PASSWORD, cmd: 'delete', row }) });
+        setTimeout(loadAdminStats, 500);
+        loadGlobalLeaderboard();
+    }
+    async function adminAdd() {
+        const name = document.getElementById('adminNewName').value;
+        const score = document.getElementById('adminNewScore').value;
+        if (!name || !score) { alert("Name und Punkte eingeben!"); return; }
+        await fetch(SHEETS_API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'admin', key: ADMIN_PASSWORD, cmd: 'add', name, score }) });
+        setTimeout(loadAdminStats, 500);
+        loadGlobalLeaderboard();
+    }
+    async function adminClear() {
+        if (!confirm("Wirklich die GESAMTE Bestenliste löschen?")) return;
+        await fetch(SHEETS_API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'admin', key: ADMIN_PASSWORD, cmd: 'clear' }) });
+        setTimeout(loadAdminStats, 500);
+        loadGlobalLeaderboard();
+    }
+    function adminSetTime() {
+        const val = parseInt(document.getElementById('adminTimeInput').value);
+        if (!val || val < 1) { alert("Bitte gültige Zahl eingeben."); return; }
+        localStorage.setItem('adminTime', val);
+        document.getElementById('adminTimeDisplay').innerText = val;
+        alert(`✅ Spielzeit auf ${val}s gesetzt!`);
+    }
+    function adminResetTime() {
+        localStorage.removeItem('adminTime');
+        document.getElementById('adminTimeDisplay').innerText = 30;
+        alert("✅ Spielzeit auf 30s zurückgesetzt.");
+    }
+    adminClearBtn.addEventListener('click', adminClear);
+
+    // ========== START ==========
     loadSavedName();
     loadGlobalLeaderboard();
     loadTotalClicks();
@@ -834,4 +949,4 @@
     } else { showStart(); }
 </script>
 </body>
-</html
+</html>
